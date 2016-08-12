@@ -1,7 +1,7 @@
 ﻿
 /*********************************************************************
  *
- * $Id: YUSBPkt.cs 25121 2016-08-04 13:26:51Z seb $
+ * $Id: YUSBPkt.cs 25186 2016-08-12 17:15:06Z seb $
  *
  * YUSBPkt Class: USB packet definitions
  *
@@ -55,7 +55,7 @@ namespace com.yoctopuce.YoctoAPI
         internal uint PktNumber { get; set; }
         internal uint StreamType { get; set; }
         internal uint PktType { get; set; }
-        internal byte[] Data { get; }
+        private byte[] Data;
         internal uint Ofs { get; }
         internal uint Len { get; }
 
@@ -99,7 +99,7 @@ namespace com.yoctopuce.YoctoAPI
                             stream = "EMPTY";
                             break;
                         case YGenericHub.YSTREAM_NOTICE:
-                            stream = "NOTICE ";
+                            stream = "NOTICE";
                             break;
                         case YGenericHub.YSTREAM_TCP:
                             stream = "TCP";
@@ -117,7 +117,7 @@ namespace com.yoctopuce.YoctoAPI
                             stream = "REPORT_V2";
                             break;
                         case YGenericHub.YSTREAM_NOTICE_V2:
-                            stream = "NOTICE_v2 ";
+                            stream = "NOTICE_v2";
                             break;
                         default:
                             stream = "INVALID!";
@@ -129,13 +129,13 @@ namespace com.yoctopuce.YoctoAPI
                     stream = "INVALID!";
                     break;
             }
-            return string.Format("Stream: type={0:D}({1}) stream/cmd={2:D}({3}) size={4:D} (pktno={5:D})", this.PktType, type, this.StreamType, stream, this.Data.Length, this.PktNumber);
+            return string.Format("Stream: type={0:D}({1}) stream/cmd={2:D}({3}) size={4:D} (pktno={5:D})", PktType, type, StreamType, stream, Len, PktNumber);
         }
 
         //decode
         public static YPktStreamHead imm_Decode(long pos, byte[] pkt)
         {
-            if (pkt.Length - pos < YUSBPkt.USB_PKT_STREAM_HEAD) {
+            if (pkt.Length < YUSBPkt.USB_PKT_STREAM_HEAD + pos ) {
                 return null;
             }
             uint b = (uint)(pkt[pos++] & 0xff);

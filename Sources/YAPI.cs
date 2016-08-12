@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YAPI.cs 25176 2016-08-12 09:10:37Z seb $
+ * $Id: YAPI.cs 25185 2016-08-12 16:07:46Z seb $
  *
  * High-level programming interface, common to all modules
  *

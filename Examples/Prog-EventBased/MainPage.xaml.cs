@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -12,6 +14,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using com.yoctopuce.YoctoAPI;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -43,28 +46,28 @@ namespace Prog_EventBased
 
         async Task anButtonValueChangeCallBack(YFunction fct, string value)
         {
-            Output.Text += fct.get_hardwareId() + ": " + value + " (new value)\n";
+            Output.Text += await fct.get_hardwareId() + ": " + value + " (new value)\n";
         }
 
         async Task sensorValueChangeCallBack(YSensor fct, string value)
         {
-            Output.Text += fct.get_hardwareId() + ": " + value + " (new value)\n";
+            Output.Text += await fct.get_hardwareId() + ": " + value + " (new value)\n";
         }
 
         async Task sensorTimedReportCallBack(YSensor fct, YMeasure measure)
         {
-            Output.Text += fct.get_hardwareId() + ": " + measure.get_averageValue() + " " + fct.get_unit() + " (timed report)\n";
+            Output.Text += await fct.get_hardwareId() + ": " + measure.get_averageValue() + " " + await fct.get_unit() + " (timed report)\n";
         }
 
         async Task deviceLog(YModule module, string logline)
         {
-            Output.Text += "log:" + module.get_hardwareId() + ":" + logline;
+            Output.Text += "log:" + await module.get_hardwareId() + ":" + logline;
         }
 
         async Task deviceArrival(YModule m)
         {
             string serial = await m.get_serialNumber();
-            Output.Text += "Device arrival : " + serial+"\n";
+            Output.Text += "Device arrival : " + serial + "\n";
             await m.registerLogCallback(deviceLog);
 
             // First solution: look for a specific type of function (eg. anButton)
@@ -97,46 +100,6 @@ namespace Prog_EventBased
             Output.Text += "Device removal : " + await m.get_serialNumber() + "\n";
         }
 
-
-
-
-
-
-        private async void Button_Click(object sender, RoutedEventArgs e)
-        {
-            try {
-                int res = await YAPI.UpdateDeviceList();
-                await YAPI.HandleEvents();
-            } catch (YAPI_Exception ex) {
-                Output.Text += "Error:" + ex.Message;
-                throw;
-            }
-        }
-
-        private async void Button_Click_init(object sender, RoutedEventArgs e)
-        {
-            string url = this.url.Text;
-            try {
-                YAPI.RegisterLogFunction(yoctoLog);
-                int res = await YAPI.RegisterHub(url);
-                YAPI.RegisterDeviceArrivalCallback(deviceArrival);
-                YAPI.RegisterDeviceRemovalCallback(deviceRemoval);
-                Output.Text = "Init done:\n";
-                initButton.IsEnabled = false;
-                enumButton.IsEnabled = true;
-                freebutton.IsEnabled = true;
-
-            } catch (YAPI_Exception ex) {
-                Output.Text = "Error:" + ex.Message + "\n";
-            }
-            TimeSpan period = TimeSpan.FromSeconds(60);
-
-            timer = new DispatcherTimer();
-            timer.Interval = new TimeSpan(0, 0, 0, 1, 100); // 100 Milliseconds 
-            timer.Tick += new EventHandler<object>(Each_Tick);
-            timer.Start();
-
-        }
         public async void Each_Tick(object o, object sender)
         {
             try {
@@ -148,13 +111,36 @@ namespace Prog_EventBased
             }
 
         }
-        private void Button_Click_free(object sender, RoutedEventArgs e)
+
+        private bool started = false;
+
+        private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            timer.Stop();
-            YAPI.FreeAPI();
-            initButton.IsEnabled = true;
-            enumButton.IsEnabled = false;
-            freebutton.IsEnabled = false;
+            if (!started) {
+                string url = this.url.Text;
+                try {
+                    YAPI.RegisterLogFunction(yoctoLog);
+                    await YAPI.RegisterHub(url);
+                    YAPI.RegisterDeviceArrivalCallback(deviceArrival);
+                    YAPI.RegisterDeviceRemovalCallback(deviceRemoval);
+                } catch (YAPI_Exception ex) {
+                    Output.Text = "Error:" + ex.Message + "\n";
+                    return;
+                }
+                timer = new DispatcherTimer();
+                timer.Interval = new TimeSpan(0, 0, 0, 0, 100); // 100 Milliseconds 
+                timer.Tick += new EventHandler<object>(Each_Tick);
+                timer.Start();
+                Output.Text = "Init done:\n";
+                initButton.Content = "Stop";
+                started = true;
+            } else {
+                timer.Stop();
+                YAPI.FreeAPI();
+                initButton.Content = "Start";
+                started = false;
+            }
         }
+
     }
 }

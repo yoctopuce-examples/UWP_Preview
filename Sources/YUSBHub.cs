@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YUSBHub.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YUSBHub.cs 25186 2016-08-12 17:15:06Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -105,7 +105,7 @@ namespace com.yoctopuce.YoctoAPI
 
             await _ywatcher.ImediateEnum();
             List<YUSBDevice> devices = _ywatcher.imm_GetUsableDevices();
-            _yctx._Log("Do Enumeration\n");
+            _yctx._Log(string.Format("{0} devices usable\n",devices.Count));
             Dictionary<string, List<YPEntry>> yellowPages = new Dictionary<string, List<YPEntry>>();
             List<WPEntry> whitePages = new List<WPEntry>();
             foreach (YUSBDevice d in devices) {

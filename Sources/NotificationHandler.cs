@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace com.yoctopuce.YoctoAPI
@@ -85,7 +86,6 @@ namespace com.yoctopuce.YoctoAPI
         protected internal virtual async Task handleNetNotification(string notification_line)
         {
             string ev = notification_line.Trim();
-
             if (ev.Length >= 3 && ev[0] >= NOTIFY_NETPKT_FLUSHV2YDX && ev[0] <= NOTIFY_NETPKT_TIMEAVGYDX) {
                 // function value ydx (tiny notification)
                 _hub._devListValidity = 10000;

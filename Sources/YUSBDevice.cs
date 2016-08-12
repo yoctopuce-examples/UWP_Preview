@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YUSBDevice.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YUSBDevice.cs 25186 2016-08-12 17:15:06Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -289,16 +289,18 @@ namespace com.yoctopuce.YoctoAPI
                 }
                 //Debug.WriteLine(s.ToString());
                 streams.Add(s);
-                ofs += s.Data.Length + 2;
+                ofs += s.Len + 2;
             }
+
+            Debug.WriteLine(string.Format("new pkt with {0} streams",streams.Count));
             YPktStreamHead streamHead = streams[0];
             switch (_devState) {
                 case DevState.ResetSend:
                     if (streamHead.PktType != YUSBPkt.YPKT_CONF || streamHead.StreamType != YUSBPkt.USB_CONF_RESET) {
                         return;
                     }
-                    byte low = streamHead.Data[streamHead.Ofs];
-                    uint hig = streamHead.Data[streamHead.Ofs + 1];
+                    byte low = streamHead.imm_GetByte(streamHead.Ofs);
+                    uint hig = streamHead.imm_GetByte(streamHead.Ofs + 1);
                     uint devapi = (hig << 8) + low;
                     _devVersion = devapi;
                     if (imm_CheckVersionCompatibility(devapi) < 0) {
@@ -311,7 +313,7 @@ namespace com.yoctopuce.YoctoAPI
                         return;
                     }
                     if (_devVersion >= YUSBPkt.YPKT_USB_VERSION_BCD) {
-                        _pktAckDelay = streamHead.Data[streamHead.Ofs + 1];
+                        _pktAckDelay = streamHead.imm_GetByte(streamHead.Ofs + 1);
                     } else {
                         _pktAckDelay = 0;
                     }
@@ -371,7 +373,6 @@ namespace com.yoctopuce.YoctoAPI
                 switch (streamType) {
                     case YGenericHub.YSTREAM_NOTICE:
                     case YGenericHub.YSTREAM_NOTICE_V2:
-                        Debug.WriteLine("Notification:" + s.ToString());
                         imm_handleNotifcation(s);
                         break;
                     case YGenericHub.YSTREAM_TCP_CLOSE:

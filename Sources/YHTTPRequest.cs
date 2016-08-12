@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YHTTPRequest.cs 25175 2016-08-12 09:06:11Z seb $
+ * $Id: YHTTPRequest.cs 25187 2016-08-12 17:18:51Z seb $
  *
  * internal yHTTPRequest object
  *
@@ -83,7 +83,7 @@ namespace com.yoctopuce.YoctoAPI
 
         private void log(string msg)
         {
-            Debug.WriteLine(string.Format("{0}:{1}:{2}", _dbglabel, _reqNum, msg));
+            //Debug.WriteLine(string.Format("{0}:{1}:{2}", _dbglabel, _reqNum, msg));
         }
 
         internal async Task WaitRequestEnd(ulong mstimeout)
@@ -175,17 +175,17 @@ namespace com.yoctopuce.YoctoAPI
                         // ensure socket is still valid
                         bool canTimeout = _in.CanTimeout;
                         bool canRead = _in.CanRead;
-                        Debug.WriteLine("Reuse socket :{0} /{1}", canTimeout, canRead);
+                        //Debug.WriteLine("Reuse socket :{0} /{1}", canTimeout, canRead);
                         if (canRead) {
                             byte[] buffer = new byte[1024];
                             int read = await _in.ReadAsync(buffer, 0, buffer.Length);
                             if (read <= 0) {
                                 // end of connection
-                                Debug.WriteLine("invalid Reuse socket :{0} restart", read);
+                                //Debug.WriteLine("invalid Reuse socket :{0} restart", read);
                                 _reuse_socket = false;
                                 retry = true;
                             } else {
-                                Debug.WriteLine("Reuse socket :{0} readed", read);
+                                //Debug.WriteLine("Reuse socket :{0} readed", read);
                                 string partial_head = YAPI.DefaultEncoding.GetString(buffer, 0, read);
                                 _header.Append(partial_head);
                             }
