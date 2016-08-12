@@ -1,0 +1,263 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
+  <Identity Name="0eb9dc84-4e76-4e5a-8bce-3e900b101993" Publisher="CN=seb" Version="1.0.0.0" />
+  <mp:PhoneIdentity PhoneProductId="0eb9dc84-4e76-4e5a-8bce-3e900b101993" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
+  <Properties>
+    <DisplayName>UniversalApp</DisplayName>
+    <PublisherDisplayName>seb</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+  </Properties>
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.0.0" MaxVersionTested="10.0.0.0" />
+  </Dependencies>
+  <Resources>
+    <Resource Language="x-generate" />
+  </Resources>
+  <Applications>
+    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="UniversalApp.App">
+      <uap:VisualElements DisplayName="UniversalApp" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="UniversalApp" BackgroundColor="transparent">
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png">
+        </uap:DefaultTile>
+        <uap:SplashScreen Image="Assets\SplashScreen.png" />
+      </uap:VisualElements>
+    </Application>
+  </Applications>
+  <Capabilities>
+    <Capability Name="internetClient" />
+    <Capability Name="privateNetworkClientServer" />
+    <DeviceCapability Name="humaninterfacedevice">
+      <!-- Yocto-Knob -->
+      <Device Id="vidpid:24e0 000a">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-Relay -->
+      <Device Id="vidpid:24e0 000c">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-PowerRelay -->
+      <Device Id="vidpid:24e0 000d">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-Servo -->
+      <Device Id="vidpid:24e0 0012">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- YoctoHub-Ethernet -->
+      <Device Id="vidpid:24e0 000e">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-Temperature -->
+      <Device Id="vidpid:24e0 000b">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-Humidity -->
+      <Device Id="vidpid:24e0 0011">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-Color -->
+      <Device Id="vidpid:24e0 0014">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-PowerColor -->
+      <Device Id="vidpid:24e0 0017">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-Meteo -->
+      <Device Id="vidpid:24e0 0018">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-Light -->
+      <Device Id="vidpid:24e0 0019">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-Motor-DC -->
+      <Device Id="vidpid:24e0 0016">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-Volt -->
+      <Device Id="vidpid:24e0 001b">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- YoctoHub-Shield -->
+      <Device Id="vidpid:24e0 001c">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-Amp -->
+      <Device Id="vidpid:24e0 001f">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-MaxiRelay -->
+      <Device Id="vidpid:24e0 0020">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-Thermistor-C -->
+      <Device Id="vidpid:24e0 004d">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- YoctoHub-Wireless -->
+      <Device Id="vidpid:24e0 0023">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-CO2 -->
+      <Device Id="vidpid:24e0 0027">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-Thermocouple -->
+      <Device Id="vidpid:24e0 0028">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-VOC -->
+      <Device Id="vidpid:24e0 0029">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-Watt -->
+      <Device Id="vidpid:24e0 002a">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-Display -->
+      <Device Id="vidpid:24e0 002d">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-MiniDisplay -->
+      <Device Id="vidpid:24e0 002f">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-LatchedRelay -->
+      <Device Id="vidpid:24e0 0032">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-MaxiDisplay -->
+      <Device Id="vidpid:24e0 0030">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-MaxiCoupler -->
+      <Device Id="vidpid:24e0 0031">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-WatchdogDC -->
+      <Device Id="vidpid:24e0 0033">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-PT100 -->
+      <Device Id="vidpid:24e0 0035">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-4-20mA-Rx -->
+      <Device Id="vidpid:24e0 0037">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-Maxi-IO -->
+      <Device Id="vidpid:24e0 0039">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-0-10V-Rx -->
+      <Device Id="vidpid:24e0 0038">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- YoctoHub-Wireless-SR -->
+      <Device Id="vidpid:24e0 003a">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-3D -->
+      <Device Id="vidpid:24e0 003b">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-PWM-Tx -->
+      <Device Id="vidpid:24e0 003c">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-StewartSigns -->
+      <Device Id="vidpid:24e0 003d">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- YoctoHub-GSM-2G -->
+      <Device Id="vidpid:24e0 003e">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-Altimeter -->
+      <Device Id="vidpid:24e0 003f">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-milliVolt-Rx -->
+      <Device Id="vidpid:24e0 0040">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-milliVolt-Rx-BNC -->
+      <Device Id="vidpid:24e0 0042">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-Light-V2 -->
+      <Device Id="vidpid:24e0 0043">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-Light-V3 -->
+      <Device Id="vidpid:24e0 0050">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- YoctoHub-Wireless-g -->
+      <Device Id="vidpid:24e0 0046">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-RS232 -->
+      <Device Id="vidpid:24e0 0047">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-RS485 -->
+      <Device Id="vidpid:24e0 0048">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-PWM-Rx -->
+      <Device Id="vidpid:24e0 0049">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-MaxiDisplay-G -->
+      <Device Id="vidpid:24e0 004a">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-MaxiPowerRelay -->
+      <Device Id="vidpid:24e0 004b">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-MaxiThermistor -->
+      <Device Id="vidpid:24e0 0051">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-Buzzer -->
+      <Device Id="vidpid:24e0 0052">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-GPS -->
+      <Device Id="vidpid:24e0 0053">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-Serial -->
+      <Device Id="vidpid:24e0 0054">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-SPI -->
+      <Device Id="vidpid:24e0 0066">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-4-20mA-Tx -->
+      <Device Id="vidpid:24e0 005c">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-ACSW -->
+      <Device Id="vidpid:24e0 005d">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- YoctoHub-GSM-3G-EU -->
+      <Device Id="vidpid:24e0 0060">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- YoctoHub-GSM-3G-NA -->
+      <Device Id="vidpid:24e0 0061">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+      <!-- Yocto-Color-V2 -->
+      <Device Id="vidpid:24e0 0065">
+        <Function Type="usage:ff00 0001"/>
+      </Device>
+    </DeviceCapability>
+  </Capabilities>
+</Package>
