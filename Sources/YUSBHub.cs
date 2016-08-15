@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YUSBHub.cs 25186 2016-08-12 17:15:06Z seb $
+ * $Id: YUSBHub.cs 25191 2016-08-15 12:43:02Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -70,7 +70,7 @@ namespace com.yoctopuce.YoctoAPI
         internal YUSBHub(YAPIContext yctx, int idx, bool requestPermission) : base(yctx, new HTTPParams("usb://"), idx, true)
         {
             Debug.WriteLine("alloc YUSBHub");
-            _ywatcher = new YUSBWatcher(yctx);
+            _ywatcher = new YUSBWatcher(this);
         }
 #pragma warning disable 1998
         internal override async Task startNotifications()
@@ -105,7 +105,7 @@ namespace com.yoctopuce.YoctoAPI
 
             await _ywatcher.ImediateEnum();
             List<YUSBDevice> devices = _ywatcher.imm_GetUsableDevices();
-            _yctx._Log(string.Format("{0} devices usable\n",devices.Count));
+            //_yctx._Log(string.Format("{0} devices usable\n",devices.Count));
             Dictionary<string, List<YPEntry>> yellowPages = new Dictionary<string, List<YPEntry>>();
             List<WPEntry> whitePages = new List<WPEntry>();
             foreach (YUSBDevice d in devices) {

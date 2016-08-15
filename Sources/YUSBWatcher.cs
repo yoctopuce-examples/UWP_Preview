@@ -61,22 +61,18 @@ namespace com.yoctopuce.YoctoAPI
         private const ushort usageId = 0x0001;
 
 
-        private YAPIContext _yctx;
+        private YUSBHub _hub;
         internal readonly List<YUSBDevice> _allDevice = new List<YUSBDevice>(4);
         internal readonly List<YUSBDevice> _usableDevices = new List<YUSBDevice>(4);
 
-        public YUSBWatcher(YAPIContext ctx)
+        internal YUSBWatcher(YUSBHub hub)
         {
-            _yctx = ctx;
+            _hub = hub;
 
 
             // Create a selector that gets a HID device using VID/PID and a
             // VendorDefined usage.
             var selector = HidDevice.GetDeviceSelector(usagePage, usageId);
-            List<string> additionalProperties = new List<string>();
-            additionalProperties.Add("System.Devices.Manufacturer");
-            additionalProperties.Add("System.Devices.ModelName");
-            additionalProperties.Add("System.Devices.HardwareIds");
         }
 
     
@@ -87,18 +83,30 @@ namespace com.yoctopuce.YoctoAPI
             // VendorDefined usage.
             var selector = HidDevice.GetDeviceSelector(usagePage, usageId);
             // Enumerate devices using the selector.
-            var devices = await DeviceInformation.FindAllAsync(selector);
+            DeviceInformationCollection devices = await DeviceInformation.FindAllAsync(selector);
+            foreach (YUSBDevice yusbDevice in _usableDevices) {
+                yusbDevice.MarkForUnplug = true;
+            }
+
             if (devices.Count > 0) {
                 for (var i = 0; i < devices.Count; i++) {
                     var devinfo = devices.ElementAt(i);
-
-                    Debug.WriteLine("find " + devinfo.Name);
                     if (!devinfo.IsEnabled) {
-                        _yctx._Log(devinfo.Name +" is disabled (skip)\n");
+                        _hub._yctx._Log(devinfo.Name +" is disabled (skip)\n");
+                        continue;
+                    }
+                    bool found = false;
+                    foreach (YUSBDevice yusbDevice in _usableDevices) {
+                        if (yusbDevice.Info.Id == devinfo.Id) {
+                            yusbDevice.MarkForUnplug = false;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found) {
                         continue;
                     }
 
-                    var readOnlyDictionary = devinfo.Properties;
                     // Open the target HID device at index 0.
                     var device = await HidDevice.FromIdAsync(devinfo.Id,
                         FileAccessMode.ReadWrite);
@@ -107,9 +115,8 @@ namespace com.yoctopuce.YoctoAPI
                         continue;
                     }
                     if (device.VendorId == 0x24e0) {
-                        Debug.WriteLine("use" + device.VendorId + ":" + device.ProductId);
-                        YUSBDevice yusbDevice = new YUSBDevice(this, _yctx, device, devinfo);
-                        Debug.WriteLine("setup yusbDevice=s " + yusbDevice.GetHashCode() + " device=" + device.GetHashCode());
+                        YUSBDevice yusbDevice = new YUSBDevice(this, _hub, device, devinfo);
+                        //Debug.WriteLine("setup yusbDevice=s " + yusbDevice.GetHashCode() + " device=" + device.GetHashCode());
                         await yusbDevice.Setup(YUSBPkt.YPKT_USB_VERSION_BCD);
                         _allDevice.Add(yusbDevice);
                     } else {
@@ -118,8 +125,9 @@ namespace com.yoctopuce.YoctoAPI
                     }
                     
                 }
-            } 
-            return _allDevice.Count;
+            }
+            _usableDevices.RemoveAll(item => item.MarkForUnplug);
+            return _usableDevices.Count;
         }
 
 

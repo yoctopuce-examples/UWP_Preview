@@ -111,7 +111,7 @@ namespace com.yoctopuce.YoctoAPI
                                 funcid = ydev.imm_getYPEntry(funydx).FuncId;
                                 if (!funcid.Equals("")) {
                                     // function value ydx (tiny notification)
-                                    _hub.handleValueNotification(serial, funcid, value);
+                                    _hub.imm_handleValueNotification(serial, funcid, value);
                                 }
                                 break;
                             case NOTIFY_NETPKT_DEVLOGYDX:
@@ -148,7 +148,7 @@ namespace com.yoctopuce.YoctoAPI
                                     if (rawval != null) {
                                         string decodedval = YGenericHub.imm_decodePubVal(rawval[0], rawval, 1, 6);
                                         // function value ydx (tiny notification)
-                                        _hub.handleValueNotification(serial, funcid, decodedval);
+                                        _hub.imm_handleValueNotification(serial, funcid, decodedval);
                                     }
                                 }
                                 break;
@@ -177,7 +177,7 @@ namespace com.yoctopuce.YoctoAPI
                             break;
                         case NOTIFY_NETPKT_FUNCVAL: // function value (long notification)
                             string[] parts = ev.Substring(5).Split(',');
-                            _hub.handleValueNotification(parts[0], parts[1], parts[2]);
+                            _hub.imm_handleValueNotification(parts[0], parts[1], parts[2]);
                             break;
                     }
                 }

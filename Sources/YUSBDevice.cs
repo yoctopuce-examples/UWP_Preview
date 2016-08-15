@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YUSBDevice.cs 25186 2016-08-12 17:15:06Z seb $
+ * $Id: YUSBDevice.cs 25191 2016-08-15 12:43:02Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -86,8 +86,8 @@ namespace com.yoctopuce.YoctoAPI
         public void imm_AddIncommingData(YPktStreamHead stream)
         {
             if (stream.Len + _response_size > _response.Length) {
-                byte[] tmp  = new byte[_response.Length*2];
-                Buffer.BlockCopy(_response, 0,tmp,0, _response.Length);
+                byte[] tmp = new byte[_response.Length * 2];
+                Buffer.BlockCopy(_response, 0, tmp, 0, _response.Length);
                 _response = tmp;
             }
             uint len = stream.imm_CopyData(_response, _response_size);
@@ -107,13 +107,13 @@ namespace com.yoctopuce.YoctoAPI
         }
 
 
-        private static readonly byte[] rnrn = new byte[] {13,10,13,10};
+        private static readonly byte[] rnrn = new byte[] { 13, 10, 13, 10 };
 
         public byte[] imm_GetResponse()
         {
-            int hpos = YAPIContext.imm_find_in_bytes(_response,  rnrn);
+            int hpos = YAPIContext.imm_find_in_bytes(_response, rnrn);
             int ofs = 0;
-            int size = (int) _response_size;
+            int size = (int)_response_size;
             if (hpos >= 0) {
                 ofs += hpos + 4;
                 size -= hpos + 4;
@@ -177,6 +177,7 @@ namespace com.yoctopuce.YoctoAPI
         private readonly Dictionary<String, YPEntry> _usbYP = new Dictionary<string, YPEntry>(2);
         private YRequest _currentRequest;
         private ulong _lastMetaUTC = 0;
+        private readonly YUSBHub _hub;
         internal HidDevice Hid { get; }
         internal DeviceInformation Info { get; }
         internal string SerialNumber { get; private set; }
@@ -185,10 +186,13 @@ namespace com.yoctopuce.YoctoAPI
             get { return _firmware; }
         }
 
-        public YUSBDevice(YUSBWatcher watcher, YAPIContext ctx, HidDevice hid, DeviceInformation info)
+        public bool MarkForUnplug { get; set; }
+
+        public YUSBDevice(YUSBWatcher watcher, YUSBHub hub, HidDevice hid, DeviceInformation info)
         {
             _watcher = watcher;
-            _yctx = ctx;
+            _hub = hub;
+            _yctx = hub._yctx;
             Hid = hid;
             Info = info;
             hid.InputReportReceived += inputReportReceivedEventHandler;
@@ -292,7 +296,6 @@ namespace com.yoctopuce.YoctoAPI
                 ofs += s.Len + 2;
             }
 
-            Debug.WriteLine(string.Format("new pkt with {0} streams",streams.Count));
             YPktStreamHead streamHead = streams[0];
             switch (_devState) {
                 case DevState.ResetSend:
@@ -419,23 +422,29 @@ namespace com.yoctopuce.YoctoAPI
 
         private int imm_handleNotifcation(YPktStreamHead ystream)
         {
+            string functionId;
             int firstByte = ystream.imm_GetByte(0);
             bool isV2 = ystream.StreamType == YGenericHub.YSTREAM_NOTICE_V2;
 
             if (isV2 || firstByte <= NOTIFY_1STBYTE_MAXTINY || firstByte >= NOTIFY_1STBYTE_MINSMALL) {
                 int funcvalType = (firstByte >> NOTIFY_V2_TYPE_OFS) & NOTIFY_V2_TYPE_MASK;
                 int funydx = firstByte & NOTIFY_V2_FUNYDX_MASK;
-                if (funcvalType == YGenericHub.NOTIFY_V2_FLUSHGROUP) {
-                    //int notType = NotType.FUNCVALFLUSH;
-                    //fixme: handle not;
-                } else {
-                    //int notType = NotType.FUNCVAL_TINY;
-                    if ((firstByte & NOTIFY_V2_IS_SMALL_FLAG) != 0) {
-                        // added on 2015-02-25, remove code below when confirmed dead code
-                        throw new YAPI_Exception(YAPI.IO_ERROR, "Hub Should not fwd notification");
+                foreach (YPEntry ypEntry in _usbYP.Values) {
+                    if (ypEntry.Index == funydx) {
+                        if (funcvalType == YGenericHub.NOTIFY_V2_FLUSHGROUP) {
+                            // not yet used by devices
+                        } else {
+                            if ((firstByte & NOTIFY_V2_IS_SMALL_FLAG) != 0) {
+                                // added on 2015-02-25, remove code below when confirmed dead code
+                                throw new YAPI_Exception(YAPI.IO_ERROR, "Hub Should not fwd notification");
+                            }
+                            int len = (int)ystream.Len;
+                            byte[] data = new byte[len];
+                            ystream.imm_CopyData(data, 0);
+                            string funcval = YGenericHub.imm_decodePubVal(funcvalType, data, 1, len - 1);
+                            _hub.imm_handleValueNotification(SerialNumber, ypEntry.FuncId, funcval);
+                        }                    
                     }
-                    //string funcval = YGenericHub.decodePubVal(funcvalType, data, 1, data.length - 1);
-                    //fixme: handle not;
                 }
             } else {
                 string serial = ystream.imm_GetString(0, YAPI.YOCTO_SERIAL_LEN);
@@ -444,7 +453,6 @@ namespace com.yoctopuce.YoctoAPI
                 }
                 uint p = YAPI.YOCTO_SERIAL_LEN;
                 int type = ystream.imm_GetByte(p++);
-                string functionId;
                 switch (type) {
                     case NOTIFY_PKT_NAME:
                         _logicalname = ystream.imm_GetString(p, YAPI.YOCTO_LOGICAL_LEN);
@@ -466,22 +474,25 @@ namespace com.yoctopuce.YoctoAPI
                         functionId = ystream.imm_GetString(p, YAPI.YOCTO_FUNCTION_LEN);
                         p += YAPI.YOCTO_FUNCTION_LEN;
                         string funcname = ystream.imm_GetString(p, YAPI.YOCTO_LOGICAL_LEN);
-                        //fixme handle funcname
+                        if (!_usbYP.ContainsKey(functionId)) {
+                            _usbYP[functionId] = new YPEntry(serial, functionId, YPEntry.BaseClass.Function);
+                        }
+                        _usbYP[functionId].LogicalName = funcname;
                         break;
                     case NOTIFY_PKT_FUNCVAL:
                         functionId = ystream.imm_GetString(p, YAPI.YOCTO_FUNCTION_LEN);
                         p += YAPI.YOCTO_FUNCTION_LEN;
                         string funcval = ystream.imm_GetString(p, YAPI.YOCTO_PUBVAL_SIZE);
-                        //fixme: handle notification
+                        _hub.imm_handleValueNotification(serial, functionId, funcval);
                         break;
                     case NOTIFY_PKT_STREAMREADY:
                         _devState = DevState.StreamReadyReceived;
                         _wp = new WPEntry(_logicalname, _product, _deviceid, "", _beacon, SerialNumber);
                         _watcher.imm_newUsableDevice(this);
-                        _yctx._Log("Device "+ SerialNumber+ " ready.\n");
+                        _yctx._Log("Device " + SerialNumber + " ready.\n");
                         break;
                     case NOTIFY_PKT_LOG:
-                        //FIXME: HANDLE NOTIFICAONT
+                        //FIXME: handle log notification
                         break;
                     case NOTIFY_PKT_FUNCNAMEYDX:
                         functionId = ystream.imm_GetString(p, YAPI.YOCTO_FUNCTION_LEN - 1);
@@ -490,7 +501,12 @@ namespace com.yoctopuce.YoctoAPI
                         funcname = ystream.imm_GetString(p, YAPI.YOCTO_LOGICAL_LEN);
                         p += YAPI.YOCTO_LOGICAL_LEN;
                         byte funydx = ystream.imm_GetByte(p);
-                        //FIXME: HANDLE NOTIFICAONT
+                        if (!_usbYP.ContainsKey(functionId)) {
+                            _usbYP[functionId] = new YPEntry(serial, functionId, YPEntry.BaseClass.forByte(funclass));
+                        }
+                        // update ydx
+                        _usbYP[functionId].Index = funydx;
+                        _usbYP[functionId].LogicalName = funcname;
                         break;
                     default:
                         throw new YAPI_Exception(YAPI.IO_ERROR, "Invalid Notification");

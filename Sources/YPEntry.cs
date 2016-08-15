@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YPEntry.cs 25121 2016-08-04 13:26:51Z seb $
+ * $Id: YPEntry.cs 25191 2016-08-15 12:43:02Z seb $
  *
  * Yellow page implementation
  *
@@ -81,7 +81,7 @@ namespace com.yoctopuce.YoctoAPI {
                     return "Function";
             }
 
-            public static BaseClass forByte(sbyte bval) {
+            public static BaseClass forByte(byte bval) {
                 return values()[bval];
             }
 

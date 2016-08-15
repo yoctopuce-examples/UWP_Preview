@@ -93,277 +93,277 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\Sources\NotificationHandler.cs">
-      <Link>YoctoLib\NotificationHandler.cs</Link>
+      <Link>Yoctopuce\NotificationHandler.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\TCPNotificationHandler.cs">
-      <Link>YoctoLib\TCPNotificationHandler.cs</Link>
+      <Link>Yoctopuce\TCPNotificationHandler.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\WPEntry.cs">
-      <Link>YoctoLib\WPEntry.cs</Link>
+      <Link>Yoctopuce\WPEntry.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\WSNotificationHandler.cs">
-      <Link>YoctoLib\WSNotificationHandler.cs</Link>
+      <Link>Yoctopuce\WSNotificationHandler.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YAccelerometer.cs">
-      <Link>YoctoLib\YAccelerometer.cs</Link>
+      <Link>Yoctopuce\YAccelerometer.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YAltitude.cs">
-      <Link>YoctoLib\YAltitude.cs</Link>
+      <Link>Yoctopuce\YAltitude.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YAnButton.cs">
-      <Link>YoctoLib\YAnButton.cs</Link>
+      <Link>Yoctopuce\YAnButton.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YAPI.cs">
-      <Link>YoctoLib\YAPI.cs</Link>
+      <Link>Yoctopuce\YAPI.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YAPIContext.cs">
-      <Link>YoctoLib\YAPIContext.cs</Link>
+      <Link>Yoctopuce\YAPIContext.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YAPI_Exception.cs">
-      <Link>YoctoLib\YAPI_Exception.cs</Link>
+      <Link>Yoctopuce\YAPI_Exception.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YAudioIn.cs">
-      <Link>YoctoLib\YAudioIn.cs</Link>
+      <Link>Yoctopuce\YAudioIn.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YAudioOut.cs">
-      <Link>YoctoLib\YAudioOut.cs</Link>
+      <Link>Yoctopuce\YAudioOut.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YBluetoothLink.cs">
-      <Link>YoctoLib\YBluetoothLink.cs</Link>
+      <Link>Yoctopuce\YBluetoothLink.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YBuzzer.cs">
-      <Link>YoctoLib\YBuzzer.cs</Link>
+      <Link>Yoctopuce\YBuzzer.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YCarbonDioxide.cs">
-      <Link>YoctoLib\YCarbonDioxide.cs</Link>
+      <Link>Yoctopuce\YCarbonDioxide.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YCellRecord.cs">
-      <Link>YoctoLib\YCellRecord.cs</Link>
+      <Link>Yoctopuce\YCellRecord.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YCellular.cs">
-      <Link>YoctoLib\YCellular.cs</Link>
+      <Link>Yoctopuce\YCellular.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YColorLed.cs">
-      <Link>YoctoLib\YColorLed.cs</Link>
+      <Link>Yoctopuce\YColorLed.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YColorLedCluster.cs">
-      <Link>YoctoLib\YColorLedCluster.cs</Link>
+      <Link>Yoctopuce\YColorLedCluster.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YCompass.cs">
-      <Link>YoctoLib\YCompass.cs</Link>
+      <Link>Yoctopuce\YCompass.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YCurrent.cs">
-      <Link>YoctoLib\YCurrent.cs</Link>
+      <Link>Yoctopuce\YCurrent.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YCurrentLoopOutput.cs">
-      <Link>YoctoLib\YCurrentLoopOutput.cs</Link>
+      <Link>Yoctopuce\YCurrentLoopOutput.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YDataLogger.cs">
-      <Link>YoctoLib\YDataLogger.cs</Link>
+      <Link>Yoctopuce\YDataLogger.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YDataSet.cs">
-      <Link>YoctoLib\YDataSet.cs</Link>
+      <Link>Yoctopuce\YDataSet.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YDataStream.cs">
-      <Link>YoctoLib\YDataStream.cs</Link>
+      <Link>Yoctopuce\YDataStream.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YDevice.cs">
-      <Link>YoctoLib\YDevice.cs</Link>
+      <Link>Yoctopuce\YDevice.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YDigitalIO.cs">
-      <Link>YoctoLib\YDigitalIO.cs</Link>
+      <Link>Yoctopuce\YDigitalIO.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YDisplay.cs">
-      <Link>YoctoLib\YDisplay.cs</Link>
+      <Link>Yoctopuce\YDisplay.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YDisplayLayer.cs">
-      <Link>YoctoLib\YDisplayLayer.cs</Link>
+      <Link>Yoctopuce\YDisplayLayer.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YDualPower.cs">
-      <Link>YoctoLib\YDualPower.cs</Link>
+      <Link>Yoctopuce\YDualPower.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YFileRecord.cs">
-      <Link>YoctoLib\YFileRecord.cs</Link>
+      <Link>Yoctopuce\YFileRecord.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YFiles.cs">
-      <Link>YoctoLib\YFiles.cs</Link>
+      <Link>Yoctopuce\YFiles.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YFirmwareFile.cs">
-      <Link>YoctoLib\YFirmwareFile.cs</Link>
+      <Link>Yoctopuce\YFirmwareFile.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YFirmwareUpdate.cs">
-      <Link>YoctoLib\YFirmwareUpdate.cs</Link>
+      <Link>Yoctopuce\YFirmwareUpdate.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YFunction.cs">
-      <Link>YoctoLib\YFunction.cs</Link>
+      <Link>Yoctopuce\YFunction.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YFunctionType.cs">
-      <Link>YoctoLib\YFunctionType.cs</Link>
+      <Link>Yoctopuce\YFunctionType.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YGenericHub.cs">
-      <Link>YoctoLib\YGenericHub.cs</Link>
+      <Link>Yoctopuce\YGenericHub.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YGenericSensor.cs">
-      <Link>YoctoLib\YGenericSensor.cs</Link>
+      <Link>Yoctopuce\YGenericSensor.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YGps.cs">
-      <Link>YoctoLib\YGps.cs</Link>
+      <Link>Yoctopuce\YGps.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YGroundSpeed.cs">
-      <Link>YoctoLib\YGroundSpeed.cs</Link>
+      <Link>Yoctopuce\YGroundSpeed.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YGyro.cs">
-      <Link>YoctoLib\YGyro.cs</Link>
+      <Link>Yoctopuce\YGyro.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YHash.cs">
-      <Link>YoctoLib\YHash.cs</Link>
+      <Link>Yoctopuce\YHash.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YHTTPHub.cs">
-      <Link>YoctoLib\YHTTPHub.cs</Link>
+      <Link>Yoctopuce\YHTTPHub.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YHTTPRequest.cs">
-      <Link>YoctoLib\YHTTPRequest.cs</Link>
+      <Link>Yoctopuce\YHTTPRequest.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YHubPort.cs">
-      <Link>YoctoLib\YHubPort.cs</Link>
+      <Link>Yoctopuce\YHubPort.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YHumidity.cs">
-      <Link>YoctoLib\YHumidity.cs</Link>
+      <Link>Yoctopuce\YHumidity.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YJSONParser.cs">
-      <Link>YoctoLib\YJSONParser.cs</Link>
+      <Link>Yoctopuce\YJSONParser.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YLatitude.cs">
-      <Link>YoctoLib\YLatitude.cs</Link>
+      <Link>Yoctopuce\YLatitude.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YLed.cs">
-      <Link>YoctoLib\YLed.cs</Link>
+      <Link>Yoctopuce\YLed.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YLightSensor.cs">
-      <Link>YoctoLib\YLightSensor.cs</Link>
+      <Link>Yoctopuce\YLightSensor.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YLongitude.cs">
-      <Link>YoctoLib\YLongitude.cs</Link>
+      <Link>Yoctopuce\YLongitude.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YMagnetometer.cs">
-      <Link>YoctoLib\YMagnetometer.cs</Link>
+      <Link>Yoctopuce\YMagnetometer.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YMeasure.cs">
-      <Link>YoctoLib\YMeasure.cs</Link>
+      <Link>Yoctopuce\YMeasure.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YMessageBox.cs">
-      <Link>YoctoLib\YMessageBox.cs</Link>
+      <Link>Yoctopuce\YMessageBox.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YModule.cs">
-      <Link>YoctoLib\YModule.cs</Link>
+      <Link>Yoctopuce\YModule.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YMotor.cs">
-      <Link>YoctoLib\YMotor.cs</Link>
+      <Link>Yoctopuce\YMotor.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YNetwork.cs">
-      <Link>YoctoLib\YNetwork.cs</Link>
+      <Link>Yoctopuce\YNetwork.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YOsControl.cs">
-      <Link>YoctoLib\YOsControl.cs</Link>
+      <Link>Yoctopuce\YOsControl.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YPEntry.cs">
-      <Link>YoctoLib\YPEntry.cs</Link>
+      <Link>Yoctopuce\YPEntry.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YPower.cs">
-      <Link>YoctoLib\YPower.cs</Link>
+      <Link>Yoctopuce\YPower.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YPowerOutput.cs">
-      <Link>YoctoLib\YPowerOutput.cs</Link>
+      <Link>Yoctopuce\YPowerOutput.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YPressure.cs">
-      <Link>YoctoLib\YPressure.cs</Link>
+      <Link>Yoctopuce\YPressure.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YPwmInput.cs">
-      <Link>YoctoLib\YPwmInput.cs</Link>
+      <Link>Yoctopuce\YPwmInput.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YPwmOutput.cs">
-      <Link>YoctoLib\YPwmOutput.cs</Link>
+      <Link>Yoctopuce\YPwmOutput.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YPwmPowerSource.cs">
-      <Link>YoctoLib\YPwmPowerSource.cs</Link>
+      <Link>Yoctopuce\YPwmPowerSource.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YQt.cs">
-      <Link>YoctoLib\YQt.cs</Link>
+      <Link>Yoctopuce\YQt.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YQuadratureDecoder.cs">
-      <Link>YoctoLib\YQuadratureDecoder.cs</Link>
+      <Link>Yoctopuce\YQuadratureDecoder.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YRealTimeClock.cs">
-      <Link>YoctoLib\YRealTimeClock.cs</Link>
+      <Link>Yoctopuce\YRealTimeClock.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YRefFrame.cs">
-      <Link>YoctoLib\YRefFrame.cs</Link>
+      <Link>Yoctopuce\YRefFrame.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YRelay.cs">
-      <Link>YoctoLib\YRelay.cs</Link>
+      <Link>Yoctopuce\YRelay.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YSegmentedDisplay.cs">
-      <Link>YoctoLib\YSegmentedDisplay.cs</Link>
+      <Link>Yoctopuce\YSegmentedDisplay.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YSensor.cs">
-      <Link>YoctoLib\YSensor.cs</Link>
+      <Link>Yoctopuce\YSensor.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YSerialPort.cs">
-      <Link>YoctoLib\YSerialPort.cs</Link>
+      <Link>Yoctopuce\YSerialPort.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YServo.cs">
-      <Link>YoctoLib\YServo.cs</Link>
+      <Link>Yoctopuce\YServo.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YSms.cs">
-      <Link>YoctoLib\YSms.cs</Link>
+      <Link>Yoctopuce\YSms.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YSpiPort.cs">
-      <Link>YoctoLib\YSpiPort.cs</Link>
+      <Link>Yoctopuce\YSpiPort.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YSSDP.cs">
-      <Link>YoctoLib\YSSDP.cs</Link>
+      <Link>Yoctopuce\YSSDP.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YSSDPCacheEntry.cs">
-      <Link>YoctoLib\YSSDPCacheEntry.cs</Link>
+      <Link>Yoctopuce\YSSDPCacheEntry.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YTemperature.cs">
-      <Link>YoctoLib\YTemperature.cs</Link>
+      <Link>Yoctopuce\YTemperature.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YTilt.cs">
-      <Link>YoctoLib\YTilt.cs</Link>
+      <Link>Yoctopuce\YTilt.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YUSBDevice.cs">
-      <Link>YoctoLib\YUSBDevice.cs</Link>
+      <Link>Yoctopuce\YUSBDevice.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YUSBHub.cs">
-      <Link>YoctoLib\YUSBHub.cs</Link>
+      <Link>Yoctopuce\YUSBHub.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YUSBPkt.cs">
-      <Link>YoctoLib\YUSBPkt.cs</Link>
+      <Link>Yoctopuce\YUSBPkt.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YUSBWatcher.cs">
-      <Link>YoctoLib\YUSBWatcher.cs</Link>
+      <Link>Yoctopuce\YUSBWatcher.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YVoc.cs">
-      <Link>YoctoLib\YVoc.cs</Link>
+      <Link>Yoctopuce\YVoc.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YVoltage.cs">
-      <Link>YoctoLib\YVoltage.cs</Link>
+      <Link>Yoctopuce\YVoltage.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YWakeUpMonitor.cs">
-      <Link>YoctoLib\YWakeUpMonitor.cs</Link>
+      <Link>Yoctopuce\YWakeUpMonitor.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YWakeUpSchedule.cs">
-      <Link>YoctoLib\YWakeUpSchedule.cs</Link>
+      <Link>Yoctopuce\YWakeUpSchedule.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YWatchdog.cs">
-      <Link>YoctoLib\YWatchdog.cs</Link>
+      <Link>Yoctopuce\YWatchdog.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YWireless.cs">
-      <Link>YoctoLib\YWireless.cs</Link>
+      <Link>Yoctopuce\YWireless.cs</Link>
     </Compile>
     <Compile Include="..\..\Sources\YWlanRecord.cs">
-      <Link>YoctoLib\YWlanRecord.cs</Link>
+      <Link>Yoctopuce\YWlanRecord.cs</Link>
     </Compile>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>

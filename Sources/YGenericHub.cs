@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YGenericHub.cs 25185 2016-08-12 16:07:46Z seb $
+ * $Id: YGenericHub.cs 25191 2016-08-15 12:43:02Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -300,20 +300,15 @@ namespace com.yoctopuce.YoctoAPI
             return res;
         }
 
-        protected internal virtual void handleValueNotification(string serial, string funcid, string value)
+        protected internal virtual void imm_handleValueNotification(string serial, string funcid, string value)
         {
             string hwid = serial + "." + funcid;
 
             _yctx._yHash.imm_setFunctionValue(hwid, value);
             YFunction conn_fn = _yctx._GetValueCallback(hwid);
             if (conn_fn != null) {
-                Debug.WriteLine("HUBNot:" + serial + "." + funcid + "->" + value);
                 _yctx._PushDataEvent(new YAPIContext.DataEvent(conn_fn, value));
             }
-            else {
-                Debug.WriteLine("No callback:" + serial + "." + funcid + "->" + value);
-            }
-
         }
 
         //called from Jni

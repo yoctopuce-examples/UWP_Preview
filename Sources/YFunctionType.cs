@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YFunctionType.cs 25173 2016-08-12 08:44:38Z seb $
+ * $Id: YFunctionType.cs 25191 2016-08-15 12:43:02Z seb $
  *
  * Internal YFunctionType object
  *
@@ -253,11 +253,11 @@ namespace com.yoctopuce.YoctoAPI
         public virtual void imm_setFunctionValue(string hwid, string pubval)
         {
 
-            YPEntry yp = _ypEntries[hwid];
-            if (yp == null) {
+            if (!_ypEntries.ContainsKey(hwid)) {
                 // device has not been correctly registered
                 return;
             }
+            YPEntry yp = _ypEntries[hwid];
             if (yp.AdvertisedValue.Equals(pubval)) {
                 return;
             }
