@@ -20,10 +20,11 @@ namespace com.yoctopuce.YoctoAPI
         }
 
 
-        public override async Task Start()
+        public override Task Start()
         {
             _mustRun = true;
             _runTask = Run();
+            return Task.FromResult(0);
         }
 
         private async Task Run()
@@ -115,7 +116,7 @@ namespace com.yoctopuce.YoctoAPI
             //Debug.WriteLine(string.Format("ASyncRes on {0} took {1}ms", device.SerialNumber, stop - start));
         }
 
-        internal override async Task<bool> waitAndFreeAsyncTasks(ulong timeout)
+        internal override async Task<bool> Stop(ulong timeout)
         {
             _mustRun = false;
             foreach (YHTTPRequest req in _httpReqByDev.Values) {

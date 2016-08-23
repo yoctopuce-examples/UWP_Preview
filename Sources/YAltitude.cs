@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: pic24config.php 25098 2016-07-29 10:24:38Z mvuilleu $
+ * $Id: YAltitude.cs 25163 2016-08-11 09:42:13Z seb $
  *
  * Implements FindAltitude(), the high-level API for Altitude functions
  *

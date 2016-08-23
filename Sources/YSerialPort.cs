@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: pic24config.php 25098 2016-07-29 10:24:38Z mvuilleu $
+ * $Id: YSerialPort.cs 25248 2016-08-22 15:51:04Z seb $
  *
  * Implements FindSerialPort(), the high-level API for SerialPort functions
  *
@@ -2199,9 +2199,6 @@ public class YSerialPort : YFunction
         List<int> reply = new List<int>();
         int res;
         res = 0;
-        if (value != 0) {
-            value = 0xff;
-        }
         pdu.Add(0x06);
         pdu.Add(((pduAddr) >> (8)));
         pdu.Add(((pduAddr) & (0xff)));

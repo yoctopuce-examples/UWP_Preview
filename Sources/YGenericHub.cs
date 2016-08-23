@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YGenericHub.cs 25191 2016-08-15 12:43:02Z seb $
+ * $Id: YGenericHub.cs 25204 2016-08-17 13:52:16Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -190,7 +190,7 @@ namespace com.yoctopuce.YoctoAPI
                             return buffer;
                         }
                     case PUBVAL_C_FLOAT:
-                        //TODO: Verifiy 32bits notification decoding (ex: Yocto-GPS)
+                        //todo: Verifiy 32bits notification decoding (ex: Yocto-GPS)
                         // 32bit (short) float
                         float floatVal = System.BitConverter.ToSingle(funcval, 0);
                         buffer = string.Format("{0:F6}", floatVal);

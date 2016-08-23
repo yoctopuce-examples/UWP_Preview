@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YFirmwareUpdate.cs 25176 2016-08-12 09:10:37Z seb $
+ * $Id: YFirmwareUpdate.cs 25204 2016-08-17 13:52:16Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -52,32 +52,32 @@ namespace com.yoctopuce.YoctoAPI
 {
 
     //--- (generated code: YFirmwareUpdate return codes)
-    //--- (end of generated code: YFirmwareUpdate return codes)
+//--- (end of generated code: YFirmwareUpdate return codes)
     //--- (generated code: YFirmwareUpdate class start)
-    /**
-     * <summary>
-     *   YFirmwareUpdate Class: Control interface for the firmware update process
-     * <para>
-     *   The YFirmwareUpdate class let you control the firmware update of a Yoctopuce
-     *   module. This class should not be instantiate directly, instead the method
-     *   <c>updateFirmware</c> should be called to get an instance of YFirmwareUpdate.
-     * </para>
-     * </summary>
-     */
-    public class YFirmwareUpdate
-    {
-        //--- (end of generated code: YFirmwareUpdate class start)
+/**
+ * <summary>
+ *   YFirmwareUpdate Class: Control interface for the firmware update process
+ * <para>
+ *   The YFirmwareUpdate class let you control the firmware update of a Yoctopuce
+ *   module. This class should not be instantiate directly, instead the method
+ *   <c>updateFirmware</c> should be called to get an instance of YFirmwareUpdate.
+ * </para>
+ * </summary>
+ */
+public class YFirmwareUpdate
+{
+//--- (end of generated code: YFirmwareUpdate class start)
         //--- (generated code: YFirmwareUpdate definitions)
-        protected string _serial;
-        protected byte[] _settings;
-        protected string _firmwarepath;
-        protected string _progress_msg;
-        protected int _progress_c = 0;
-        protected int _progress = 0;
-        protected int _restore_step = 0;
-        protected bool _force;
+    protected string _serial;
+    protected byte[] _settings;
+    protected string _firmwarepath;
+    protected string _progress_msg;
+    protected int _progress_c = 0;
+    protected int _progress = 0;
+    protected int _restore_step = 0;
+    protected bool _force;
 
-        //--- (end of generated code: YFirmwareUpdate definitions)
+    //--- (end of generated code: YFirmwareUpdate definitions)
         private readonly YAPIContext _yctx;
         //fixme :implement firwmare Update
 
@@ -147,7 +147,7 @@ namespace com.yoctopuce.YoctoAPI
             _yctx = yctx;
             _force = force;
             //--- (generated code: YFirmwareUpdate attributes initialization)
-            //--- (end of generated code: YFirmwareUpdate attributes initialization)
+        //--- (end of generated code: YFirmwareUpdate attributes initialization)
         }
 
 
@@ -337,101 +337,101 @@ namespace com.yoctopuce.YoctoAPI
         //--- (generated code: YFirmwareUpdate implementation)
 #pragma warning disable 1998
 
-        //cannot be generated for Java:
-        //public virtual async Task<int> _processMore(int newupdate)
+    //cannot be generated for Java:
+    //public virtual async Task<int> _processMore(int newupdate)
 
-        //cannot be generated for Java:
-        //public static List<string> GetAllBootLoaders()
+    //cannot be generated for Java:
+    //public static List<string> GetAllBootLoaders()
 
-        //cannot be generated for Java:
-        //public static List<string> GetAllBootLoadersInContext(YAPIContext yctx)
+    //cannot be generated for Java:
+    //public static List<string> GetAllBootLoadersInContext(YAPIContext yctx)
 
-        //cannot be generated for Java:
-        //public static string CheckFirmware(string serial,string path,int minrelease)
+    //cannot be generated for Java:
+    //public static string CheckFirmware(string serial,string path,int minrelease)
 
-        /**
-         * <summary>
-         *   Returns the progress of the firmware update, on a scale from 0 to 100.
-         * <para>
-         *   When the object is
-         *   instantiated, the progress is zero. The value is updated during the firmware update process until
-         *   the value of 100 is reached. The 100 value means that the firmware update was completed
-         *   successfully. If an error occurs during the firmware update, a negative value is returned, and the
-         *   error message can be retrieved with <c>get_progressMessage</c>.
-         * </para>
-         * <para>
-         * </para>
-         * </summary>
-         * <returns>
-         *   an integer in the range 0 to 100 (percentage of completion)
-         *   or a negative error code in case of failure.
-         * </returns>
-         */
-        public virtual async Task<int> get_progress()
-        {
-            if (_progress >= 0) {
-                await this._processMore(0);
-            }
-            return _progress;
+    /**
+     * <summary>
+     *   Returns the progress of the firmware update, on a scale from 0 to 100.
+     * <para>
+     *   When the object is
+     *   instantiated, the progress is zero. The value is updated during the firmware update process until
+     *   the value of 100 is reached. The 100 value means that the firmware update was completed
+     *   successfully. If an error occurs during the firmware update, a negative value is returned, and the
+     *   error message can be retrieved with <c>get_progressMessage</c>.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer in the range 0 to 100 (percentage of completion)
+     *   or a negative error code in case of failure.
+     * </returns>
+     */
+    public virtual async Task<int> get_progress()
+    {
+        if (_progress >= 0) {
+            await this._processMore(0);
         }
+        return _progress;
+    }
 
-        /**
-         * <summary>
-         *   Returns the last progress message of the firmware update process.
-         * <para>
-         *   If an error occurs during the
-         *   firmware update process, the error message is returned
-         * </para>
-         * <para>
-         * </para>
-         * </summary>
-         * <returns>
-         *   a string  with the latest progress message, or the error message.
-         * </returns>
-         */
-        public virtual async Task<string> get_progressMessage()
-        {
-            return _progress_msg;
-        }
+    /**
+     * <summary>
+     *   Returns the last progress message of the firmware update process.
+     * <para>
+     *   If an error occurs during the
+     *   firmware update process, the error message is returned
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a string  with the latest progress message, or the error message.
+     * </returns>
+     */
+    public virtual async Task<string> get_progressMessage()
+    {
+        return _progress_msg;
+    }
 
-        /**
-         * <summary>
-         *   Starts the firmware update process.
-         * <para>
-         *   This method starts the firmware update process in background. This method
-         *   returns immediately. You can monitor the progress of the firmware update with the <c>get_progress()</c>
-         *   and <c>get_progressMessage()</c> methods.
-         * </para>
-         * <para>
-         * </para>
-         * </summary>
-         * <returns>
-         *   an integer in the range 0 to 100 (percentage of completion),
-         *   or a negative error code in case of failure.
-         * </returns>
-         * <para>
-         *   On failure returns a negative error code.
-         * </para>
-         */
-        public virtual async Task<int> startUpdate()
-        {
-            string err;
-            int leng;
-            err = YAPI.DefaultEncoding.GetString(_settings);
-            leng = (err).Length;
-            if ((leng >= 6) && ("error:" == (err).Substring(0, 6))) {
-                _progress = -1;
-                _progress_msg = (err).Substring(6, leng - 6);
-            } else {
-                _progress = 0;
-                _progress_c = 0;
-                await this._processMore(1);
-            }
-            return _progress;
+    /**
+     * <summary>
+     *   Starts the firmware update process.
+     * <para>
+     *   This method starts the firmware update process in background. This method
+     *   returns immediately. You can monitor the progress of the firmware update with the <c>get_progress()</c>
+     *   and <c>get_progressMessage()</c> methods.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer in the range 0 to 100 (percentage of completion),
+     *   or a negative error code in case of failure.
+     * </returns>
+     * <para>
+     *   On failure returns a negative error code.
+     * </para>
+     */
+    public virtual async Task<int> startUpdate()
+    {
+        string err;
+        int leng;
+        err = YAPI.DefaultEncoding.GetString(_settings);
+        leng = (err).Length;
+        if (( leng >= 6) && ("error:" == (err).Substring(0, 6))) {
+            _progress = -1;
+            _progress_msg = (err).Substring( 6, leng - 6);
+        } else {
+            _progress = 0;
+            _progress_c = 0;
+            await this._processMore(1);
         }
+        return _progress;
+    }
 
 #pragma warning restore 1998
-        //--- (end of generated code: YFirmwareUpdate implementation)
+    //--- (end of generated code: YFirmwareUpdate implementation)
     }
 
 

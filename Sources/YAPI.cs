@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YAPI.cs 25185 2016-08-12 16:07:46Z seb $
+ * $Id: YAPI.cs 25204 2016-08-17 13:52:16Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -77,7 +77,7 @@ namespace com.yoctopuce.YoctoAPI
         public const int YOCTO_DEVID_FACTORYBOOT = 1;
         public const int YOCTO_DEVID_BOOTLOADER = 2;
         // --- (generated code: YFunction return codes)
-        // Yoctopuce error codes, used by default as function return value
+    // Yoctopuce error codes, used by default as function return value
         public const int SUCCESS = 0;                   // everything worked all right
         public const int NOT_INITIALIZED = -1;          // call yInitAPI() first !
         public const int INVALID_ARGUMENT = -2;         // one of the arguments passed to the function is invalid
@@ -94,7 +94,7 @@ namespace com.yoctopuce.YoctoAPI
         public const int RTC_NOT_READY = -13;           // real-time clock has not been initialized (or time was lost)
         public const int FILE_NOT_FOUND = -14;          // the file is not found
 
-        //--- (end of generated code: YFunction return codes)
+//--- (end of generated code: YFunction return codes)
         internal static Encoding DefaultEncoding = System.Text.Encoding.GetEncoding("iso-8859-1");
 
         // Encoding types

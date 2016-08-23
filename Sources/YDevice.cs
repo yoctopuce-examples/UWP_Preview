@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YDevice.cs 25172 2016-08-12 08:40:42Z seb $
+ * $Id: YDevice.cs 25251 2016-08-22 16:25:31Z seb $
  *
  * Internal YDevice class
  *
@@ -251,7 +251,7 @@ namespace com.yoctopuce.YoctoAPI
             return _deviceTime;
         }
 
-        public virtual void imm_setDeviceTime(int[] data) {
+        public virtual void imm_setDeviceTime(byte[] data) {
             double time = data[0] + 0x100 * data[1] + 0x10000 * data[2] + 0x1000000 * data[3];
             _deviceTime = time + data[4] / 250.0;
         }

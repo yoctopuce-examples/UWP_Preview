@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: pic24config.php 25098 2016-07-29 10:24:38Z mvuilleu $
+ * $Id: YLongitude.cs 25163 2016-08-11 09:42:13Z seb $
  *
  * Implements FindLongitude(), the high-level API for Longitude functions
  *

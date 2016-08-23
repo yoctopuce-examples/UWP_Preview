@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YAPIContext.cs 25176 2016-08-12 09:10:37Z seb $
+ * $Id: YAPIContext.cs 25207 2016-08-17 17:00:09Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -44,10 +44,8 @@ using System.Threading.Tasks;
 namespace com.yoctopuce.YoctoAPI
 {
 
-    //todo: check how to handle disable exception
     public class YAPIContext
     {
-
 
         internal class DataEvent
         {
@@ -397,7 +395,7 @@ namespace com.yoctopuce.YoctoAPI
 
 
         public ulong DefaultCacheValidity = 5;
-        //TODO: Replace global encding to the YAPIContext one
+        //todo: Replace global encding to the YAPIContext one
         //internal string _defaultEncoding = YAPI.DefaultEncoding;
         private int _apiMode;
         internal bool _exceptionsDisabled = false;
@@ -412,14 +410,13 @@ namespace com.yoctopuce.YoctoAPI
         public event YAPI.LogHandler _logCallback;
         private event YAPI.HubDiscoveryHandler _HubDiscoveryCallback;
 
-        private readonly object _newHubCallbackLock = new object();
         private readonly Dictionary<int, YAPI.CalibrationHandler> _calibHandlers = new Dictionary<int, YAPI.CalibrationHandler>();
         private readonly YSSDP _ssdp;
         internal readonly YHash _yHash;
         private readonly List<YFunction> _ValueCallbackList = new List<YFunction>();
         private readonly List<YFunction> _TimedReportCallbackList = new List<YFunction>();
 
-        // todo: review SSDP code        
+        // fixme: review SSDP code        
         internal async void HubDiscoveryCallback(string serial, string urlToRegister, string urlToUnregister)
         {
             if (urlToRegister != null) {
@@ -509,18 +506,14 @@ namespace com.yoctopuce.YoctoAPI
 
         internal void _pushPlugEvent(PlugEvent.Event ev, string serial)
         {
-            lock (_pendingCallbacks) {
-                _pendingCallbacks.AddLast(new PlugEvent(this, ev, serial));
-            }
+            _pendingCallbacks.AddLast(new PlugEvent(this, ev, serial));
         }
 
 
         // Queue a function data event (timed report of notification value)
         internal void _PushDataEvent(DataEvent ev)
         {
-            lock (_data_events) {
-                _data_events.AddLast(ev);
-            }
+            _data_events.AddLast(ev);
         }
 
         /*
@@ -594,15 +587,11 @@ namespace com.yoctopuce.YoctoAPI
         {
             if (add) {
                 await func.isOnline();
-                lock (_TimedReportCallbackList) {
-                    if (!_TimedReportCallbackList.Contains(func)) {
-                        _TimedReportCallbackList.Add(func);
-                    }
+                if (!_TimedReportCallbackList.Contains(func)) {
+                    _TimedReportCallbackList.Add(func);
                 }
             } else {
-                lock (_TimedReportCallbackList) {
-                    _TimedReportCallbackList.Remove(func);
-                }
+                _TimedReportCallbackList.Remove(func);
             }
         }
 
@@ -620,39 +609,37 @@ namespace com.yoctopuce.YoctoAPI
             return null;
         }
 
-        private int imm_AddNewHub(string url, bool reportConnnectionLost, System.IO.Stream request, System.IO.Stream response, object session)
+        private async Task<int> AddNewHub(string url, bool reportConnnectionLost, System.IO.Stream request, System.IO.Stream response, object session)
         {
-            lock (this) {
-                foreach (YGenericHub h in _hubs) {
-                    if (h.imm_isSameHub(url, request, response, session)) {
-                        return YAPI.SUCCESS;
-                    }
-                }
-                YGenericHub newhub;
-                YGenericHub.HTTPParams parsedurl;
-                parsedurl = new YGenericHub.HTTPParams(url);
-                // Add hub to known list
-                if (url.Equals("usb")) {
-                    newhub = new YUSBHub(this, _hubs.Count, true);
-                } else if (url.Equals("usb_silent")) {
-                    newhub = new YUSBHub(this, _hubs.Count, false);
-                } else if (url.Equals("net")) {
-                    if ((_apiMode & YAPI.DETECT_NET) == 0) {
-                        _apiMode |= YAPI.DETECT_NET;
-                        // todo: review ssdp callback
-                        //_ssdp.addCallback(_ssdpCallback);
-                    }
+            foreach (YGenericHub h in _hubs) {
+                if (h.imm_isSameHub(url, request, response, session)) {
                     return YAPI.SUCCESS;
-                } else if (parsedurl.Host.Equals("callback")) {
-                    //todo: add SUPPORT FOR CALLBACK
-                    throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "callback is not yet supported");
-                } else {
-                    newhub = new YHTTPHub(this, _hubs.Count, parsedurl, reportConnnectionLost, null);
                 }
-                _hubs.Add(newhub);
-                newhub.startNotifications();
-                return YAPI.SUCCESS;
             }
+            YGenericHub newhub;
+            YGenericHub.HTTPParams parsedurl;
+            parsedurl = new YGenericHub.HTTPParams(url);
+            // Add hub to known list
+            if (url.Equals("usb")) {
+                newhub = new YUSBHub(this, _hubs.Count, true);
+            } else if (url.Equals("usb_silent")) {
+                newhub = new YUSBHub(this, _hubs.Count, false);
+            } else if (url.Equals("net")) {
+                if ((_apiMode & YAPI.DETECT_NET) == 0) {
+                    _apiMode |= YAPI.DETECT_NET;
+                    // todo: review ssdp callback
+                    //_ssdp.addCallback(_ssdpCallback);
+                }
+                return YAPI.SUCCESS;
+            } else if (parsedurl.Host.Equals("callback")) {
+                //todo: add SUPPORT FOR CALLBACK
+                throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "callback is not yet supported");
+            } else {
+                newhub = new YHTTPHub(this, _hubs.Count, parsedurl, reportConnnectionLost);
+            }
+            _hubs.Add(newhub);
+            await newhub.startNotifications();
+            return YAPI.SUCCESS;
         }
 
 
@@ -671,13 +658,11 @@ namespace com.yoctopuce.YoctoAPI
             if (invokecallbacks) {
                 while (true) {
                     PlugEvent evt;
-                    lock (_pendingCallbacks) {
-                        if (_pendingCallbacks.Count == 0) {
-                            break;
-                        }
-                        evt = _pendingCallbacks.First.Value;
-                        _pendingCallbacks.RemoveFirst();
+                    if (_pendingCallbacks.Count == 0) {
+                        break;
                     }
+                    evt = _pendingCallbacks.First.Value;
+                    _pendingCallbacks.RemoveFirst();
                     switch (evt.ev) {
                         case com.yoctopuce.YoctoAPI.YAPIContext.PlugEvent.Event.PLUG:
                             if (_arrivalCallback != null) {
@@ -784,13 +769,12 @@ namespace com.yoctopuce.YoctoAPI
          */
         public async Task<int> RegisterHub(string url)
         {
-            imm_AddNewHub(url, true, null, null, null);
+            await AddNewHub(url, true, null, null, null);
             // Register device list
             await _updateDeviceList_internal(true, false);
             return YAPI.SUCCESS;
         }
 
-#pragma warning disable 1998
 
         /**
          *
@@ -798,7 +782,7 @@ namespace com.yoctopuce.YoctoAPI
         public async Task<int> PreregisterHub(string url)
         {
             try {
-                imm_AddNewHub(url, false, null, null, null);
+                await AddNewHub(url, false, null, null, null);
             } catch (YAPI_Exception ex) {
                 if (_exceptionsDisabled) {
                     return ex.errorType;
@@ -808,7 +792,6 @@ namespace com.yoctopuce.YoctoAPI
             }
             return YAPI.SUCCESS;
         }
-#pragma warning restore 1998
 
         /**
          *
@@ -854,7 +837,7 @@ namespace com.yoctopuce.YoctoAPI
                 } else if (parsedurl.Host.Equals("callback")) {
                     throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "Not yet supported");
                 } else {
-                    newhub = new YHTTPHub(this, 0, parsedurl, true, null);
+                    newhub = new YHTTPHub(this, 0, parsedurl, true);
                 }
                 return await newhub.ping(mstimeout);
             } catch (YAPI_Exception ex) {
@@ -904,12 +887,12 @@ namespace com.yoctopuce.YoctoAPI
         /**
          *
          */
-        public async Task<int> TriggerHubDiscovery()
+        public Task<int> TriggerHubDiscovery()
         {
             // Register device list
             //todo: add ssd support
             //_ssdp.addCallback(_ssdpCallback);
-            return YAPI.SUCCESS;
+            return Task.FromResult<int>(YAPI.SUCCESS);
         }
 
         /**

@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YUSBDevice.cs 25191 2016-08-15 12:43:02Z seb $
+ * $Id: YUSBDevice.cs 25251 2016-08-22 16:25:31Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -352,6 +352,16 @@ namespace com.yoctopuce.YoctoAPI
         }
 
 
+        private YPEntry imm_getYPEntryFromYdx(int funIdx)
+        {
+            foreach (YPEntry ypEntry in _usbYP.Values) {
+                if (ypEntry.Index == funIdx) {
+                    return ypEntry;
+                }
+            }
+            return null;
+        }
+
         private async Task checkMetaUTC()
         {
             if (_lastMetaUTC + META_UTC_DELAY < YAPI.GetTickCount()) {
@@ -402,15 +412,15 @@ namespace com.yoctopuce.YoctoAPI
                         break;
                     case YGenericHub.YSTREAM_REPORT:
                         Debug.WriteLine("Report:" + s.ToString());
-                        //if (testState(PKT_State.StreamReadyReceived, null)) {
-                        //    handleTimedNotification(s.getDataAsByteArray());
-                        //}
+                        if (_devState == DevState.StreamReadyReceived) {
+                            imm_handleTimedNotification(s);
+                        }
                         break;
                     case YGenericHub.YSTREAM_REPORT_V2:
                         Debug.WriteLine("Report V2:" + s.ToString());
-                        //if (testState(PKT_State.StreamReadyReceived, null)) {
-                        //handleTimedNotificationV2(s.getDataAsByteArray());
-                        //}
+                        if (_devState == DevState.StreamReadyReceived) {
+                            handleTimedNotificationV2(s);
+                        }
                         break;
                     default:
                         _yctx._Log("drop unknown ystream:" + s.ToString());
@@ -429,7 +439,8 @@ namespace com.yoctopuce.YoctoAPI
             if (isV2 || firstByte <= NOTIFY_1STBYTE_MAXTINY || firstByte >= NOTIFY_1STBYTE_MINSMALL) {
                 int funcvalType = (firstByte >> NOTIFY_V2_TYPE_OFS) & NOTIFY_V2_TYPE_MASK;
                 int funydx = firstByte & NOTIFY_V2_FUNYDX_MASK;
-                foreach (YPEntry ypEntry in _usbYP.Values) {
+                YPEntry ypEntry = imm_getYPEntryFromYdx(funydx);
+                if (ypEntry != null) {
                     if (ypEntry.Index == funydx) {
                         if (funcvalType == YGenericHub.NOTIFY_V2_FLUSHGROUP) {
                             // not yet used by devices
@@ -443,7 +454,7 @@ namespace com.yoctopuce.YoctoAPI
                             ystream.imm_CopyData(data, 0);
                             string funcval = YGenericHub.imm_decodePubVal(funcvalType, data, 1, len - 1);
                             _hub.imm_handleValueNotification(SerialNumber, ypEntry.FuncId, funcval);
-                        }                    
+                        }
                     }
                 }
             } else {
@@ -514,6 +525,85 @@ namespace com.yoctopuce.YoctoAPI
             }
             return 0;
         }
+
+
+        public void imm_handleTimedNotification(YPktStreamHead data)
+        {
+            uint pos = 0;
+            YDevice ydev = _yctx._yHash.imm_getDevice(SerialNumber);
+            if (ydev == null) {
+                // device has not been registered;
+                return;
+            }
+
+            while (pos < data.Len) {
+                int funYdx = data.imm_GetByte(pos) & 0xf;
+                bool isAvg = (data.imm_GetByte(pos) & 0x80) != 0;
+                uint len = (uint)(1 + ((data.imm_GetByte(pos) >> 4) & 0x7));
+                pos++;
+                if (data.Len < pos + len) {
+                    _yctx._Log("drop invalid timedNotification");
+                    return;
+                }
+                if (funYdx == 0xf) {
+                    byte[] intData = new byte[len];
+                    for (uint i = 0; i < len; i++) {
+                        intData[i] = data.imm_GetByte(pos + i);
+                    }
+                    ydev.imm_setDeviceTime(intData);
+                } else {
+                    YPEntry yp = imm_getYPEntryFromYdx(funYdx);
+                    if (yp != null) {
+                        List<int> report = new List<int>((int) (len + 1));
+                        report.Add(isAvg ? 1 : 0);
+                        for (uint i = 0; i < len; i++) {
+                            int b = data.imm_GetByte(pos + i) & 0xff;
+                            report.Add(b);
+                        }
+                        _hub.imm_handleTimedNotification(yp.Serial, yp.FuncId, ydev.imm_getDeviceTime(), report);
+                    }
+                }
+                pos += len;
+            }
+        }
+
+
+        public void handleTimedNotificationV2(YPktStreamHead data)
+        {
+            uint pos = 0;
+            YDevice ydev = _yctx._yHash.imm_getDevice(SerialNumber);
+            if (ydev == null) {
+                // device has not been registered;
+                return;
+            }
+            while (pos < data.Len) {
+                int funYdx = data.imm_GetByte(pos) & 0xf;
+                uint extralen = (uint)((data.imm_GetByte(pos) >> 4) & 0xf);
+                uint len = extralen + 1;
+                pos++; // consume generic header
+                if (funYdx == 0xf) {
+                    byte[] intData = new byte[len];
+                    for (uint i = 0; i < len; i++) {
+                        intData[i] = data.imm_GetByte(pos + i);
+                    }
+                    ydev.imm_setDeviceTime(intData);
+                } else {
+                    YPEntry yp = imm_getYPEntryFromYdx(funYdx);
+                    if (yp != null) {
+                        List<int> report = new List<int>((int)(len + 1));
+                        report.Add(2);
+                        for (uint i = 0; i < len; i++) {
+                            int b = data.imm_GetByte(pos + i) & 0xff;
+                            report.Add(b);
+                        }
+                        _hub.imm_handleTimedNotification(yp.Serial, yp.FuncId, ydev.imm_getDeviceTime(), report);
+                    }
+                }
+                pos += len;
+            }
+        }
+
+
 
         public void imm_UpdateYellowPages(Dictionary<string, List<YPEntry>> publicYP)
         {

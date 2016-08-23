@@ -31,7 +31,6 @@ namespace com.yoctopuce.YoctoAPI
         protected internal int _notifRetryCount = 0;
         protected internal int _error_delay = 0;
 
-
         protected internal readonly YHTTPHub _hub;
 
 
@@ -121,10 +120,10 @@ namespace com.yoctopuce.YoctoAPI
                             case NOTIFY_NETPKT_TIMEAVGYDX:
                             case NOTIFY_NETPKT_TIMEV2YDX:
                                 if (funydx == 0xf) {
-                                    int[] data = new int[5];
+                                    byte[] data = new byte[5];
                                     for (int i = 0; i < 5; i++) {
                                         string part = value.Substring(i * 2, 2);
-                                        data[i] = Convert.ToInt32(part, 16);
+                                        data[i] = Convert.ToByte(part, 16);
                                     }
                                     ydev.imm_setDeviceTime(data);
                                 } else {
@@ -212,7 +211,7 @@ namespace com.yoctopuce.YoctoAPI
         /// </summary>
         /// <param name="timeout"> the nubmer of milisecond before going into timeout </param>
         /// <returns> true if some request are still pendin </returns>
-        internal abstract Task<bool> waitAndFreeAsyncTasks(ulong timeout);
+        internal abstract Task<bool> Stop(ulong timeout);
 
         public abstract bool Connected { get; }
 

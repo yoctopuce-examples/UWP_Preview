@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: pic24config.php 25098 2016-07-29 10:24:38Z mvuilleu $
+ * $Id: YAudioIn.cs 25163 2016-08-11 09:42:13Z seb $
  *
  * Implements FindAudioIn(), the high-level API for AudioIn functions
  *

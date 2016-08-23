@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YHTTPHub.cs 25176 2016-08-12 09:10:37Z seb $
+ * $Id: YHTTPHub.cs 25246 2016-08-22 15:28:10Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -37,16 +37,10 @@
  *
  *********************************************************************/
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Net;
-using System.Net.Sockets;
 using System.Runtime.InteropServices.WindowsRuntime;
-using System.Threading;
 using System.Threading.Tasks;
-using Windows.Foundation;
-using Windows.Networking;
 using Windows.Security.Cryptography.Core;
 using Windows.Storage.Streams;
 
@@ -60,17 +54,16 @@ namespace com.yoctopuce.YoctoAPI
         public const int YIO_1_MINUTE_TCP_TIMEOUT = 60000;
         public const int YIO_10_MINUTES_TCP_TIMEOUT = 600000;
 
-        private readonly object _callbackSession;
         private NotificationHandler _notificationHandler;
         private string _http_realm = "";
         private string _nounce = "";
         private string _serial = "";
-        private int _nounce_count = 0;
+        private int _nounce_count;
         private string _ha1 = "";
         private string _opaque = "";
         private readonly Random _randGen = new Random();
-        private int _authRetryCount = 0;
-        internal bool _writeProtected = false;
+        private int _authRetryCount;
+        internal bool _writeProtected;
 
         internal virtual bool imm_needRetryWithAuth()
         {
@@ -84,7 +77,7 @@ namespace com.yoctopuce.YoctoAPI
 
         // Update the hub internal variables according
         // to a received header with WWW-Authenticate
-        //TODO: verify authentification
+        //todo: verify authentification
         internal virtual void imm_parseWWWAuthenticate(string header)
         {
             int pos = header.IndexOf("\r\nWWW-Authenticate:", StringComparison.Ordinal);
@@ -181,10 +174,9 @@ namespace com.yoctopuce.YoctoAPI
         }
 
 
-        internal YHTTPHub(YAPIContext yctx, int idx, HTTPParams httpParams, bool reportConnnectionLost, object session)
+        internal YHTTPHub(YAPIContext yctx, int idx, HTTPParams httpParams, bool reportConnnectionLost)
             : base(yctx, httpParams, idx, reportConnnectionLost)
         {
-            _callbackSession = session;
         }
 
 
@@ -194,7 +186,7 @@ namespace com.yoctopuce.YoctoAPI
                 throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "notification already started");
             }
             if (_http_params.WebSocket) {
-                _notificationHandler = new WSNotificationHandler(this, _callbackSession);
+                _notificationHandler = new WSNotificationHandler(this);
             } else {
                 _notificationHandler = new TCPNotificationHandler(this);
             }
@@ -204,7 +196,7 @@ namespace com.yoctopuce.YoctoAPI
         internal override async Task stopNotifications()
         {
             if (_notificationHandler != null) {
-                bool requestsUnfinished = await _notificationHandler.waitAndFreeAsyncTasks(YHTTPRequest.MAX_REQUEST_MS);
+                bool requestsUnfinished = await _notificationHandler.Stop(YHTTPRequest.MAX_REQUEST_MS);
                 if (requestsUnfinished) {
                     _yctx._Log(string.Format("Stop hub {0} before all async request has ended", Host));
                 }
@@ -225,7 +217,7 @@ namespace com.yoctopuce.YoctoAPI
         {
             HTTPParams param = new HTTPParams(url);
             bool url_equals = param.imm_getUrl(false, false).Equals(_http_params.imm_getUrl(false, false));
-            return url_equals && (_callbackSession == null || _callbackSession.Equals(session));
+            return url_equals;
         }
 
 
@@ -241,7 +233,7 @@ namespace com.yoctopuce.YoctoAPI
             }
             if (!_notificationHandler.Connected) {
                 if (_reportConnnectionLost) {
-                    throw new YAPI_Exception(YAPI.TIMEOUT, "hub " + this._http_params.Url + " is not reachable");
+                    throw new YAPI_Exception(YAPI.TIMEOUT, "hub " + _http_params.Url + " is not reachable");
                 } else {
                     return;
                 }
@@ -252,9 +244,9 @@ namespace com.yoctopuce.YoctoAPI
                 byte[] data = await _notificationHandler.hubRequestSync("GET /api.json", null,
                     YIO_DEFAULT_TCP_TIMEOUT);
                 json_data = YAPI.DefaultEncoding.GetString(data);
-            } catch (YAPI_Exception ex) {
+            } catch (YAPI_Exception) {
                 if (_reportConnnectionLost) {
-                    throw ex;
+                    throw;
                 }
                 return;
             }
@@ -267,7 +259,7 @@ namespace com.yoctopuce.YoctoAPI
                 loadval.Parse();
             } catch (Exception ex) {
                 Debug.WriteLine(ex.Message);
-                throw ex;
+                throw;
             }
             if (!loadval.Has("services") || !loadval.GetYJSONObject("services").Has("whitePages")) {
                 throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Device " + _http_params.Host + " is not a hub");
@@ -446,7 +438,7 @@ namespace com.yoctopuce.YoctoAPI
             RequestAsyncResult asyncResult, object asyncContext)
         {
             if (!_notificationHandler.Connected) {
-                throw new YAPI_Exception(YAPI.TIMEOUT, "hub " + this._http_params.Url + " is not reachable");
+                throw new YAPI_Exception(YAPI.TIMEOUT, "hub " + _http_params.Url + " is not reachable");
             }
             if (_writeProtected && !_notificationHandler.hasRwAccess()) {
                 throw new YAPI_Exception(YAPI.UNAUTHORIZED, "Access denied: admin credentials required");
@@ -460,7 +452,7 @@ namespace com.yoctopuce.YoctoAPI
             RequestProgress progress, object context)
         {
             if (!_notificationHandler.Connected) {
-                throw new YAPI_Exception(YAPI.TIMEOUT, "hub " + this._http_params.Url + " is not reachable");
+                throw new YAPI_Exception(YAPI.TIMEOUT, "hub " + _http_params.Url + " is not reachable");
             }
             // Setup timeout counter
             uint tcpTimeout = YIO_DEFAULT_TCP_TIMEOUT;

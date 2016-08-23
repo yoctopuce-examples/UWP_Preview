@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: pic24config.php 25098 2016-07-29 10:24:38Z mvuilleu $
+ * $Id: YWakeUpMonitor.cs 25163 2016-08-11 09:42:13Z seb $
  *
  * Implements FindWakeUpMonitor(), the high-level API for WakeUpMonitor functions
  *

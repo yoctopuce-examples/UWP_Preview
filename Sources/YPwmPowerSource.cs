@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: pic24config.php 25098 2016-07-29 10:24:38Z mvuilleu $
+ * $Id: YPwmPowerSource.cs 25163 2016-08-11 09:42:13Z seb $
  *
  * Implements FindPwmPowerSource(), the high-level API for PwmPowerSource functions
  *

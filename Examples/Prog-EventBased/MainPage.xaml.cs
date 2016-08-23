@@ -100,8 +100,10 @@ namespace Prog_EventBased
             Output.Text += "Device removal : " + await m.get_serialNumber() + "\n";
         }
 
-        public async void Each_Tick(object o, object sender)
+        public async void Each_Tick(object sender, object o)
         {
+            DispatcherTimer timer = (DispatcherTimer) sender;
+            timer.Stop();
             try {
                 int res = await YAPI.UpdateDeviceList();
                 await YAPI.HandleEvents();
@@ -109,6 +111,7 @@ namespace Prog_EventBased
                 Output.Text += "Error:" + ex.Message;
                 throw;
             }
+            timer.Start();
 
         }
 
