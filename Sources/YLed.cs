@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YLed.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YLed.cs 27700 2017-06-01 12:27:09Z seb $
  *
  * Implements FindLed(), the high-level API for Led functions
  *
@@ -155,12 +155,14 @@ public class YLed : YFunction
      */
     public async Task<int> get_power()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return POWER_INVALID;
             }
         }
-        return _power;
+        res = _power;
+        return res;
     }
 
 
@@ -209,12 +211,14 @@ public class YLed : YFunction
      */
     public async Task<int> get_luminosity()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LUMINOSITY_INVALID;
             }
         }
-        return _luminosity;
+        res = _luminosity;
+        return res;
     }
 
 
@@ -265,12 +269,14 @@ public class YLed : YFunction
      */
     public async Task<int> get_blinking()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return BLINKING_INVALID;
             }
         }
-        return _blinking;
+        res = _blinking;
+        return res;
     }
 
 
@@ -337,6 +343,13 @@ public class YLed : YFunction
      *   a LED by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">

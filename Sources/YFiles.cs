@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFiles.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YFiles.cs 27700 2017-06-01 12:27:09Z seb $
  *
  * Implements FindFiles(), the high-level API for Files functions
  *
@@ -136,12 +136,14 @@ public class YFiles : YFunction
      */
     public async Task<int> get_filesCount()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return FILESCOUNT_INVALID;
             }
         }
-        return _filesCount;
+        res = _filesCount;
+        return res;
     }
 
 
@@ -162,12 +164,14 @@ public class YFiles : YFunction
      */
     public async Task<int> get_freeSpace()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return FREESPACE_INVALID;
             }
         }
-        return _freeSpace;
+        res = _freeSpace;
+        return res;
     }
 
 
@@ -204,6 +208,13 @@ public class YFiles : YFunction
      *   a filesystem by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">
@@ -331,7 +342,7 @@ public class YFiles : YFunction
     {
         string url;
         url = "files.json?a="+command;
-        // may throw an exception
+
         return await this._download(url);
     }
 

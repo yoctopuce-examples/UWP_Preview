@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCurrentLoopOutput.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YCurrentLoopOutput.cs 28293 2017-08-03 09:01:57Z mvuilleu $
  *
  * Implements FindCurrentLoopOutput(), the high-level API for CurrentLoopOutput functions
  *
@@ -190,12 +190,14 @@ public class YCurrentLoopOutput : YFunction
      */
     public async Task<double> get_current()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CURRENT_INVALID;
             }
         }
-        return _current;
+        res = _current;
+        return res;
     }
 
 
@@ -206,12 +208,14 @@ public class YCurrentLoopOutput : YFunction
      */
     public async Task<string> get_currentTransition()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CURRENTTRANSITION_INVALID;
             }
         }
-        return _currentTransition;
+        res = _currentTransition;
+        return res;
     }
 
 
@@ -270,12 +274,14 @@ public class YCurrentLoopOutput : YFunction
      */
     public async Task<double> get_currentAtStartUp()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CURRENTATSTARTUP_INVALID;
             }
         }
-        return _currentAtStartUp;
+        res = _currentAtStartUp;
+        return res;
     }
 
 
@@ -300,12 +306,14 @@ public class YCurrentLoopOutput : YFunction
      */
     public async Task<int> get_loopPower()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LOOPPOWER_INVALID;
             }
         }
-        return _loopPower;
+        res = _loopPower;
+        return res;
     }
 
 
@@ -342,6 +350,13 @@ public class YCurrentLoopOutput : YFunction
      *   a 4-20mA output by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">
@@ -475,7 +490,7 @@ public class YCurrentLoopOutput : YFunction
      * </summary>
      * <param name="mA_target">
      *   new current value at the end of the transition
-     *   (floating-point number, representing the transition duration in mA)
+     *   (floating-point number, representing the end current in mA)
      * </param>
      * <param name="ms_duration">
      *   total duration of the transition, in milliseconds
@@ -493,8 +508,8 @@ public class YCurrentLoopOutput : YFunction
         if (mA_target > 21.0) {
             mA_target = 21.0;
         }
-        newval = ""+Convert.ToString( (int) Math.Round(mA_target*1000))+":"+Convert.ToString(ms_duration);
-        // may throw an exception
+        newval = ""+Convert.ToString( (int) Math.Round(mA_target*65536))+":"+Convert.ToString(ms_duration);
+
         return await this.set_currentTransition(newval);
     }
 

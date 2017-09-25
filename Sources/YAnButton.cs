@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAnButton.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YAnButton.cs 27700 2017-06-01 12:27:09Z seb $
  *
  * Implements FindAnButton(), the high-level API for AnButton functions
  *
@@ -234,12 +234,14 @@ public class YAnButton : YFunction
      */
     public async Task<int> get_calibratedValue()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CALIBRATEDVALUE_INVALID;
             }
         }
-        return _calibratedValue;
+        res = _calibratedValue;
+        return res;
     }
 
 
@@ -260,12 +262,14 @@ public class YAnButton : YFunction
      */
     public async Task<int> get_rawValue()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return RAWVALUE_INVALID;
             }
         }
-        return _rawValue;
+        res = _rawValue;
+        return res;
     }
 
 
@@ -286,12 +290,14 @@ public class YAnButton : YFunction
      */
     public async Task<int> get_analogCalibration()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ANALOGCALIBRATION_INVALID;
             }
         }
-        return _analogCalibration;
+        res = _analogCalibration;
+        return res;
     }
 
 
@@ -342,12 +348,14 @@ public class YAnButton : YFunction
      */
     public async Task<int> get_calibrationMax()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CALIBRATIONMAX_INVALID;
             }
         }
-        return _calibrationMax;
+        res = _calibrationMax;
+        return res;
     }
 
 
@@ -401,12 +409,14 @@ public class YAnButton : YFunction
      */
     public async Task<int> get_calibrationMin()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CALIBRATIONMIN_INVALID;
             }
         }
-        return _calibrationMin;
+        res = _calibrationMin;
+        return res;
     }
 
 
@@ -460,12 +470,14 @@ public class YAnButton : YFunction
      */
     public async Task<int> get_sensitivity()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SENSITIVITY_INVALID;
             }
         }
-        return _sensitivity;
+        res = _sensitivity;
+        return res;
     }
 
 
@@ -520,12 +532,14 @@ public class YAnButton : YFunction
      */
     public async Task<int> get_isPressed()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ISPRESSED_INVALID;
             }
         }
-        return _isPressed;
+        res = _isPressed;
+        return res;
     }
 
 
@@ -548,12 +562,14 @@ public class YAnButton : YFunction
      */
     public async Task<long> get_lastTimePressed()
     {
+        long res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LASTTIMEPRESSED_INVALID;
             }
         }
-        return _lastTimePressed;
+        res = _lastTimePressed;
+        return res;
     }
 
 
@@ -576,12 +592,14 @@ public class YAnButton : YFunction
      */
     public async Task<long> get_lastTimeReleased()
     {
+        long res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LASTTIMERELEASED_INVALID;
             }
         }
-        return _lastTimeReleased;
+        res = _lastTimeReleased;
+        return res;
     }
 
 
@@ -605,12 +623,14 @@ public class YAnButton : YFunction
      */
     public async Task<long> get_pulseCounter()
     {
+        long res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PULSECOUNTER_INVALID;
             }
         }
-        return _pulseCounter;
+        res = _pulseCounter;
+        return res;
     }
 
 
@@ -639,12 +659,14 @@ public class YAnButton : YFunction
      */
     public async Task<long> get_pulseTimer()
     {
+        long res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PULSETIMER_INVALID;
             }
         }
-        return _pulseTimer;
+        res = _pulseTimer;
+        return res;
     }
 
 
@@ -681,6 +703,13 @@ public class YAnButton : YFunction
      *   an analog input by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">

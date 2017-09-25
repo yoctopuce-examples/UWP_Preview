@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YQuadratureDecoder.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YQuadratureDecoder.cs 28159 2017-07-27 09:37:52Z seb $
  *
  * Implements FindQuadratureDecoder(), the high-level API for QuadratureDecoder functions
  *
@@ -52,7 +52,7 @@ namespace com.yoctopuce.YoctoAPI
  * <para>
  *   The class YQuadratureDecoder allows you to decode a two-wire signal produced by a
  *   quadrature encoder. It inherits from YSensor class the core functions to read measurements,
- *   register callback functions, access to the autonomous datalogger.
+ *   to register callback functions, to access the autonomous datalogger.
  * </para>
  * </summary>
  */
@@ -154,14 +154,14 @@ public class YQuadratureDecoder : YSensor
 
     /**
      * <summary>
-     *   Returns the PWM frequency in Hz.
+     *   Returns the increments frequency, in Hz.
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   a floating point number corresponding to the PWM frequency in Hz
+     *   a floating point number corresponding to the increments frequency, in Hz
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YQuadratureDecoder.SPEED_INVALID</c>.
@@ -169,12 +169,14 @@ public class YQuadratureDecoder : YSensor
      */
     public async Task<double> get_speed()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SPEED_INVALID;
             }
         }
-        return _speed;
+        res = _speed;
+        return res;
     }
 
 
@@ -196,12 +198,14 @@ public class YQuadratureDecoder : YSensor
      */
     public async Task<int> get_decoding()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DECODING_INVALID;
             }
         }
-        return _decoding;
+        res = _decoding;
+        return res;
     }
 
 
@@ -267,6 +271,13 @@ public class YQuadratureDecoder : YSensor
      *   a quadrature decoder by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YColorLed.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YColorLed.cs 27700 2017-06-01 12:27:09Z seb $
  *
  * Implements FindColorLed(), the high-level API for ColorLed functions
  *
@@ -212,12 +212,14 @@ public class YColorLed : YFunction
      */
     public async Task<int> get_rgbColor()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return RGBCOLOR_INVALID;
             }
         }
-        return _rgbColor;
+        res = _rgbColor;
+        return res;
     }
 
 
@@ -267,12 +269,14 @@ public class YColorLed : YFunction
      */
     public async Task<int> get_hslColor()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return HSLCOLOR_INVALID;
             }
         }
-        return _hslColor;
+        res = _hslColor;
+        return res;
     }
 
 
@@ -322,12 +326,14 @@ public class YColorLed : YFunction
      */
     public async Task<int> get_rgbColorAtPowerOn()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return RGBCOLORATPOWERON_INVALID;
             }
         }
-        return _rgbColorAtPowerOn;
+        res = _rgbColorAtPowerOn;
+        return res;
     }
 
 
@@ -376,12 +382,14 @@ public class YColorLed : YFunction
      */
     public async Task<int> get_blinkSeqSize()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return BLINKSEQSIZE_INVALID;
             }
         }
-        return _blinkSeqSize;
+        res = _blinkSeqSize;
+        return res;
     }
 
 
@@ -402,12 +410,14 @@ public class YColorLed : YFunction
      */
     public async Task<int> get_blinkSeqMaxSize()
     {
+        int res;
         if (_cacheExpiration == 0) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return BLINKSEQMAXSIZE_INVALID;
             }
         }
-        return _blinkSeqMaxSize;
+        res = _blinkSeqMaxSize;
+        return res;
     }
 
 
@@ -432,12 +442,14 @@ public class YColorLed : YFunction
      */
     public async Task<int> get_blinkSeqSignature()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return BLINKSEQSIGNATURE_INVALID;
             }
         }
-        return _blinkSeqSignature;
+        res = _blinkSeqSignature;
+        return res;
     }
 
 
@@ -448,12 +460,14 @@ public class YColorLed : YFunction
      */
     public async Task<string> get_command()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COMMAND_INVALID;
             }
         }
-        return _command;
+        res = _command;
+        return res;
     }
 
 
@@ -498,6 +512,13 @@ public class YColorLed : YFunction
      *   an RGB LED by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YLightSensor.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YLightSensor.cs 28559 2017-09-15 15:01:38Z seb $
  *
  * Implements FindLightSensor(), the high-level API for LightSensor functions
  *
@@ -52,7 +52,7 @@ namespace com.yoctopuce.YoctoAPI
  * <para>
  *   The Yoctopuce class YLightSensor allows you to read and configure Yoctopuce light
  *   sensors. It inherits from YSensor class the core functions to read measurements,
- *   register callback functions, access to the autonomous datalogger.
+ *   to register callback functions, to access the autonomous datalogger.
  *   This class adds the ability to easily perform a one-point linear calibration
  *   to compensate the effect of a glass or filter placed in front of the sensor.
  *   For some light sensors with several working modes, this class can select the
@@ -180,18 +180,20 @@ public class YLightSensor : YSensor
      */
     public async Task<int> get_measureType()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MEASURETYPE_INVALID;
             }
         }
-        return _measureType;
+        res = _measureType;
+        return res;
     }
 
 
     /**
      * <summary>
-     *   Modify the light sensor type used in the device.
+     *   Changes the light sensor type used in the device.
      * <para>
      *   The measure can either
      *   approximate the response of the human eye, focus on a specific light
@@ -205,7 +207,7 @@ public class YLightSensor : YSensor
      * <param name="newval">
      *   a value among <c>YLightSensor.MEASURETYPE_HUMAN_EYE</c>, <c>YLightSensor.MEASURETYPE_WIDE_SPECTRUM</c>,
      *   <c>YLightSensor.MEASURETYPE_INFRARED</c>, <c>YLightSensor.MEASURETYPE_HIGH_RATE</c> and
-     *   <c>YLightSensor.MEASURETYPE_HIGH_ENERGY</c>
+     *   <c>YLightSensor.MEASURETYPE_HIGH_ENERGY</c> corresponding to the light sensor type used in the device
      * </param>
      * <para>
      * </para>
@@ -257,6 +259,13 @@ public class YLightSensor : YSensor
      *   a light sensor by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">

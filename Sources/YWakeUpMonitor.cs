@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWakeUpMonitor.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YWakeUpMonitor.cs 27700 2017-06-01 12:27:09Z seb $
  *
  * Implements FindWakeUpMonitor(), the high-level API for WakeUpMonitor functions
  *
@@ -185,12 +185,14 @@ public class YWakeUpMonitor : YFunction
      */
     public async Task<int> get_powerDuration()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return POWERDURATION_INVALID;
             }
         }
-        return _powerDuration;
+        res = _powerDuration;
+        return res;
     }
 
 
@@ -239,12 +241,14 @@ public class YWakeUpMonitor : YFunction
      */
     public async Task<int> get_sleepCountdown()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SLEEPCOUNTDOWN_INVALID;
             }
         }
-        return _sleepCountdown;
+        res = _sleepCountdown;
+        return res;
     }
 
 
@@ -293,12 +297,14 @@ public class YWakeUpMonitor : YFunction
      */
     public async Task<long> get_nextWakeUp()
     {
+        long res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return NEXTWAKEUP_INVALID;
             }
         }
-        return _nextWakeUp;
+        res = _nextWakeUp;
+        return res;
     }
 
 
@@ -350,12 +356,14 @@ public class YWakeUpMonitor : YFunction
      */
     public async Task<int> get_wakeUpReason()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return WAKEUPREASON_INVALID;
             }
         }
-        return _wakeUpReason;
+        res = _wakeUpReason;
+        return res;
     }
 
 
@@ -377,12 +385,14 @@ public class YWakeUpMonitor : YFunction
      */
     public async Task<int> get_wakeUpState()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return WAKEUPSTATE_INVALID;
             }
         }
-        return _wakeUpState;
+        res = _wakeUpState;
+        return res;
     }
 
 
@@ -401,12 +411,14 @@ public class YWakeUpMonitor : YFunction
      */
     public async Task<long> get_rtcTime()
     {
+        long res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return RTCTIME_INVALID;
             }
         }
-        return _rtcTime;
+        res = _rtcTime;
+        return res;
     }
 
 
@@ -443,6 +455,13 @@ public class YWakeUpMonitor : YFunction
      *   a monitor by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">

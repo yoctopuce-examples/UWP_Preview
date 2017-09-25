@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YDataSet.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YDataSet.cs 28024 2017-07-10 08:50:02Z mvuilleu $
  *
  * Implements yFindDataSet(), the high-level API for DataSet functions
  *
@@ -211,7 +211,7 @@ public class YDataSet
         int minCol;
         int avgCol;
         int maxCol;
-        // may throw an exception
+
         if (progress != _progress) {
             return _progress;
         }
@@ -247,14 +247,14 @@ public class YDataSet
         } else {
             maxCol = 0;
         }
-        
+
         for (int ii = 0; ii < dataRows.Count; ii++) {
             if ((tim >= _startTime) && ((_endTime == 0) || (tim <= _endTime))) {
                 _measures.Add(new YMeasure(tim - itv, tim, dataRows[ii][minCol], dataRows[ii][avgCol], dataRows[ii][maxCol]));
             }
             tim = tim + itv;
+            tim = Math.Round(tim * 1000) / 1000.0;
         }
-        
         return await this.get_progress();
     }
 
@@ -431,6 +431,12 @@ public class YDataSet
         YDataStream stream;
         if (_progress < 0) {
             url = "logger.json?id="+_functionId;
+            if (_startTime != 0) {
+                url = ""+url+"&from="+Convert.ToString(_startTime);
+            }
+            if (_endTime != 0) {
+                url = ""+url+"&to="+Convert.ToString(_endTime);
+            }
         } else {
             if (_progress >= _streams.Count) {
                 return 100;
@@ -537,14 +543,13 @@ public class YDataSet
         int minCol;
         int avgCol;
         int maxCol;
-        // may throw an exception
+
         startUtc = (long) Math.Round(measure.get_startTimeUTC());
         stream = null;
         for (int ii = 0; ii < _streams.Count; ii++) {
             if (await _streams[ii].get_startTimeUTC() == startUtc) {
                 stream = _streams[ii];
             }
-            ;;
         }
         if (stream == null) {
             return measures;
@@ -570,12 +575,12 @@ public class YDataSet
         } else {
             maxCol = 0;
         }
-        
+
         for (int ii = 0; ii < dataRows.Count; ii++) {
             if ((tim >= _startTime) && ((_endTime == 0) || (tim <= _endTime))) {
                 measures.Add(new YMeasure(tim - itv, tim, dataRows[ii][minCol], dataRows[ii][avgCol], dataRows[ii][maxCol]));
             }
-            tim = tim + itv;;
+            tim = tim + itv;
         }
         return measures;
     }

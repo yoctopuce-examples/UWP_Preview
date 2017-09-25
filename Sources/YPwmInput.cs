@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPwmInput.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YPwmInput.cs 28559 2017-09-15 15:01:38Z seb $
  *
  * Implements FindPwmInput(), the high-level API for PwmInput functions
  *
@@ -52,7 +52,7 @@ namespace com.yoctopuce.YoctoAPI
  * <para>
  *   The Yoctopuce class YPwmInput allows you to read and configure Yoctopuce PWM
  *   sensors. It inherits from YSensor class the core functions to read measurements,
- *   register callback functions, access to the autonomous datalogger.
+ *   to register callback functions, to access the autonomous datalogger.
  *   This class adds the ability to configure the signal parameter used to transmit
  *   information: the duty cycle, the frequency or the pulse width.
  * </para>
@@ -108,6 +108,12 @@ public class YPwmInput : YSensor
     public const int PWMREPORTMODE_PWM_PULSEDURATION = 2;
     public const int PWMREPORTMODE_PWM_EDGECOUNT = 3;
     public const int PWMREPORTMODE_INVALID = -1;
+    /**
+     * <summary>
+     *   invalid debouncePeriod value
+     * </summary>
+     */
+    public const  int DEBOUNCEPERIOD_INVALID = YAPI.INVALID_UINT;
     protected double _dutyCycle = DUTYCYCLE_INVALID;
     protected double _pulseDuration = PULSEDURATION_INVALID;
     protected double _frequency = FREQUENCY_INVALID;
@@ -115,6 +121,7 @@ public class YPwmInput : YSensor
     protected long _pulseCounter = PULSECOUNTER_INVALID;
     protected long _pulseTimer = PULSETIMER_INVALID;
     protected int _pwmReportMode = PWMREPORTMODE_INVALID;
+    protected int _debouncePeriod = DEBOUNCEPERIOD_INVALID;
     protected ValueCallback _valueCallbackPwmInput = null;
     protected TimedReportCallback _timedReportCallbackPwmInput = null;
 
@@ -174,6 +181,9 @@ public class YPwmInput : YSensor
         if (json_val.Has("pwmReportMode")) {
             _pwmReportMode = json_val.GetInt("pwmReportMode");
         }
+        if (json_val.Has("debouncePeriod")) {
+            _debouncePeriod = json_val.GetInt("debouncePeriod");
+        }
         base.imm_parseAttr(json_val);
     }
 
@@ -194,12 +204,14 @@ public class YPwmInput : YSensor
      */
     public async Task<double> get_dutyCycle()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DUTYCYCLE_INVALID;
             }
         }
-        return _dutyCycle;
+        res = _dutyCycle;
+        return res;
     }
 
 
@@ -220,12 +232,14 @@ public class YPwmInput : YSensor
      */
     public async Task<double> get_pulseDuration()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PULSEDURATION_INVALID;
             }
         }
-        return _pulseDuration;
+        res = _pulseDuration;
+        return res;
     }
 
 
@@ -246,12 +260,14 @@ public class YPwmInput : YSensor
      */
     public async Task<double> get_frequency()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return FREQUENCY_INVALID;
             }
         }
-        return _frequency;
+        res = _frequency;
+        return res;
     }
 
 
@@ -272,12 +288,14 @@ public class YPwmInput : YSensor
      */
     public async Task<double> get_period()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PERIOD_INVALID;
             }
         }
-        return _period;
+        res = _period;
+        return res;
     }
 
 
@@ -301,12 +319,14 @@ public class YPwmInput : YSensor
      */
     public async Task<long> get_pulseCounter()
     {
+        long res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PULSECOUNTER_INVALID;
             }
         }
-        return _pulseCounter;
+        res = _pulseCounter;
+        return res;
     }
 
 
@@ -335,12 +355,14 @@ public class YPwmInput : YSensor
      */
     public async Task<long> get_pulseTimer()
     {
+        long res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PULSETIMER_INVALID;
             }
         }
-        return _pulseTimer;
+        res = _pulseTimer;
+        return res;
     }
 
 
@@ -365,18 +387,20 @@ public class YPwmInput : YSensor
      */
     public async Task<int> get_pwmReportMode()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PWMREPORTMODE_INVALID;
             }
         }
-        return _pwmReportMode;
+        res = _pwmReportMode;
+        return res;
     }
 
 
     /**
      * <summary>
-     *   Modifies the  parameter  type (frequency/duty cycle, pulse width, or edge count) returned by the get_currentValue function and callbacks.
+     *   Changes the  parameter  type (frequency/duty cycle, pulse width, or edge count) returned by the get_currentValue function and callbacks.
      * <para>
      *   The edge count value is limited to the 6 lowest digits. For values greater than one million, use
      *   get_pulseCounter().
@@ -387,6 +411,8 @@ public class YPwmInput : YSensor
      * <param name="newval">
      *   a value among <c>YPwmInput.PWMREPORTMODE_PWM_DUTYCYCLE</c>, <c>YPwmInput.PWMREPORTMODE_PWM_FREQUENCY</c>,
      *   <c>YPwmInput.PWMREPORTMODE_PWM_PULSEDURATION</c> and <c>YPwmInput.PWMREPORTMODE_PWM_EDGECOUNT</c>
+     *   corresponding to the  parameter  type (frequency/duty cycle, pulse width, or edge count) returned
+     *   by the get_currentValue function and callbacks
      * </param>
      * <para>
      * </para>
@@ -402,6 +428,64 @@ public class YPwmInput : YSensor
         string rest_val;
         rest_val = (newval).ToString();
         await _setAttr("pwmReportMode",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * <summary>
+     *   Returns the shortest expected pulse duration, in ms.
+     * <para>
+     *   Any shorter pulse will be automatically ignored (debounce).
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the shortest expected pulse duration, in ms
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YPwmInput.DEBOUNCEPERIOD_INVALID</c>.
+     * </para>
+     */
+    public async Task<int> get_debouncePeriod()
+    {
+        int res;
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+            if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return DEBOUNCEPERIOD_INVALID;
+            }
+        }
+        res = _debouncePeriod;
+        return res;
+    }
+
+
+    /**
+     * <summary>
+     *   Changes the shortest expected pulse duration, in ms.
+     * <para>
+     *   Any shorter pulse will be automatically ignored (debounce).
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   an integer corresponding to the shortest expected pulse duration, in ms
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public async Task<int> set_debouncePeriod(int  newval)
+    {
+        string rest_val;
+        rest_val = (newval).ToString();
+        await _setAttr("debouncePeriod",rest_val);
         return YAPI.SUCCESS;
     }
 
@@ -438,6 +522,13 @@ public class YPwmInput : YSensor
      *   a PWM input by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">

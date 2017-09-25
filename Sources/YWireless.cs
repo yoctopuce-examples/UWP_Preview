@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWireless.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YWireless.cs 27700 2017-06-01 12:27:09Z seb $
  *
  * Implements FindWireless(), the high-level API for Wireless functions
  *
@@ -102,12 +102,23 @@ public class YWireless : YFunction
      * </summary>
      */
     public const  string WLANCONFIG_INVALID = YAPI.INVALID_STRING;
+    /**
+     * <summary>
+     *   invalid wlanState value
+     * </summary>
+     */
+    public const int WLANSTATE_DOWN = 0;
+    public const int WLANSTATE_SCANNING = 1;
+    public const int WLANSTATE_CONNECTED = 2;
+    public const int WLANSTATE_REJECTED = 3;
+    public const int WLANSTATE_INVALID = -1;
     protected int _linkQuality = LINKQUALITY_INVALID;
     protected string _ssid = SSID_INVALID;
     protected int _channel = CHANNEL_INVALID;
     protected int _security = SECURITY_INVALID;
     protected string _message = MESSAGE_INVALID;
     protected string _wlanConfig = WLANCONFIG_INVALID;
+    protected int _wlanState = WLANSTATE_INVALID;
     protected ValueCallback _valueCallbackWireless = null;
 
     public new delegate Task ValueCallback(YWireless func, string value);
@@ -164,6 +175,9 @@ public class YWireless : YFunction
         if (json_val.Has("wlanConfig")) {
             _wlanConfig = json_val.GetString("wlanConfig");
         }
+        if (json_val.Has("wlanState")) {
+            _wlanState = json_val.GetInt("wlanState");
+        }
         base.imm_parseAttr(json_val);
     }
 
@@ -184,12 +198,14 @@ public class YWireless : YFunction
      */
     public async Task<int> get_linkQuality()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LINKQUALITY_INVALID;
             }
         }
-        return _linkQuality;
+        res = _linkQuality;
+        return res;
     }
 
 
@@ -210,12 +226,14 @@ public class YWireless : YFunction
      */
     public async Task<string> get_ssid()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SSID_INVALID;
             }
         }
-        return _ssid;
+        res = _ssid;
+        return res;
     }
 
 
@@ -236,12 +254,14 @@ public class YWireless : YFunction
      */
     public async Task<int> get_channel()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CHANNEL_INVALID;
             }
         }
-        return _channel;
+        res = _channel;
+        return res;
     }
 
 
@@ -264,12 +284,14 @@ public class YWireless : YFunction
      */
     public async Task<int> get_security()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SECURITY_INVALID;
             }
         }
-        return _security;
+        res = _security;
+        return res;
     }
 
 
@@ -290,12 +312,14 @@ public class YWireless : YFunction
      */
     public async Task<string> get_message()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MESSAGE_INVALID;
             }
         }
-        return _message;
+        res = _message;
+        return res;
     }
 
 
@@ -306,12 +330,14 @@ public class YWireless : YFunction
      */
     public async Task<string> get_wlanConfig()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return WLANCONFIG_INVALID;
             }
         }
-        return _wlanConfig;
+        res = _wlanConfig;
+        return res;
     }
 
 
@@ -322,6 +348,49 @@ public class YWireless : YFunction
         await _setAttr("wlanConfig",rest_val);
         return YAPI.SUCCESS;
     }
+
+    /**
+     * <summary>
+     *   Returns the current state of the wireless interface.
+     * <para>
+     *   The state <c>YWireless.WLANSTATE_DOWN</c> means that the network interface is
+     *   not connected to a network. The state <c>YWireless.WLANSTATE_SCANNING</c> means that the network
+     *   interface is scanning available
+     *   frequencies. During this stage, the device is not reachable, and the network settings are not yet
+     *   applied. The state
+     *   <c>YWireless.WLANSTATE_CONNECTED</c> means that the network settings have been successfully applied
+     *   ant that the device is reachable
+     *   from the wireless network. If the device is configured to use ad-hoc or Soft AP mode, it means that
+     *   the wireless network
+     *   is up and that other devices can join the network. The state <c>YWireless.WLANSTATE_REJECTED</c>
+     *   means that the network interface has
+     *   not been able to join the requested network. The description of the error can be obtain with the
+     *   <c>get_message()</c> method.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a value among <c>YWireless.WLANSTATE_DOWN</c>, <c>YWireless.WLANSTATE_SCANNING</c>,
+     *   <c>YWireless.WLANSTATE_CONNECTED</c> and <c>YWireless.WLANSTATE_REJECTED</c> corresponding to the
+     *   current state of the wireless interface
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YWireless.WLANSTATE_INVALID</c>.
+     * </para>
+     */
+    public async Task<int> get_wlanState()
+    {
+        int res;
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+            if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return WLANSTATE_INVALID;
+            }
+        }
+        res = _wlanState;
+        return res;
+    }
+
 
     /**
      * <summary>
@@ -356,6 +425,13 @@ public class YWireless : YFunction
      *   a wireless lan interface by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">
@@ -481,6 +557,31 @@ public class YWireless : YFunction
 
     /**
      * <summary>
+     *   Triggers a scan of the wireless frequency and builds the list of available networks.
+     * <para>
+     *   The scan forces a disconnection from the current network. At then end of the process, the
+     *   the network interface attempts to reconnect to the previous network. During the scan, the <c>wlanState</c>
+     *   switches to <c>YWireless.WLANSTATE_DOWN</c>, then to <c>YWireless.WLANSTATE_SCANNING</c>. When the
+     *   scan is completed,
+     *   <c>get_wlanState()</c> returns either <c>YWireless.WLANSTATE_DOWN</c> or
+     *   <c>YWireless.WLANSTATE_SCANNING</c>. At this
+     *   point, the list of detected network can be retrieved with the <c>get_detectedWlans()</c> method.
+     * </para>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     * </summary>
+     */
+    public virtual async Task<int> startWlanScan()
+    {
+        string config;
+        config = await this.get_wlanConfig();
+        // a full scan is triggered when a config is applied
+        return await this.set_wlanConfig(config);
+    }
+
+    /**
+     * <summary>
      *   Changes the configuration of the wireless lan interface to connect to an existing
      *   access point (infrastructure mode).
      * <para>
@@ -580,8 +681,8 @@ public class YWireless : YFunction
      *   Returns a list of YWlanRecord objects that describe detected Wireless networks.
      * <para>
      *   This list is not updated when the module is already connected to an acces point (infrastructure mode).
-     *   To force an update of this list, <c>adhocNetwork()</c> must be called to disconnect
-     *   the module from the current network. The returned list must be unallocated by the caller.
+     *   To force an update of this list, <c>startWlanScan()</c> must be called.
+     *   Note that an languages without garbage collections, the returned list must be freed by the caller.
      * </para>
      * <para>
      * </para>
@@ -599,7 +700,7 @@ public class YWireless : YFunction
         byte[] json;
         List<string> wlanlist = new List<string>();
         List<YWlanRecord> res = new List<YWlanRecord>();
-        // may throw an exception
+
         json = await this._download("wlan.json?by=name");
         wlanlist = this.imm_json_get_array(json);
         res.Clear();

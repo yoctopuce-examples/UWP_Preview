@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCarbonDioxide.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YCarbonDioxide.cs 28559 2017-09-15 15:01:38Z seb $
  *
  * Implements FindCarbonDioxide(), the high-level API for CarbonDioxide functions
  *
@@ -52,7 +52,7 @@ namespace com.yoctopuce.YoctoAPI
  * <para>
  *   The Yoctopuce class YCarbonDioxide allows you to read and configure Yoctopuce CO2
  *   sensors. It inherits from YSensor class the core functions to read measurements,
- *   register callback functions, access to the autonomous datalogger.
+ *   to register callback functions,  to access the autonomous datalogger.
  *   This class adds the ability to perform manual calibration if reuired.
  * </para>
  * </summary>
@@ -141,18 +141,20 @@ public class YCarbonDioxide : YSensor
      */
     public async Task<int> get_abcPeriod()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ABCPERIOD_INVALID;
             }
         }
-        return _abcPeriod;
+        res = _abcPeriod;
+        return res;
     }
 
 
     /**
      * <summary>
-     *   Modifies Automatic Baseline Calibration period, in hours.
+     *   Changes Automatic Baseline Calibration period, in hours.
      * <para>
      *   If you need
      *   to disable automatic baseline calibration (for instance when using the
@@ -164,7 +166,7 @@ public class YCarbonDioxide : YSensor
      * </para>
      * </summary>
      * <param name="newval">
-     *   an integer
+     *   an integer corresponding to Automatic Baseline Calibration period, in hours
      * </param>
      * <para>
      * </para>
@@ -190,12 +192,14 @@ public class YCarbonDioxide : YSensor
      */
     public async Task<string> get_command()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COMMAND_INVALID;
             }
         }
-        return _command;
+        res = _command;
+        return res;
     }
 
 
@@ -240,6 +244,13 @@ public class YCarbonDioxide : YSensor
      *   a CO2 sensor by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">
@@ -426,9 +437,14 @@ public class YCarbonDioxide : YSensor
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual async Task<int> triggetBaselineCalibration()
+    public virtual async Task<int> triggerBaselineCalibration()
     {
         return await this.set_command("BC");
+    }
+
+    public virtual async Task<int> triggetBaselineCalibration()
+    {
+        return await this.triggerBaselineCalibration();
     }
 
     /**
@@ -455,9 +471,14 @@ public class YCarbonDioxide : YSensor
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual async Task<int> triggetZeroCalibration()
+    public virtual async Task<int> triggerZeroCalibration()
     {
         return await this.set_command("ZC");
+    }
+
+    public virtual async Task<int> triggetZeroCalibration()
+    {
+        return await this.triggerZeroCalibration();
     }
 
     /**

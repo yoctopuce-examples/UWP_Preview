@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplay.cs 25176 2016-08-12 09:10:37Z seb $
+ * $Id: YDisplay.cs 27700 2017-06-01 12:27:09Z seb $
  *
  * Implements FindDisplay(), the high-level API for Display functions
  *
@@ -240,12 +240,14 @@ public class YDisplay : YFunction
      */
     public async Task<int> get_enabled()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ENABLED_INVALID;
             }
         }
-        return _enabled;
+        res = _enabled;
+        return res;
     }
 
 
@@ -295,12 +297,14 @@ public class YDisplay : YFunction
      */
     public async Task<string> get_startupSeq()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return STARTUPSEQ_INVALID;
             }
         }
-        return _startupSeq;
+        res = _startupSeq;
+        return res;
     }
 
 
@@ -351,12 +355,14 @@ public class YDisplay : YFunction
      */
     public async Task<int> get_brightness()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return BRIGHTNESS_INVALID;
             }
         }
-        return _brightness;
+        res = _brightness;
+        return res;
     }
 
 
@@ -410,12 +416,14 @@ public class YDisplay : YFunction
      */
     public async Task<int> get_orientation()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ORIENTATION_INVALID;
             }
         }
-        return _orientation;
+        res = _orientation;
+        return res;
     }
 
 
@@ -467,12 +475,14 @@ public class YDisplay : YFunction
      */
     public async Task<int> get_displayWidth()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DISPLAYWIDTH_INVALID;
             }
         }
-        return _displayWidth;
+        res = _displayWidth;
+        return res;
     }
 
 
@@ -493,12 +503,14 @@ public class YDisplay : YFunction
      */
     public async Task<int> get_displayHeight()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DISPLAYHEIGHT_INVALID;
             }
         }
-        return _displayHeight;
+        res = _displayHeight;
+        return res;
     }
 
 
@@ -520,12 +532,14 @@ public class YDisplay : YFunction
      */
     public async Task<int> get_displayType()
     {
+        int res;
         if (_cacheExpiration == 0) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DISPLAYTYPE_INVALID;
             }
         }
-        return _displayType;
+        res = _displayType;
+        return res;
     }
 
 
@@ -546,12 +560,14 @@ public class YDisplay : YFunction
      */
     public async Task<int> get_layerWidth()
     {
+        int res;
         if (_cacheExpiration == 0) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LAYERWIDTH_INVALID;
             }
         }
-        return _layerWidth;
+        res = _layerWidth;
+        return res;
     }
 
 
@@ -572,12 +588,14 @@ public class YDisplay : YFunction
      */
     public async Task<int> get_layerHeight()
     {
+        int res;
         if (_cacheExpiration == 0) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LAYERHEIGHT_INVALID;
             }
         }
-        return _layerHeight;
+        res = _layerHeight;
+        return res;
     }
 
 
@@ -598,12 +616,14 @@ public class YDisplay : YFunction
      */
     public async Task<int> get_layerCount()
     {
+        int res;
         if (_cacheExpiration == 0) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LAYERCOUNT_INVALID;
             }
         }
-        return _layerCount;
+        res = _layerCount;
+        return res;
     }
 
 
@@ -614,12 +634,14 @@ public class YDisplay : YFunction
      */
     public async Task<string> get_command()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COMMAND_INVALID;
             }
         }
-        return _command;
+        res = _command;
+        return res;
     }
 
 
@@ -664,6 +686,13 @@ public class YDisplay : YFunction
      *   a display by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">

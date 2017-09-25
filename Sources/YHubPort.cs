@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YHubPort.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YHubPort.cs 27700 2017-06-01 12:27:09Z seb $
  *
  * Implements FindHubPort(), the high-level API for HubPort functions
  *
@@ -156,12 +156,14 @@ public class YHubPort : YFunction
      */
     public async Task<int> get_enabled()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ENABLED_INVALID;
             }
         }
-        return _enabled;
+        res = _enabled;
+        return res;
     }
 
 
@@ -215,12 +217,14 @@ public class YHubPort : YFunction
      */
     public async Task<int> get_portState()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PORTSTATE_INVALID;
             }
         }
-        return _portState;
+        res = _portState;
+        return res;
     }
 
 
@@ -243,12 +247,14 @@ public class YHubPort : YFunction
      */
     public async Task<int> get_baudRate()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return BAUDRATE_INVALID;
             }
         }
-        return _baudRate;
+        res = _baudRate;
+        return res;
     }
 
 
@@ -285,6 +291,13 @@ public class YHubPort : YFunction
      *   a Yocto-hub port by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">

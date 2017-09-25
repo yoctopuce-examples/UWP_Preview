@@ -225,7 +225,7 @@ namespace com.yoctopuce.YoctoAPI
         }
 
         //The Closed event handler
-        private async void WebSock_Closed(IWebSocket sender, WebSocketClosedEventArgs args)
+        private void WebSock_Closed(IWebSocket sender, WebSocketClosedEventArgs args)
         {
             WSLOG("WS: disconnenction detected");
             _connected = false;

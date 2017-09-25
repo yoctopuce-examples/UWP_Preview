@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMotor.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YMotor.cs 27700 2017-06-01 12:27:09Z seb $
  *
  * Implements FindMotor(), the high-level API for Motor functions
  *
@@ -233,12 +233,14 @@ public class YMotor : YFunction
      */
     public async Task<int> get_motorStatus()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MOTORSTATUS_INVALID;
             }
         }
-        return _motorStatus;
+        res = _motorStatus;
+        return res;
     }
 
 
@@ -300,12 +302,14 @@ public class YMotor : YFunction
      */
     public async Task<double> get_drivingForce()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DRIVINGFORCE_INVALID;
             }
         }
-        return _drivingForce;
+        res = _drivingForce;
+        return res;
     }
 
 
@@ -357,12 +361,14 @@ public class YMotor : YFunction
      */
     public async Task<double> get_brakingForce()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return BRAKINGFORCE_INVALID;
             }
         }
-        return _brakingForce;
+        res = _brakingForce;
+        return res;
     }
 
 
@@ -423,12 +429,14 @@ public class YMotor : YFunction
      */
     public async Task<double> get_cutOffVoltage()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CUTOFFVOLTAGE_INVALID;
             }
         }
-        return _cutOffVoltage;
+        res = _cutOffVoltage;
+        return res;
     }
 
 
@@ -452,12 +460,14 @@ public class YMotor : YFunction
      */
     public async Task<int> get_overCurrentLimit()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return OVERCURRENTLIMIT_INVALID;
             }
         }
-        return _overCurrentLimit;
+        res = _overCurrentLimit;
+        return res;
     }
 
 
@@ -543,12 +553,14 @@ public class YMotor : YFunction
      */
     public async Task<double> get_frequency()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return FREQUENCY_INVALID;
             }
         }
-        return _frequency;
+        res = _frequency;
+        return res;
     }
 
 
@@ -571,12 +583,14 @@ public class YMotor : YFunction
      */
     public async Task<int> get_starterTime()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return STARTERTIME_INVALID;
             }
         }
-        return _starterTime;
+        res = _starterTime;
+        return res;
     }
 
 
@@ -632,12 +646,14 @@ public class YMotor : YFunction
      */
     public async Task<int> get_failSafeTimeout()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return FAILSAFETIMEOUT_INVALID;
             }
         }
-        return _failSafeTimeout;
+        res = _failSafeTimeout;
+        return res;
     }
 
 
@@ -681,12 +697,14 @@ public class YMotor : YFunction
      */
     public async Task<string> get_command()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COMMAND_INVALID;
             }
         }
-        return _command;
+        res = _command;
+        return res;
     }
 
 
@@ -731,6 +749,13 @@ public class YMotor : YFunction
      *   a motor by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">

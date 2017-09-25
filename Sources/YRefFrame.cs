@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRefFrame.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YRefFrame.cs 28457 2017-09-06 08:34:21Z mvuilleu $
  *
  * Implements FindRefFrame(), the high-level API for RefFrame functions
  *
@@ -80,23 +80,37 @@ public class YRefFrame : YFunction
      * </summary>
      */
     public const  string CALIBRATIONPARAM_INVALID = YAPI.INVALID_STRING;
+    /**
+     * <summary>
+     *   invalid fusionMode value
+     * </summary>
+     */
+    public const int FUSIONMODE_NDOF = 0;
+    public const int FUSIONMODE_NDOF_FMC_OFF = 1;
+    public const int FUSIONMODE_M4G = 2;
+    public const int FUSIONMODE_COMPASS = 3;
+    public const int FUSIONMODE_IMU = 4;
+    public const int FUSIONMODE_INVALID = -1;
     public enum MOUNTPOSITION {
         BOTTOM = 0,
         TOP = 1,
         FRONT = 2,
         REAR = 3,
         RIGHT = 4,
-        LEFT = 5}
+        LEFT = 5,
+        INVALID = 6}
 
     public enum MOUNTORIENTATION {
         TWELVE = 0,
         THREE = 1,
         SIX = 2,
-        NINE = 3}
+        NINE = 3,
+        INVALID = 4}
 
     protected int _mountPos = MOUNTPOS_INVALID;
     protected double _bearing = BEARING_INVALID;
     protected string _calibrationParam = CALIBRATIONPARAM_INVALID;
+    protected int _fusionMode = FUSIONMODE_INVALID;
     protected ValueCallback _valueCallbackRefFrame = null;
     protected bool _calibV2;
     protected int _calibStage = 0;
@@ -164,6 +178,9 @@ public class YRefFrame : YFunction
         if (json_val.Has("calibrationParam")) {
             _calibrationParam = json_val.GetString("calibrationParam");
         }
+        if (json_val.Has("fusionMode")) {
+            _fusionMode = json_val.GetInt("fusionMode");
+        }
         base.imm_parseAttr(json_val);
     }
 
@@ -174,12 +191,14 @@ public class YRefFrame : YFunction
      */
     public async Task<int> get_mountPos()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MOUNTPOS_INVALID;
             }
         }
-        return _mountPos;
+        res = _mountPos;
+        return res;
     }
 
 
@@ -256,12 +275,14 @@ public class YRefFrame : YFunction
      */
     public async Task<double> get_bearing()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return BEARING_INVALID;
             }
         }
-        return _bearing;
+        res = _bearing;
+        return res;
     }
 
 
@@ -272,12 +293,14 @@ public class YRefFrame : YFunction
      */
     public async Task<string> get_calibrationParam()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CALIBRATIONPARAM_INVALID;
             }
         }
-        return _calibrationParam;
+        res = _calibrationParam;
+        return res;
     }
 
 
@@ -286,6 +309,32 @@ public class YRefFrame : YFunction
         string rest_val;
         rest_val = newval;
         await _setAttr("calibrationParam",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * <summary>
+     *   throws an exception on error
+     * </summary>
+     */
+    public async Task<int> get_fusionMode()
+    {
+        int res;
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+            if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return FUSIONMODE_INVALID;
+            }
+        }
+        res = _fusionMode;
+        return res;
+    }
+
+
+    public async Task<int> set_fusionMode(int  newval)
+    {
+        string rest_val;
+        rest_val = (newval).ToString();
+        await _setAttr("fusionMode",rest_val);
         return YAPI.SUCCESS;
     }
 
@@ -322,6 +371,13 @@ public class YRefFrame : YFunction
      *   a reference frame by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">
@@ -457,19 +513,22 @@ public class YRefFrame : YFunction
      * </summary>
      * <returns>
      *   a value among the <c>YRefFrame.MOUNTPOSITION</c> enumeration
-     *   (<c>YRefFrame.MOUNTPOSITION_BOTTOM</c>,   <c>YRefFrame.MOUNTPOSITION_TOP</c>,
-     *   <c>YRefFrame.MOUNTPOSITION_FRONT</c>,    <c>YRefFrame.MOUNTPOSITION_RIGHT</c>,
-     *   <c>YRefFrame.MOUNTPOSITION_REAR</c>,     <c>YRefFrame.MOUNTPOSITION_LEFT</c>),
+     *   (<c>YRefFrame.MOUNTPOSITION.BOTTOM</c>,   <c>YRefFrame.MOUNTPOSITION.TOP</c>,
+     *   <c>YRefFrame.MOUNTPOSITION.FRONT</c>,    <c>YRefFrame.MOUNTPOSITION.RIGHT</c>,
+     *   <c>YRefFrame.MOUNTPOSITION.REAR</c>,     <c>YRefFrame.MOUNTPOSITION.LEFT</c>),
      *   corresponding to the installation in a box, on one of the six faces.
      * </returns>
      * <para>
-     *   On failure, throws an exception or returns a negative error code.
+     *   On failure, throws an exception or returns YRefFrame.MOUNTPOSITION.INVALID.
      * </para>
      */
     public virtual async Task<MOUNTPOSITION> get_mountPosition()
     {
         int position;
         position = await this.get_mountPos();
+        if (position < 0) {
+            return MOUNTPOSITION.INVALID;
+        }
         return (MOUNTPOSITION) ((position) >> (2));
     }
 
@@ -485,21 +544,24 @@ public class YRefFrame : YFunction
      * </summary>
      * <returns>
      *   a value among the enumeration <c>YRefFrame.MOUNTORIENTATION</c>
-     *   (<c>YRefFrame.MOUNTORIENTATION_TWELVE</c>, <c>YRefFrame.MOUNTORIENTATION_THREE</c>,
-     *   <c>YRefFrame.MOUNTORIENTATION_SIX</c>,     <c>YRefFrame.MOUNTORIENTATION_NINE</c>)
+     *   (<c>YRefFrame.MOUNTORIENTATION.TWELVE</c>, <c>YRefFrame.MOUNTORIENTATION.THREE</c>,
+     *   <c>YRefFrame.MOUNTORIENTATION.SIX</c>,     <c>YRefFrame.MOUNTORIENTATION.NINE</c>)
      *   corresponding to the orientation of the "X" arrow on the device,
      *   as on a clock dial seen from an observer in the center of the box.
      *   On the bottom face, the 12H orientation points to the front, while
      *   on the top face, the 12H orientation points to the rear.
      * </returns>
      * <para>
-     *   On failure, throws an exception or returns a negative error code.
+     *   On failure, throws an exception or returns YRefFrame.MOUNTORIENTATION.INVALID.
      * </para>
      */
     public virtual async Task<MOUNTORIENTATION> get_mountOrientation()
     {
         int position;
         position = await this.get_mountPos();
+        if (position < 0) {
+            return MOUNTORIENTATION.INVALID;
+        }
         return (MOUNTORIENTATION) ((position) & (3));
     }
 
@@ -518,15 +580,15 @@ public class YRefFrame : YFunction
      * </summary>
      * <param name="position">
      *   a value among the <c>YRefFrame.MOUNTPOSITION</c> enumeration
-     *   (<c>YRefFrame.MOUNTPOSITION_BOTTOM</c>,   <c>YRefFrame.MOUNTPOSITION_TOP</c>,
-     *   <c>YRefFrame.MOUNTPOSITION_FRONT</c>,    <c>YRefFrame.MOUNTPOSITION_RIGHT</c>,
-     *   <c>YRefFrame.MOUNTPOSITION_REAR</c>,     <c>YRefFrame.MOUNTPOSITION_LEFT</c>),
+     *   (<c>YRefFrame.MOUNTPOSITION.BOTTOM</c>,   <c>YRefFrame.MOUNTPOSITION.TOP</c>,
+     *   <c>YRefFrame.MOUNTPOSITION.FRONT</c>,    <c>YRefFrame.MOUNTPOSITION.RIGHT</c>,
+     *   <c>YRefFrame.MOUNTPOSITION.REAR</c>,     <c>YRefFrame.MOUNTPOSITION.LEFT</c>),
      *   corresponding to the installation in a box, on one of the six faces.
      * </param>
      * <param name="orientation">
      *   a value among the enumeration <c>YRefFrame.MOUNTORIENTATION</c>
-     *   (<c>YRefFrame.MOUNTORIENTATION_TWELVE</c>, <c>YRefFrame.MOUNTORIENTATION_THREE</c>,
-     *   <c>YRefFrame.MOUNTORIENTATION_SIX</c>,     <c>YRefFrame.MOUNTORIENTATION_NINE</c>)
+     *   (<c>YRefFrame.MOUNTORIENTATION.TWELVE</c>, <c>YRefFrame.MOUNTORIENTATION.THREE</c>,
+     *   <c>YRefFrame.MOUNTORIENTATION.SIX</c>,     <c>YRefFrame.MOUNTORIENTATION.NINE</c>)
      *   corresponding to the orientation of the "X" arrow on the device,
      *   as on a clock dial seen from an observer in the center of the box.
      *   On the bottom face, the 12H orientation points to the front, while
@@ -574,7 +636,7 @@ public class YRefFrame : YFunction
         List<int> iCalib = new List<int>();
         int caltyp;
         int res;
-        // may throw an exception
+
         calibParam = await this.get_calibrationParam();
         iCalib = YAPIContext.imm_decodeFloats(calibParam);
         caltyp = ((iCalib[0]) / (1000));
@@ -611,7 +673,7 @@ public class YRefFrame : YFunction
         List<int> iCalib = new List<int>();
         int caltyp;
         int res;
-        // may throw an exception
+
         calibParam = await this.get_calibrationParam();
         iCalib = YAPIContext.imm_decodeFloats(calibParam);
         caltyp = ((iCalib[0]) / (1000));
@@ -820,6 +882,7 @@ public class YRefFrame : YFunction
         }
         // Discard measures that are not in the proper orientation
         if (_calibStageProgress == 0) {
+            // New stage, check that this orientation is not yet done
             idx = 0;
             err = 0;
             while (idx + 1 < _calibStage) {
@@ -834,6 +897,7 @@ public class YRefFrame : YFunction
             }
             _calibOrient.Add(orient);
         } else {
+            // Make sure device is not turned before stage is completed
             if (orient != _calibOrient[_calibStage-1]) {
                 _calibStageHint = "Not yet done, please move back to the previous face";
                 return YAPI.SUCCESS;
@@ -960,7 +1024,7 @@ public class YRefFrame : YFunction
                 return YAPI.SUCCESS;
             }
         }
-        // may throw an exception
+
         calibParam = await this._download("api/refFrame/calibrationParam.txt");
         iCalib = YAPIContext.imm_decodeFloats(YAPI.DefaultEncoding.GetString(calibParam));
         cal3 = ((iCalib[1]) / (1000));
@@ -1181,7 +1245,7 @@ public class YRefFrame : YFunction
         if (_calibStage == 0) {
             return YAPI.SUCCESS;
         }
-        // may throw an exception
+
         _calibStage = 0;
         return await this.set_calibrationParam(_calibSavedParams);
     }

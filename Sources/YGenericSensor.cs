@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YGenericSensor.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YGenericSensor.cs 27700 2017-06-01 12:27:09Z seb $
  *
  * Implements FindGenericSensor(), the high-level API for GenericSensor functions
  *
@@ -52,7 +52,7 @@ namespace com.yoctopuce.YoctoAPI
  * <para>
  *   The YGenericSensor class allows you to read and configure Yoctopuce signal
  *   transducers. It inherits from YSensor class the core functions to read measurements,
- *   register callback functions, access to the autonomous datalogger.
+ *   to register callback functions, to access the autonomous datalogger.
  *   This class adds the ability to configure the automatic conversion between the
  *   measured signal and the corresponding engineering unit.
  * </para>
@@ -214,12 +214,14 @@ public class YGenericSensor : YSensor
      */
     public async Task<double> get_signalValue()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SIGNALVALUE_INVALID;
             }
         }
-        return Math.Round(_signalValue * 1000) / 1000;
+        res = Math.Round(_signalValue * 1000) / 1000;
+        return res;
     }
 
 
@@ -240,12 +242,14 @@ public class YGenericSensor : YSensor
      */
     public async Task<string> get_signalUnit()
     {
+        string res;
         if (_cacheExpiration == 0) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SIGNALUNIT_INVALID;
             }
         }
-        return _signalUnit;
+        res = _signalUnit;
+        return res;
     }
 
 
@@ -266,12 +270,14 @@ public class YGenericSensor : YSensor
      */
     public async Task<string> get_signalRange()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SIGNALRANGE_INVALID;
             }
         }
-        return _signalRange;
+        res = _signalRange;
+        return res;
     }
 
 
@@ -279,6 +285,7 @@ public class YGenericSensor : YSensor
      * <summary>
      *   Changes the electric signal range used by the sensor.
      * <para>
+     *   Default value is "-999999.999...999999.999".
      * </para>
      * <para>
      * </para>
@@ -320,12 +327,14 @@ public class YGenericSensor : YSensor
      */
     public async Task<string> get_valueRange()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return VALUERANGE_INVALID;
             }
         }
-        return _valueRange;
+        res = _valueRange;
+        return res;
     }
 
 
@@ -334,7 +343,7 @@ public class YGenericSensor : YSensor
      *   Changes the physical value range measured by the sensor.
      * <para>
      *   As a side effect, the range modification may
-     *   automatically modify the display resolution.
+     *   automatically modify the display resolution. Default value is "-999999.999...999999.999".
      * </para>
      * <para>
      * </para>
@@ -408,12 +417,14 @@ public class YGenericSensor : YSensor
      */
     public async Task<double> get_signalBias()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SIGNALBIAS_INVALID;
             }
         }
-        return _signalBias;
+        res = _signalBias;
+        return res;
     }
 
 
@@ -442,12 +453,14 @@ public class YGenericSensor : YSensor
      */
     public async Task<int> get_signalSampling()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SIGNALSAMPLING_INVALID;
             }
         }
-        return _signalSampling;
+        res = _signalSampling;
+        return res;
     }
 
 
@@ -520,6 +533,13 @@ public class YGenericSensor : YSensor
      *   a generic sensor by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">

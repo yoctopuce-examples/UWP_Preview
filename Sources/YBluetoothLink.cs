@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YBluetoothLink.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YBluetoothLink.cs 27700 2017-06-01 12:27:09Z seb $
  *
  * Implements FindBluetoothLink(), the high-level API for BluetoothLink functions
  *
@@ -225,12 +225,14 @@ public class YBluetoothLink : YFunction
      */
     public async Task<string> get_ownAddress()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return OWNADDRESS_INVALID;
             }
         }
-        return _ownAddress;
+        res = _ownAddress;
+        return res;
     }
 
 
@@ -255,12 +257,14 @@ public class YBluetoothLink : YFunction
      */
     public async Task<string> get_pairingPin()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PAIRINGPIN_INVALID;
             }
         }
-        return _pairingPin;
+        res = _pairingPin;
+        return res;
     }
 
 
@@ -311,12 +315,14 @@ public class YBluetoothLink : YFunction
      */
     public async Task<string> get_remoteAddress()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return REMOTEADDRESS_INVALID;
             }
         }
-        return _remoteAddress;
+        res = _remoteAddress;
+        return res;
     }
 
 
@@ -365,12 +371,14 @@ public class YBluetoothLink : YFunction
      */
     public async Task<string> get_remoteName()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return REMOTENAME_INVALID;
             }
         }
-        return _remoteName;
+        res = _remoteName;
+        return res;
     }
 
 
@@ -392,12 +400,14 @@ public class YBluetoothLink : YFunction
      */
     public async Task<int> get_mute()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MUTE_INVALID;
             }
         }
-        return _mute;
+        res = _mute;
+        return res;
     }
 
 
@@ -449,12 +459,14 @@ public class YBluetoothLink : YFunction
      */
     public async Task<int> get_preAmplifier()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PREAMPLIFIER_INVALID;
             }
         }
-        return _preAmplifier;
+        res = _preAmplifier;
+        return res;
     }
 
 
@@ -503,12 +515,14 @@ public class YBluetoothLink : YFunction
      */
     public async Task<int> get_volume()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return VOLUME_INVALID;
             }
         }
-        return _volume;
+        res = _volume;
+        return res;
     }
 
 
@@ -560,12 +574,14 @@ public class YBluetoothLink : YFunction
      */
     public async Task<int> get_linkState()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LINKSTATE_INVALID;
             }
         }
-        return _linkState;
+        res = _linkState;
+        return res;
     }
 
 
@@ -587,12 +603,14 @@ public class YBluetoothLink : YFunction
      */
     public async Task<int> get_linkQuality()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LINKQUALITY_INVALID;
             }
         }
-        return _linkQuality;
+        res = _linkQuality;
+        return res;
     }
 
 
@@ -603,12 +621,14 @@ public class YBluetoothLink : YFunction
      */
     public async Task<string> get_command()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COMMAND_INVALID;
             }
         }
-        return _command;
+        res = _command;
+        return res;
     }
 
 
@@ -653,6 +673,13 @@ public class YBluetoothLink : YFunction
      *   a cellular interface by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">

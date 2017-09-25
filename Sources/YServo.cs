@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YServo.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YServo.cs 27700 2017-06-01 12:27:09Z seb $
  *
  * Implements FindServo(), the high-level API for Servo functions
  *
@@ -197,12 +197,14 @@ public class YServo : YFunction
      */
     public async Task<int> get_position()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return POSITION_INVALID;
             }
         }
-        return _position;
+        res = _position;
+        return res;
     }
 
 
@@ -251,12 +253,14 @@ public class YServo : YFunction
      */
     public async Task<int> get_enabled()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ENABLED_INVALID;
             }
         }
-        return _enabled;
+        res = _enabled;
+        return res;
     }
 
 
@@ -305,12 +309,14 @@ public class YServo : YFunction
      */
     public async Task<int> get_range()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return RANGE_INVALID;
             }
         }
-        return _range;
+        res = _range;
+        return res;
     }
 
 
@@ -365,12 +371,14 @@ public class YServo : YFunction
      */
     public async Task<int> get_neutral()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return NEUTRAL_INVALID;
             }
         }
-        return _neutral;
+        res = _neutral;
+        return res;
     }
 
 
@@ -424,12 +432,14 @@ public class YServo : YFunction
      */
     public async Task<int> get_positionAtPowerOn()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return POSITIONATPOWERON_INVALID;
             }
         }
-        return _positionAtPowerOn;
+        res = _positionAtPowerOn;
+        return res;
     }
 
 
@@ -481,12 +491,14 @@ public class YServo : YFunction
      */
     public async Task<int> get_enabledAtPowerOn()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ENABLEDATPOWERON_INVALID;
             }
         }
-        return _enabledAtPowerOn;
+        res = _enabledAtPowerOn;
+        return res;
     }
 
 
@@ -553,6 +565,13 @@ public class YServo : YFunction
      *   a servo by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">

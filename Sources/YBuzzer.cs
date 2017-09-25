@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YBuzzer.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YBuzzer.cs 27700 2017-06-01 12:27:09Z seb $
  *
  * Implements FindBuzzer(), the high-level API for Buzzer functions
  *
@@ -206,12 +206,14 @@ public class YBuzzer : YFunction
      */
     public async Task<double> get_frequency()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return FREQUENCY_INVALID;
             }
         }
-        return _frequency;
+        res = _frequency;
+        return res;
     }
 
 
@@ -232,12 +234,14 @@ public class YBuzzer : YFunction
      */
     public async Task<int> get_volume()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return VOLUME_INVALID;
             }
         }
-        return _volume;
+        res = _volume;
+        return res;
     }
 
 
@@ -286,12 +290,14 @@ public class YBuzzer : YFunction
      */
     public async Task<int> get_playSeqSize()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PLAYSEQSIZE_INVALID;
             }
         }
-        return _playSeqSize;
+        res = _playSeqSize;
+        return res;
     }
 
 
@@ -312,12 +318,14 @@ public class YBuzzer : YFunction
      */
     public async Task<int> get_playSeqMaxSize()
     {
+        int res;
         if (_cacheExpiration == 0) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PLAYSEQMAXSIZE_INVALID;
             }
         }
-        return _playSeqMaxSize;
+        res = _playSeqMaxSize;
+        return res;
     }
 
 
@@ -342,12 +350,14 @@ public class YBuzzer : YFunction
      */
     public async Task<int> get_playSeqSignature()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PLAYSEQSIGNATURE_INVALID;
             }
         }
-        return _playSeqSignature;
+        res = _playSeqSignature;
+        return res;
     }
 
 
@@ -358,12 +368,14 @@ public class YBuzzer : YFunction
      */
     public async Task<string> get_command()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COMMAND_INVALID;
             }
         }
-        return _command;
+        res = _command;
+        return res;
     }
 
 
@@ -408,6 +420,13 @@ public class YBuzzer : YFunction
      *   a buzzer by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">
@@ -608,11 +627,191 @@ public class YBuzzer : YFunction
 
     /**
      * <summary>
+     *   Adds notes to the playing sequence.
+     * <para>
+     *   Notes are provided as text words, separated by
+     *   spaces. The pitch is specified using the usual letter from A to G. The duration is
+     *   specified as the divisor of a whole note: 4 for a fourth, 8 for an eight note, etc.
+     *   Some modifiers are supported: <c>#</c> and <c>b</c> to alter a note pitch,
+     *   <c>'</c> and <c>,</c> to move to the upper/lower octave, <c>.</c> to enlarge
+     *   the note duration.
+     * </para>
+     * </summary>
+     * <param name="notes">
+     *   notes to be played, as a text string.
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     *   On failure, throws an exception or returns a negative error code.
+     * </returns>
+     */
+    public virtual async Task<int> addNotesToPlaySeq(string notes)
+    {
+        int tempo;
+        int prevPitch;
+        int prevDuration;
+        int prevFreq;
+        int note;
+        int num;
+        int typ;
+        byte[] ascNotes;
+        int notesLen;
+        int i;
+        int ch;
+        int dNote;
+        int pitch;
+        int freq;
+        int ms;
+        int ms16;
+        int rest;
+        tempo = 100;
+        prevPitch = 3;
+        prevDuration = 4;
+        prevFreq = 110;
+        note = -99;
+        num = 0;
+        typ = 3;
+        ascNotes = YAPI.DefaultEncoding.GetBytes(notes);
+        notesLen = (ascNotes).Length;
+        i = 0;
+        while (i < notesLen) {
+            ch = ascNotes[i];
+            // A (note))
+            if (ch == 65) {
+                note = 0;
+            }
+            // B (note)
+            if (ch == 66) {
+                note = 2;
+            }
+            // C (note)
+            if (ch == 67) {
+                note = 3;
+            }
+            // D (note)
+            if (ch == 68) {
+                note = 5;
+            }
+            // E (note)
+            if (ch == 69) {
+                note = 7;
+            }
+            // F (note)
+            if (ch == 70) {
+                note = 8;
+            }
+            // G (note)
+            if (ch == 71) {
+                note = 10;
+            }
+            // '#' (sharp modifier)
+            if (ch == 35) {
+                note = note + 1;
+            }
+            // 'b' (flat modifier)
+            if (ch == 98) {
+                note = note - 1;
+            }
+            // ' (octave up)
+            if (ch == 39) {
+                prevPitch = prevPitch + 12;
+            }
+            // , (octave down)
+            if (ch == 44) {
+                prevPitch = prevPitch - 12;
+            }
+            // R (rest)
+            if (ch == 82) {
+                typ = 0;
+            }
+            // ! (staccato modifier)
+            if (ch == 33) {
+                typ = 1;
+            }
+            // ^ (short modifier)
+            if (ch == 94) {
+                typ = 2;
+            }
+            // _ (legato modifier)
+            if (ch == 95) {
+                typ = 4;
+            }
+            // - (glissando modifier)
+            if (ch == 45) {
+                typ = 5;
+            }
+            // % (tempo change)
+            if ((ch == 37) && (num > 0)) {
+                tempo = num;
+                num = 0;
+            }
+            if ((ch >= 48) && (ch <= 57)) {
+                // 0-9 (number)
+                num = (num * 10) + (ch - 48);
+            }
+            if (ch == 46) {
+                // . (duration modifier)
+                num = ((num * 2) / (3));
+            }
+            if (((ch == 32) || (i+1 == notesLen)) && ((note > -99) || (typ != 3))) {
+                if (num == 0) {
+                    num = prevDuration;
+                } else {
+                    prevDuration = num;
+                }
+                ms = (int) Math.Round(320000.0 / (tempo * num));
+                if (typ == 0) {
+                    await this.addPulseToPlaySeq(0, ms);
+                } else {
+                    dNote = note - (((prevPitch) % (12)));
+                    if (dNote > 6) {
+                        dNote = dNote - 12;
+                    }
+                    if (dNote <= -6) {
+                        dNote = dNote + 12;
+                    }
+                    pitch = prevPitch + dNote;
+                    freq = (int) Math.Round(440 * Math.Exp(pitch * 0.05776226504666));
+                    ms16 = ((ms) >> (4));
+                    rest = 0;
+                    if (typ == 3) {
+                        rest = 2 * ms16;
+                    }
+                    if (typ == 2) {
+                        rest = 8 * ms16;
+                    }
+                    if (typ == 1) {
+                        rest = 12 * ms16;
+                    }
+                    if (typ == 5) {
+                        await this.addPulseToPlaySeq(prevFreq, ms16);
+                        await this.addFreqMoveToPlaySeq(freq, 8 * ms16);
+                        await this.addPulseToPlaySeq(freq, ms - 9 * ms16);
+                    } else {
+                        await this.addPulseToPlaySeq(freq, ms - rest);
+                        if (rest > 0) {
+                            await this.addPulseToPlaySeq(0, rest);
+                        }
+                    }
+                    prevFreq = freq;
+                    prevPitch = pitch;
+                }
+                note = -99;
+                num = 0;
+                typ = 3;
+            }
+            i = i + 1;
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * <summary>
      *   Starts the preprogrammed playing sequence.
      * <para>
      *   The sequence
      *   runs in loop until it is stopped by stopPlaySeq or an explicit
-     *   change.
+     *   change. To play the sequence only once, use <c>oncePlaySeq()</c>.
      * </para>
      * </summary>
      * <returns>
@@ -655,6 +854,22 @@ public class YBuzzer : YFunction
     public virtual async Task<int> resetPlaySeq()
     {
         return await this.sendCommand("Z");
+    }
+
+    /**
+     * <summary>
+     *   Starts the preprogrammed playing sequence and run it once only.
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     *   On failure, throws an exception or returns a negative error code.
+     * </returns>
+     */
+    public virtual async Task<int> oncePlaySeq()
+    {
+        return await this.sendCommand("s");
     }
 
     /**
@@ -727,6 +942,33 @@ public class YBuzzer : YFunction
     public virtual async Task<int> volumeMove(int volume,int duration)
     {
         return await this.set_command("V"+Convert.ToString(volume)+","+Convert.ToString(duration));
+    }
+
+    /**
+     * <summary>
+     *   Immediately play a note sequence.
+     * <para>
+     *   Notes are provided as text words, separated by
+     *   spaces. The pitch is specified using the usual letter from A to G. The duration is
+     *   specified as the divisor of a whole note: 4 for a fourth, 8 for an eight note, etc.
+     *   Some modifiers are supported: <c>#</c> and <c>b</c> to alter a note pitch,
+     *   <c>'</c> and <c>,</c> to move to the upper/lower octave, <c>.</c> to enlarge
+     *   the note duration.
+     * </para>
+     * </summary>
+     * <param name="notes">
+     *   notes to be played, as a text string.
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     *   On failure, throws an exception or returns a negative error code.
+     * </returns>
+     */
+    public virtual async Task<int> playNotes(string notes)
+    {
+        await this.resetPlaySeq();
+        await this.addNotesToPlaySeq(notes);
+        return await this.oncePlaySeq();
     }
 
     /**

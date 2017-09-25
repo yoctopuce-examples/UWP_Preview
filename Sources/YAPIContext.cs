@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YAPIContext.cs 25207 2016-08-17 17:00:09Z seb $
+ * $Id: YAPIContext.cs 25303 2016-09-02 16:00:33Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -826,23 +826,19 @@ namespace com.yoctopuce.YoctoAPI
          */
         public async Task<int> TestHub(string url, uint mstimeout)
         {
-            try {
-                YGenericHub newhub;
-                YGenericHub.HTTPParams parsedurl = new YGenericHub.HTTPParams(url);
-                // Add hub to known list
-                if (url.Equals("usb")) {
-                    newhub = new YUSBHub(this, 0, true);
-                } else if (url.Equals("net")) {
-                    return YAPI.SUCCESS;
-                } else if (parsedurl.Host.Equals("callback")) {
-                    throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "Not yet supported");
-                } else {
-                    newhub = new YHTTPHub(this, 0, parsedurl, true);
-                }
-                return await newhub.ping(mstimeout);
-            } catch (YAPI_Exception ex) {
-                return ex.errorType;
+            YGenericHub newhub;
+            YGenericHub.HTTPParams parsedurl = new YGenericHub.HTTPParams(url);
+            // Add hub to known list
+            if (url.Equals("usb")) {
+                newhub = new YUSBHub(this, 0, true);
+            } else if (url.Equals("net")) {
+                return YAPI.SUCCESS;
+            } else if (parsedurl.Host.Equals("callback")) {
+                throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "Not yet supported");
+            } else {
+                newhub = new YHTTPHub(this, 0, parsedurl, true);
             }
+            return await newhub.ping(mstimeout);
 
         }
 
@@ -880,6 +876,30 @@ namespace com.yoctopuce.YoctoAPI
                 }
             }
             return YAPI.SUCCESS;
+        }
+
+        /**
+        *
+        */
+        public async Task<int> Sleep(ulong ms_duration)
+        {
+            try {
+                ulong end = GetTickCount() + ms_duration;
+
+                do {
+                    await HandleEvents();
+                    if (end > GetTickCount()) {
+                        await Task.Delay(new TimeSpan(0, 0, 0, 0, 2));
+                    }
+                } while (end > GetTickCount());
+                return YAPI.SUCCESS;
+            } catch (YAPI_Exception ex) {
+                if (_exceptionsDisabled) {
+                    return ex.errorType;
+                } else {
+                    throw ex;
+                }
+            }
         }
 
 

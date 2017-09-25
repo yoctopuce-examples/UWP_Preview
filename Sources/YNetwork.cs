@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YNetwork.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YNetwork.cs 28015 2017-07-07 16:27:06Z mvuilleu $
  *
  * Implements FindNetwork(), the high-level API for Network functions
  *
@@ -186,6 +186,7 @@ public class YNetwork : YFunction
     public const int CALLBACKENCODING_AZURE = 7;
     public const int CALLBACKENCODING_INFLUXDB = 8;
     public const int CALLBACKENCODING_MQTT = 9;
+    public const int CALLBACKENCODING_YOCTO_API_JZON = 10;
     public const int CALLBACKENCODING_INVALID = -1;
     /**
      * <summary>
@@ -199,6 +200,12 @@ public class YNetwork : YFunction
      * </summary>
      */
     public const  int CALLBACKINITIALDELAY_INVALID = YAPI.INVALID_UINT;
+    /**
+     * <summary>
+     *   invalid callbackSchedule value
+     * </summary>
+     */
+    public const  string CALLBACKSCHEDULE_INVALID = YAPI.INVALID_STRING;
     /**
      * <summary>
      *   invalid callbackMinDelay value
@@ -237,6 +244,7 @@ public class YNetwork : YFunction
     protected int _callbackEncoding = CALLBACKENCODING_INVALID;
     protected string _callbackCredentials = CALLBACKCREDENTIALS_INVALID;
     protected int _callbackInitialDelay = CALLBACKINITIALDELAY_INVALID;
+    protected string _callbackSchedule = CALLBACKSCHEDULE_INVALID;
     protected int _callbackMinDelay = CALLBACKMINDELAY_INVALID;
     protected int _callbackMaxDelay = CALLBACKMAXDELAY_INVALID;
     protected int _poeCurrent = POECURRENT_INVALID;
@@ -337,6 +345,9 @@ public class YNetwork : YFunction
         if (json_val.Has("callbackInitialDelay")) {
             _callbackInitialDelay = json_val.GetInt("callbackInitialDelay");
         }
+        if (json_val.Has("callbackSchedule")) {
+            _callbackSchedule = json_val.GetString("callbackSchedule");
+        }
         if (json_val.Has("callbackMinDelay")) {
             _callbackMinDelay = json_val.GetInt("callbackMinDelay");
         }
@@ -381,12 +392,14 @@ public class YNetwork : YFunction
      */
     public async Task<int> get_readiness()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return READINESS_INVALID;
             }
         }
-        return _readiness;
+        res = _readiness;
+        return res;
     }
 
 
@@ -409,12 +422,14 @@ public class YNetwork : YFunction
      */
     public async Task<string> get_macAddress()
     {
+        string res;
         if (_cacheExpiration == 0) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MACADDRESS_INVALID;
             }
         }
-        return _macAddress;
+        res = _macAddress;
+        return res;
     }
 
 
@@ -437,12 +452,14 @@ public class YNetwork : YFunction
      */
     public async Task<string> get_ipAddress()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return IPADDRESS_INVALID;
             }
         }
-        return _ipAddress;
+        res = _ipAddress;
+        return res;
     }
 
 
@@ -463,12 +480,14 @@ public class YNetwork : YFunction
      */
     public async Task<string> get_subnetMask()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SUBNETMASK_INVALID;
             }
         }
-        return _subnetMask;
+        res = _subnetMask;
+        return res;
     }
 
 
@@ -489,28 +508,56 @@ public class YNetwork : YFunction
      */
     public async Task<string> get_router()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ROUTER_INVALID;
             }
         }
-        return _router;
+        res = _router;
+        return res;
     }
 
 
     /**
      * <summary>
-     *   throws an exception on error
+     *   Returns the IP configuration of the network interface.
+     * <para>
+     * </para>
+     * <para>
+     *   If the network interface is setup to use a static IP address, the string starts with "STATIC:" and
+     *   is followed by three
+     *   parameters, separated by "/". The first is the device IP address, followed by the subnet mask
+     *   length, and finally the
+     *   router IP address (default gateway). For instance: "STATIC:192.168.1.14/16/192.168.1.1"
+     * </para>
+     * <para>
+     *   If the network interface is configured to receive its IP from a DHCP server, the string start with
+     *   "DHCP:" and is followed by
+     *   three parameters separated by "/". The first is the fallback IP address, then the fallback subnet
+     *   mask length and finally the
+     *   fallback router IP address. These three parameters are used when no DHCP reply is received.
+     * </para>
+     * <para>
+     * </para>
      * </summary>
+     * <returns>
+     *   a string corresponding to the IP configuration of the network interface
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YNetwork.IPCONFIG_INVALID</c>.
+     * </para>
      */
     public async Task<string> get_ipConfig()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return IPCONFIG_INVALID;
             }
         }
-        return _ipConfig;
+        res = _ipConfig;
+        return res;
     }
 
 
@@ -539,12 +586,14 @@ public class YNetwork : YFunction
      */
     public async Task<string> get_primaryDNS()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PRIMARYDNS_INVALID;
             }
         }
-        return _primaryDNS;
+        res = _primaryDNS;
+        return res;
     }
 
 
@@ -595,12 +644,14 @@ public class YNetwork : YFunction
      */
     public async Task<string> get_secondaryDNS()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SECONDARYDNS_INVALID;
             }
         }
-        return _secondaryDNS;
+        res = _secondaryDNS;
+        return res;
     }
 
 
@@ -651,12 +702,14 @@ public class YNetwork : YFunction
      */
     public async Task<string> get_ntpServer()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return NTPSERVER_INVALID;
             }
         }
-        return _ntpServer;
+        res = _ntpServer;
+        return res;
     }
 
 
@@ -708,12 +761,14 @@ public class YNetwork : YFunction
      */
     public async Task<string> get_userPassword()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return USERPASSWORD_INVALID;
             }
         }
-        return _userPassword;
+        res = _userPassword;
+        return res;
     }
 
 
@@ -769,12 +824,14 @@ public class YNetwork : YFunction
      */
     public async Task<string> get_adminPassword()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ADMINPASSWORD_INVALID;
             }
         }
-        return _adminPassword;
+        res = _adminPassword;
+        return res;
     }
 
 
@@ -828,12 +885,14 @@ public class YNetwork : YFunction
      */
     public async Task<int> get_httpPort()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return HTTPPORT_INVALID;
             }
         }
-        return _httpPort;
+        res = _httpPort;
+        return res;
     }
 
 
@@ -885,12 +944,14 @@ public class YNetwork : YFunction
      */
     public async Task<string> get_defaultPage()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DEFAULTPAGE_INVALID;
             }
         }
-        return _defaultPage;
+        res = _defaultPage;
+        return res;
     }
 
 
@@ -945,12 +1006,14 @@ public class YNetwork : YFunction
      */
     public async Task<int> get_discoverable()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DISCOVERABLE_INVALID;
             }
         }
-        return _discoverable;
+        res = _discoverable;
+        return res;
     }
 
 
@@ -1006,12 +1069,14 @@ public class YNetwork : YFunction
      */
     public async Task<int> get_wwwWatchdogDelay()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return WWWWATCHDOGDELAY_INVALID;
             }
         }
-        return _wwwWatchdogDelay;
+        res = _wwwWatchdogDelay;
+        return res;
     }
 
 
@@ -1065,12 +1130,14 @@ public class YNetwork : YFunction
      */
     public async Task<string> get_callbackUrl()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CALLBACKURL_INVALID;
             }
         }
-        return _callbackUrl;
+        res = _callbackUrl;
+        return res;
     }
 
 
@@ -1123,12 +1190,14 @@ public class YNetwork : YFunction
      */
     public async Task<int> get_callbackMethod()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CALLBACKMETHOD_INVALID;
             }
         }
-        return _callbackMethod;
+        res = _callbackMethod;
+        return res;
     }
 
 
@@ -1175,8 +1244,9 @@ public class YNetwork : YFunction
      *   <c>YNetwork.CALLBACKENCODING_JSON_ARRAY</c>, <c>YNetwork.CALLBACKENCODING_CSV</c>,
      *   <c>YNetwork.CALLBACKENCODING_YOCTO_API</c>, <c>YNetwork.CALLBACKENCODING_JSON_NUM</c>,
      *   <c>YNetwork.CALLBACKENCODING_EMONCMS</c>, <c>YNetwork.CALLBACKENCODING_AZURE</c>,
-     *   <c>YNetwork.CALLBACKENCODING_INFLUXDB</c> and <c>YNetwork.CALLBACKENCODING_MQTT</c> corresponding
-     *   to the encoding standard to use for representing notification values
+     *   <c>YNetwork.CALLBACKENCODING_INFLUXDB</c>, <c>YNetwork.CALLBACKENCODING_MQTT</c> and
+     *   <c>YNetwork.CALLBACKENCODING_YOCTO_API_JZON</c> corresponding to the encoding standard to use for
+     *   representing notification values
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YNetwork.CALLBACKENCODING_INVALID</c>.
@@ -1184,12 +1254,14 @@ public class YNetwork : YFunction
      */
     public async Task<int> get_callbackEncoding()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CALLBACKENCODING_INVALID;
             }
         }
-        return _callbackEncoding;
+        res = _callbackEncoding;
+        return res;
     }
 
 
@@ -1206,8 +1278,9 @@ public class YNetwork : YFunction
      *   <c>YNetwork.CALLBACKENCODING_JSON_ARRAY</c>, <c>YNetwork.CALLBACKENCODING_CSV</c>,
      *   <c>YNetwork.CALLBACKENCODING_YOCTO_API</c>, <c>YNetwork.CALLBACKENCODING_JSON_NUM</c>,
      *   <c>YNetwork.CALLBACKENCODING_EMONCMS</c>, <c>YNetwork.CALLBACKENCODING_AZURE</c>,
-     *   <c>YNetwork.CALLBACKENCODING_INFLUXDB</c> and <c>YNetwork.CALLBACKENCODING_MQTT</c> corresponding
-     *   to the encoding standard to use for representing notification values
+     *   <c>YNetwork.CALLBACKENCODING_INFLUXDB</c>, <c>YNetwork.CALLBACKENCODING_MQTT</c> and
+     *   <c>YNetwork.CALLBACKENCODING_YOCTO_API_JZON</c> corresponding to the encoding standard to use for
+     *   representing notification values
      * </param>
      * <para>
      * </para>
@@ -1245,12 +1318,14 @@ public class YNetwork : YFunction
      */
     public async Task<string> get_callbackCredentials()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CALLBACKCREDENTIALS_INVALID;
             }
         }
-        return _callbackCredentials;
+        res = _callbackCredentials;
+        return res;
     }
 
 
@@ -1308,12 +1383,14 @@ public class YNetwork : YFunction
      */
     public async Task<int> get_callbackInitialDelay()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CALLBACKINITIALDELAY_INVALID;
             }
         }
-        return _callbackInitialDelay;
+        res = _callbackInitialDelay;
+        return res;
     }
 
 
@@ -1347,14 +1424,70 @@ public class YNetwork : YFunction
 
     /**
      * <summary>
-     *   Returns the minimum waiting time between two callback notifications, in seconds.
+     *   Returns the HTTP callback schedule strategy, as a text string.
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   an integer corresponding to the minimum waiting time between two callback notifications, in seconds
+     *   a string corresponding to the HTTP callback schedule strategy, as a text string
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YNetwork.CALLBACKSCHEDULE_INVALID</c>.
+     * </para>
+     */
+    public async Task<string> get_callbackSchedule()
+    {
+        string res;
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+            if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return CALLBACKSCHEDULE_INVALID;
+            }
+        }
+        res = _callbackSchedule;
+        return res;
+    }
+
+
+    /**
+     * <summary>
+     *   Changes the HTTP callback schedule strategy, as a text string.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   a string corresponding to the HTTP callback schedule strategy, as a text string
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public async Task<int> set_callbackSchedule(string  newval)
+    {
+        string rest_val;
+        rest_val = newval;
+        await _setAttr("callbackSchedule",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * <summary>
+     *   Returns the minimum waiting time between two HTTP callbacks, in seconds.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the minimum waiting time between two HTTP callbacks, in seconds
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YNetwork.CALLBACKMINDELAY_INVALID</c>.
@@ -1362,25 +1495,27 @@ public class YNetwork : YFunction
      */
     public async Task<int> get_callbackMinDelay()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CALLBACKMINDELAY_INVALID;
             }
         }
-        return _callbackMinDelay;
+        res = _callbackMinDelay;
+        return res;
     }
 
 
     /**
      * <summary>
-     *   Changes the minimum waiting time between two callback notifications, in seconds.
+     *   Changes the minimum waiting time between two HTTP callbacks, in seconds.
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <param name="newval">
-     *   an integer corresponding to the minimum waiting time between two callback notifications, in seconds
+     *   an integer corresponding to the minimum waiting time between two HTTP callbacks, in seconds
      * </param>
      * <para>
      * </para>
@@ -1401,14 +1536,14 @@ public class YNetwork : YFunction
 
     /**
      * <summary>
-     *   Returns the maximum waiting time between two callback notifications, in seconds.
+     *   Returns the waiting time between two HTTP callbacks when there is nothing new.
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   an integer corresponding to the maximum waiting time between two callback notifications, in seconds
+     *   an integer corresponding to the waiting time between two HTTP callbacks when there is nothing new
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YNetwork.CALLBACKMAXDELAY_INVALID</c>.
@@ -1416,25 +1551,27 @@ public class YNetwork : YFunction
      */
     public async Task<int> get_callbackMaxDelay()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CALLBACKMAXDELAY_INVALID;
             }
         }
-        return _callbackMaxDelay;
+        res = _callbackMaxDelay;
+        return res;
     }
 
 
     /**
      * <summary>
-     *   Changes the maximum waiting time between two callback notifications, in seconds.
+     *   Changes the waiting time between two HTTP callbacks when there is nothing new.
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <param name="newval">
-     *   an integer corresponding to the maximum waiting time between two callback notifications, in seconds
+     *   an integer corresponding to the waiting time between two HTTP callbacks when there is nothing new
      * </param>
      * <para>
      * </para>
@@ -1472,12 +1609,14 @@ public class YNetwork : YFunction
      */
     public async Task<int> get_poeCurrent()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return POECURRENT_INVALID;
             }
         }
-        return _poeCurrent;
+        res = _poeCurrent;
+        return res;
     }
 
 
@@ -1514,6 +1653,13 @@ public class YNetwork : YFunction
      *   a network interface by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">
@@ -1671,6 +1817,28 @@ public class YNetwork : YFunction
 
     /**
      * <summary>
+     *   Changes the configuration of the network interface to enable the use of an
+     *   IP address received from a DHCP server.
+     * <para>
+     *   Until an address is received from a DHCP
+     *   server, the module uses an IP of the network 169.254.0.0/16 (APIPA).
+     *   Remember to call the <c>saveToFlash()</c> method and then to reboot the module to apply this setting.
+     * </para>
+     * </summary>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual async Task<int> useDHCPauto()
+    {
+        return await this.set_ipConfig("DHCP:");
+    }
+
+    /**
+     * <summary>
      *   Changes the configuration of the network interface to use a static IP address.
      * <para>
      *   Remember to call the <c>saveToFlash()</c> method and then to reboot the module to apply this setting.
@@ -1718,7 +1886,7 @@ public class YNetwork : YFunction
     public virtual async Task<string> ping(string host)
     {
         byte[] content;
-        // may throw an exception
+
         content = await this._download("ping.txt?host="+host);
         return YAPI.DefaultEncoding.GetString(content);
     }
@@ -1743,6 +1911,33 @@ public class YNetwork : YFunction
     public virtual async Task<int> triggerCallback()
     {
         return await this.set_callbackMethod(await this.get_callbackMethod());
+    }
+
+    /**
+     * <summary>
+     *   Setup periodic HTTP callbacks (simplifed function).
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="interval">
+     *   a string representing the callback periodicity, expressed in
+     *   seconds, minutes or hours, eg. "60s", "5m", "1h", "48h".
+     * </param>
+     * <param name="offset">
+     *   an integer representing the time offset relative to the period
+     *   when the callback should occur. For instance, if the periodicity is
+     *   24h, an offset of 7 will make the callback occur each day at 7AM.
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual async Task<int> set_periodicCallbackSchedule(string interval,int offset)
+    {
+        return await this.set_callbackSchedule("every "+interval+"+"+Convert.ToString(offset));
     }
 
     /**

@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YUSBDevice.cs 25251 2016-08-22 16:25:31Z seb $
+ * $Id: YUSBDevice.cs 25307 2016-09-06 08:31:29Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -41,16 +41,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Devices.Enumeration;
 using Windows.Devices.HumanInterfaceDevice;
-using Windows.Foundation;
-using Windows.Storage;
-using Windows.Storage.Streams;
 using Buffer = System.Buffer;
 
 namespace com.yoctopuce.YoctoAPI
@@ -59,12 +53,17 @@ namespace com.yoctopuce.YoctoAPI
 
     internal class YRequest
     {
-        private byte[] _request;
         private byte[] _response;
         private uint _response_size;
-        private bool _isDone;
+        private volatile bool _isDone;
         private YGenericHub.RequestAsyncResult _asyncResult;
         private object _asyncContext;
+        private TaskCompletionSource<byte[]> _tcs;
+        private static readonly byte[] rnrn = new byte[] { 13, 10, 13, 10 };
+        private ulong _timeout;
+        private ulong _tm_start;
+        private string _debug_name;
+
 
         public YRequest()
         {
@@ -74,16 +73,25 @@ namespace com.yoctopuce.YoctoAPI
 
         }
 
-        internal void imm_NewRequest(byte[] requestBytes, YGenericHub.RequestAsyncResult asyncResult, object asyncContext)
+        internal void imm_NewRequest(byte[] requestBytes, YGenericHub.RequestAsyncResult asyncResult, object asyncContext, ulong maxTime)
         {
-            _request = requestBytes;
+            _debug_name = YAPI.DefaultEncoding.GetString(requestBytes);
+            int debug_pos = _debug_name.IndexOf('\r');
+            if (debug_pos > 0) {
+                _debug_name = _debug_name.Substring(0, debug_pos);
+            }
             _response_size = 0;
             _isDone = false;
             _asyncResult = asyncResult;
             _asyncContext = asyncContext;
+            _tm_start = YAPI.GetTickCount();
+            _timeout = _tm_start + maxTime;
+            _tcs = new TaskCompletionSource<byte[]>();
+            //Debug.WriteLine(string.Format("new request {0}", _debug_name));
         }
 
-        public void imm_AddIncommingData(YPktStreamHead stream)
+        //NOTE: will bee called by another thread
+        internal void imm_AddIncommingData(YPktStreamHead stream)
         {
             if (stream.Len + _response_size > _response.Length) {
                 byte[] tmp = new byte[_response.Length * 2];
@@ -92,24 +100,23 @@ namespace com.yoctopuce.YoctoAPI
             }
             uint len = stream.imm_CopyData(_response, _response_size);
             _response_size += len;
-            if (stream.StreamType == YGenericHub.YSTREAM_TCP_CLOSE) {
-                _isDone = true;
-                if (_asyncResult != null) {
-                    //todo: handle error
-                    _asyncResult(_asyncContext, imm_GetResponse(), YAPI.SUCCESS, "");
-                }
-            }
         }
 
-        public bool imm_IsDone()
+        //NOTE: will bee called by another thread
+        internal void imm_Close()
         {
-            return _isDone;
+            if (_asyncResult != null) {
+                //todo: handle error
+                _asyncResult(_asyncContext, imm_GetResponse(), YAPI.SUCCESS, "");
+            }
+            //Debug.WriteLine(string.Format("{0}:End request {1} finished after {2}ms", Environment.CurrentManagedThreadId, _debug_name, YAPI.GetTickCount() - _tm_start));
+            _tcs.SetResult(_response);
+            _isDone = true;
         }
 
 
-        private static readonly byte[] rnrn = new byte[] { 13, 10, 13, 10 };
 
-        public byte[] imm_GetResponse()
+        internal byte[] imm_GetResponse()
         {
             int hpos = YAPIContext.imm_find_in_bytes(_response, rnrn);
             int ofs = 0;
@@ -121,6 +128,24 @@ namespace com.yoctopuce.YoctoAPI
             byte[] res = new byte[size];
             Buffer.BlockCopy(_response, ofs, res, 0, size);
             return res;
+        }
+
+        public bool EnsureIsEnded()
+        {
+            if (_isDone)
+                return true;
+            ulong now = YAPI.GetTickCount();
+            if (_timeout <= now) {
+                return false;
+            }
+            int msTimeout = (int)(_timeout - now);
+            bool ended = _tcs.Task.Wait(msTimeout);
+            return ended;
+        }
+
+        internal bool imm_IsDone()
+        {
+            return _isDone;
         }
     }
 
@@ -166,17 +191,16 @@ namespace com.yoctopuce.YoctoAPI
         private YAPIContext _yctx;
         private byte _pktAckDelay;
         private uint _devVersion;
-        private uint _lastpktno = 0;
+        private uint _lastpktno;
         private string _logicalname;
         private byte _beacon;
         private string _firmware;
         private string _product;
         private UInt16 _deviceid;
-        private UInt16 _vendorid;
         private WPEntry _wp;
         private readonly Dictionary<String, YPEntry> _usbYP = new Dictionary<string, YPEntry>(2);
         private YRequest _currentRequest;
-        private ulong _lastMetaUTC = 0;
+        private ulong _lastMetaUTC;
         private readonly YUSBHub _hub;
         internal HidDevice Hid { get; }
         internal DeviceInformation Info { get; }
@@ -195,7 +219,7 @@ namespace com.yoctopuce.YoctoAPI
             _yctx = hub._yctx;
             Hid = hid;
             Info = info;
-            hid.InputReportReceived += inputReportReceivedEventHandler;
+            hid.InputReportReceived += OnInputReportEvent;
             _devState = DevState.Detected;
             _pktAckDelay = 0;
             _currentRequest = new YRequest();
@@ -206,7 +230,7 @@ namespace com.yoctopuce.YoctoAPI
 
         public void imm_Stop()
         {
-            Hid.InputReportReceived -= inputReportReceivedEventHandler;
+            Hid.InputReportReceived -= OnInputReportEvent;
             Hid.Dispose();
         }
 
@@ -238,7 +262,6 @@ namespace com.yoctopuce.YoctoAPI
                 Debug.WriteLine("Unable to send Start PKT");
                 _devState = DevState.IOError;
                 _watcher.imm_removeUsableDevice(this);
-                return;
             }
         }
 
@@ -276,7 +299,7 @@ namespace com.yoctopuce.YoctoAPI
         }
 
 
-        internal async void inputReportReceivedEventHandler(HidDevice sender, HidInputReportReceivedEventArgs args)
+        internal async void OnInputReportEvent(HidDevice sender, HidInputReportReceivedEventArgs args)
         {
             if (_devState == DevState.Detected || _devState == DevState.IOError) {
                 // drop all packet until reset has been sent
@@ -397,7 +420,7 @@ namespace com.yoctopuce.YoctoAPI
                         if (streamType == YGenericHub.YSTREAM_TCP_CLOSE) {
                             // construct a HID output report to send to the device
                             HidOutputReport outReport = Hid.CreateOutputReport();
-                            int size = YUSBPkt.imm_FormatTCP(outReport, null, 0, true);
+                            YUSBPkt.imm_FormatTCP(outReport, null, 0, true);
                             // Send the output report asynchronously
                             var u = await Hid.SendOutputReportAsync(outReport);
                             if (u != 65) {
@@ -406,31 +429,32 @@ namespace com.yoctopuce.YoctoAPI
                                 _watcher.imm_removeUsableDevice(this);
                                 return;
                             }
+                            _currentRequest.imm_Close();
                         }
                         break;
                     case YGenericHub.YSTREAM_EMPTY:
                         break;
                     case YGenericHub.YSTREAM_REPORT:
-                        Debug.WriteLine("Report:" + s.ToString());
+                        Debug.WriteLine("Report:" + s);
                         if (_devState == DevState.StreamReadyReceived) {
                             imm_handleTimedNotification(s);
                         }
                         break;
                     case YGenericHub.YSTREAM_REPORT_V2:
-                        Debug.WriteLine("Report V2:" + s.ToString());
+                        Debug.WriteLine("Report V2:" + s);
                         if (_devState == DevState.StreamReadyReceived) {
                             handleTimedNotificationV2(s);
                         }
                         break;
                     default:
-                        _yctx._Log("drop unknown ystream:" + s.ToString());
+                        _yctx._Log("drop unknown ystream:" + s);
                         break;
                 }
             }
 
         }
 
-        private int imm_handleNotifcation(YPktStreamHead ystream)
+        private void imm_handleNotifcation(YPktStreamHead ystream)
         {
             string functionId;
             int firstByte = ystream.imm_GetByte(0);
@@ -477,7 +501,6 @@ namespace com.yoctopuce.YoctoAPI
                     case NOTIFY_PKT_FIRMWARE:
                         _firmware = ystream.imm_GetString(p, YAPI.YOCTO_FIRMWARE_LEN);
                         p += YAPI.YOCTO_FIRMWARE_LEN;
-                        _vendorid = (ushort)(ystream.imm_GetByte(p) + (ystream.imm_GetByte(p + 1) << 8));
                         p += 2;
                         _deviceid = (ushort)(ystream.imm_GetByte(p) + (ystream.imm_GetByte(p + 1) << 8));
                         break;
@@ -523,7 +546,6 @@ namespace com.yoctopuce.YoctoAPI
                         throw new YAPI_Exception(YAPI.IO_ERROR, "Invalid Notification");
                 }
             }
-            return 0;
         }
 
 
@@ -554,7 +576,7 @@ namespace com.yoctopuce.YoctoAPI
                 } else {
                     YPEntry yp = imm_getYPEntryFromYdx(funYdx);
                     if (yp != null) {
-                        List<int> report = new List<int>((int) (len + 1));
+                        List<int> report = new List<int>((int)(len + 1));
                         report.Add(isAvg ? 1 : 0);
                         for (uint i = 0; i < len; i++) {
                             int b = data.imm_GetByte(pos + i) & 0xff;
@@ -621,12 +643,17 @@ namespace com.yoctopuce.YoctoAPI
         }
 
 
-
-        private async Task sendRequestAsync(byte[] request, YGenericHub.RequestAsyncResult asyncResult, object asyncContext)
+        private async Task sendRequest(byte[] request, YGenericHub.RequestAsyncResult asyncResult, object asyncContext)
         {
             int pos = 0;
 
-            _currentRequest.imm_NewRequest(request, asyncResult, asyncContext);
+
+            //Debug.WriteLine(string.Format("{0}:Check last request is sent", Environment.CurrentManagedThreadId));
+            bool done = _currentRequest.EnsureIsEnded();
+            if (!done) {
+                throw new YAPI_Exception(YAPI.TIMEOUT, "HTTP request on " + SerialNumber + " did not finished correctly");
+            }
+            _currentRequest.imm_NewRequest(request, asyncResult, asyncContext, 10000);
             while (pos < request.Length) {
                 // construct a HID output report to send to the device
                 HidOutputReport outReport = Hid.CreateOutputReport();
@@ -641,6 +668,7 @@ namespace com.yoctopuce.YoctoAPI
                 }
                 pos += size;
             }
+            //Debug.WriteLine(string.Format("{0}:sent", Environment.CurrentManagedThreadId));
 
         }
 
@@ -650,11 +678,10 @@ namespace com.yoctopuce.YoctoAPI
             if (_devState != DevState.StreamReadyReceived) {
                 throw new YAPI_Exception(YAPI.IO_ERROR, "Device not ready");
             }
-            //fixme: implement timeout and upload progress
-            await sendRequestAsync(request, null, null);
-            // todo: test if we have not perfomance issue with this code
-            while (!_currentRequest.imm_IsDone()) {
-                await Task.Delay(2);
+            await sendRequest(request, null, null);
+            bool done = _currentRequest.EnsureIsEnded();
+            if (!done) {
+                throw new YAPI_Exception(YAPI.TIMEOUT, "HTTP request on " + SerialNumber + " did not finished in time");
             }
             return _currentRequest.imm_GetResponse();
         }
@@ -664,7 +691,7 @@ namespace com.yoctopuce.YoctoAPI
             if (_devState != DevState.StreamReadyReceived) {
                 throw new YAPI_Exception(YAPI.IO_ERROR, "Device not ready");
             }
-            await sendRequestAsync(request, asyncResult, asyncContext);
+            await sendRequest(request, asyncResult, asyncContext);
         }
     }
 

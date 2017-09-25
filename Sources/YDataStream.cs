@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 /// <summary>
 ///*******************************************************************
 /// 
-/// $Id: YDataStream.cs 25163 2016-08-11 09:42:13Z seb $
+/// $Id: YDataStream.cs 27281 2017-04-25 15:44:20Z seb $
 /// 
 /// YDataStream Class: Sequence of measured data, stored by the data logger
 /// 
@@ -243,7 +243,7 @@ public class YDataStream
             _nRows = 0;
             return YAPI.SUCCESS;
         }
-        // may throw an exception
+
         udat = YAPIContext.imm_decodeWords(_parent.imm_json_get_string(sdata));
         _values.Clear();
         idx = 0;
@@ -280,7 +280,7 @@ public class YDataStream
                 }
             }
         }
-        
+
         _nRows = _values.Count;
         return YAPI.SUCCESS;
     }
@@ -312,7 +312,9 @@ public class YDataStream
             }
         }
         if (_caltyp != 0) {
-            val = imm_calhdl(val, _caltyp, _calpar, _calraw, _calref);
+            if (imm_calhdl != null) {
+                val = imm_calhdl(val, _caltyp, _calpar, _calraw, _calref);
+            }
         }
         return val;
     }
@@ -331,7 +333,9 @@ public class YDataStream
             }
         }
         if (_caltyp != 0) {
-            val = imm_calhdl(val, _caltyp, _calpar, _calraw, _calref);
+            if (imm_calhdl != null) {
+                val = imm_calhdl(val, _caltyp, _calpar, _calraw, _calref);
+            }
         }
         return val;
     }

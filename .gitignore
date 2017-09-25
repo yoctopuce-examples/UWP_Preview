@@ -1,8 +1,0 @@
-*.sln
-*.pfx
-Examples/Prog-EventBased/project.lock.json
-Examples/UniversalApp/project.lock.json
-Examples/Prog-EventBased/bin
-Examples/Prog-EventBased/obj
-Examples/UniversalApp/bin
-Examples/UniversalApp/obj

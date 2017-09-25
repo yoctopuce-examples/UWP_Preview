@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSpiPort.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YSpiPort.cs 27700 2017-06-01 12:27:09Z seb $
  *
  * Implements FindSpiPort(), the high-level API for SpiPort functions
  *
@@ -273,12 +273,14 @@ public class YSpiPort : YFunction
      */
     public async Task<int> get_rxCount()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return RXCOUNT_INVALID;
             }
         }
-        return _rxCount;
+        res = _rxCount;
+        return res;
     }
 
 
@@ -299,12 +301,14 @@ public class YSpiPort : YFunction
      */
     public async Task<int> get_txCount()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return TXCOUNT_INVALID;
             }
         }
-        return _txCount;
+        res = _txCount;
+        return res;
     }
 
 
@@ -325,12 +329,14 @@ public class YSpiPort : YFunction
      */
     public async Task<int> get_errCount()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ERRCOUNT_INVALID;
             }
         }
-        return _errCount;
+        res = _errCount;
+        return res;
     }
 
 
@@ -351,12 +357,14 @@ public class YSpiPort : YFunction
      */
     public async Task<int> get_rxMsgCount()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return RXMSGCOUNT_INVALID;
             }
         }
-        return _rxMsgCount;
+        res = _rxMsgCount;
+        return res;
     }
 
 
@@ -377,12 +385,14 @@ public class YSpiPort : YFunction
      */
     public async Task<int> get_txMsgCount()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return TXMSGCOUNT_INVALID;
             }
         }
-        return _txMsgCount;
+        res = _txMsgCount;
+        return res;
     }
 
 
@@ -403,12 +413,14 @@ public class YSpiPort : YFunction
      */
     public async Task<string> get_lastMsg()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LASTMSG_INVALID;
             }
         }
-        return _lastMsg;
+        res = _lastMsg;
+        return res;
     }
 
 
@@ -429,12 +441,14 @@ public class YSpiPort : YFunction
      */
     public async Task<string> get_currentJob()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CURRENTJOB_INVALID;
             }
         }
-        return _currentJob;
+        res = _currentJob;
+        return res;
     }
 
 
@@ -485,12 +499,14 @@ public class YSpiPort : YFunction
      */
     public async Task<string> get_startupJob()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return STARTUPJOB_INVALID;
             }
         }
-        return _startupJob;
+        res = _startupJob;
+        return res;
     }
 
 
@@ -531,12 +547,14 @@ public class YSpiPort : YFunction
      */
     public async Task<string> get_command()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COMMAND_INVALID;
             }
         }
-        return _command;
+        res = _command;
+        return res;
     }
 
 
@@ -568,12 +586,14 @@ public class YSpiPort : YFunction
      */
     public async Task<int> get_voltageLevel()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return VOLTAGELEVEL_INVALID;
             }
         }
-        return _voltageLevel;
+        res = _voltageLevel;
+        return res;
     }
 
 
@@ -634,12 +654,14 @@ public class YSpiPort : YFunction
      */
     public async Task<string> get_protocol()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PROTOCOL_INVALID;
             }
         }
-        return _protocol;
+        res = _protocol;
+        return res;
     }
 
 
@@ -698,12 +720,14 @@ public class YSpiPort : YFunction
      */
     public async Task<string> get_spiMode()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SPIMODE_INVALID;
             }
         }
-        return _spiMode;
+        res = _spiMode;
+        return res;
     }
 
 
@@ -757,12 +781,14 @@ public class YSpiPort : YFunction
      */
     public async Task<int> get_ssPolarity()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SSPOLARITY_INVALID;
             }
         }
-        return _ssPolarity;
+        res = _ssPolarity;
+        return res;
     }
 
 
@@ -813,12 +839,14 @@ public class YSpiPort : YFunction
      */
     public async Task<int> get_shitftSampling()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SHITFTSAMPLING_INVALID;
             }
         }
-        return _shitftSampling;
+        res = _shitftSampling;
+        return res;
     }
 
 
@@ -887,6 +915,13 @@ public class YSpiPort : YFunction
      *   a SPI port by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">
@@ -1035,7 +1070,7 @@ public class YSpiPort : YFunction
         _rxptr = 0;
         _rxbuffptr = 0;
         _rxbuff = new byte[0];
-        // may throw an exception
+
         return await this.sendCommand("Z");
     }
 
@@ -1085,6 +1120,7 @@ public class YSpiPort : YFunction
         buff = YAPI.DefaultEncoding.GetBytes(text);
         bufflen = (buff).Length;
         if (bufflen < 100) {
+            // if string is pure text, we can send it as a simple command (faster)
             ch = 0x20;
             idx = 0;
             while ((idx < bufflen) && (ch != 0)) {
@@ -1155,7 +1191,7 @@ public class YSpiPort : YFunction
             buff[idx] = (byte)(hexb & 0xff);
             idx = idx + 1;
         }
-        // may throw an exception
+
         res = await this._upload("txdata", buff);
         return res;
     }
@@ -1195,7 +1231,7 @@ public class YSpiPort : YFunction
             buff[idx] = (byte)(hexb & 0xff);
             idx = idx + 1;
         }
-        // may throw an exception
+
         res = await this._upload("txdata", buff);
         return res;
     }
@@ -1225,6 +1261,7 @@ public class YSpiPort : YFunction
         buff = YAPI.DefaultEncoding.GetBytes(""+text+"\r\n");
         bufflen = (buff).Length-2;
         if (bufflen < 100) {
+            // if string is pure text, we can send it as a simple command (faster)
             ch = 0x20;
             idx = 0;
             while ((idx < bufflen) && (ch != 0)) {
@@ -1267,7 +1304,7 @@ public class YSpiPort : YFunction
         int mult;
         int endpos;
         int res;
-        
+
         // first check if we have the requested character in the look-ahead buffer
         bufflen = (_rxbuff).Length;
         if ((_rxptr >= _rxbuffptr) && (_rxptr < _rxbuffptr+bufflen)) {
@@ -1275,7 +1312,7 @@ public class YSpiPort : YFunction
             _rxptr = _rxptr + 1;
             return res;
         }
-        
+
         // try to preload more than one byte to speed-up byte-per-byte access
         currpos = _rxptr;
         reqlen = 1024;
@@ -1302,8 +1339,8 @@ public class YSpiPort : YFunction
         }
         // still mixed, need to process character by character
         _rxptr = currpos;
-        
-        // may throw an exception
+
+
         buff = await this._download("rxdata.bin?pos="+Convert.ToString(_rxptr)+"&len=1");
         bufflen = (buff).Length - 1;
         endpos = 0;
@@ -1349,7 +1386,7 @@ public class YSpiPort : YFunction
         if (nChars > 65535) {
             nChars = 65535;
         }
-        // may throw an exception
+
         buff = await this._download("rxdata.bin?pos="+Convert.ToString( _rxptr)+"&len="+Convert.ToString(nChars));
         bufflen = (buff).Length - 1;
         endpos = 0;
@@ -1393,7 +1430,7 @@ public class YSpiPort : YFunction
         if (nChars > 65535) {
             nChars = 65535;
         }
-        // may throw an exception
+
         buff = await this._download("rxdata.bin?pos="+Convert.ToString( _rxptr)+"&len="+Convert.ToString(nChars));
         bufflen = (buff).Length - 1;
         endpos = 0;
@@ -1443,7 +1480,7 @@ public class YSpiPort : YFunction
         if (nChars > 65535) {
             nChars = 65535;
         }
-        // may throw an exception
+
         buff = await this._download("rxdata.bin?pos="+Convert.ToString( _rxptr)+"&len="+Convert.ToString(nChars));
         bufflen = (buff).Length - 1;
         endpos = 0;
@@ -1493,7 +1530,7 @@ public class YSpiPort : YFunction
         if (nBytes > 65535) {
             nBytes = 65535;
         }
-        // may throw an exception
+
         buff = await this._download("rxdata.bin?pos="+Convert.ToString( _rxptr)+"&len="+Convert.ToString(nBytes));
         bufflen = (buff).Length - 1;
         endpos = 0;
@@ -1544,7 +1581,7 @@ public class YSpiPort : YFunction
         List<string> msgarr = new List<string>();
         int msglen;
         string res;
-        // may throw an exception
+
         url = "rxmsg.json?pos="+Convert.ToString(_rxptr)+"&len=1&maxw=1";
         msgbin = await this._download(url);
         msgarr = this.imm_json_get_array(msgbin);
@@ -1602,7 +1639,7 @@ public class YSpiPort : YFunction
         int msglen;
         List<string> res = new List<string>();
         int idx;
-        // may throw an exception
+
         url = "rxmsg.json?pos="+Convert.ToString( _rxptr)+"&maxw="+Convert.ToString( maxWait)+"&pat="+pattern;
         msgbin = await this._download(url);
         msgarr = this.imm_json_get_array(msgbin);
@@ -1674,7 +1711,7 @@ public class YSpiPort : YFunction
         byte[] buff;
         int bufflen;
         int res;
-        // may throw an exception
+
         buff = await this._download("rxcnt.bin?pos="+Convert.ToString(_rxptr));
         bufflen = (buff).Length - 1;
         while ((bufflen > 0) && (buff[bufflen] != 64)) {
@@ -1712,7 +1749,7 @@ public class YSpiPort : YFunction
         List<string> msgarr = new List<string>();
         int msglen;
         string res;
-        // may throw an exception
+
         url = "rxmsg.json?len=1&maxw="+Convert.ToString( maxWait)+"&cmd=!"+query;
         msgbin = await this._download(url);
         msgarr = this.imm_json_get_array(msgbin);

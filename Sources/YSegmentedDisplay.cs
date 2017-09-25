@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSegmentedDisplay.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YSegmentedDisplay.cs 27700 2017-06-01 12:27:09Z seb $
  *
  * Implements FindSegmentedDisplay(), the high-level API for SegmentedDisplay functions
  *
@@ -139,12 +139,14 @@ public class YSegmentedDisplay : YFunction
      */
     public async Task<string> get_displayedText()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DISPLAYEDTEXT_INVALID;
             }
         }
-        return _displayedText;
+        res = _displayedText;
+        return res;
     }
 
 
@@ -183,12 +185,14 @@ public class YSegmentedDisplay : YFunction
      */
     public async Task<int> get_displayMode()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DISPLAYMODE_INVALID;
             }
         }
-        return _displayMode;
+        res = _displayMode;
+        return res;
     }
 
 
@@ -233,6 +237,13 @@ public class YSegmentedDisplay : YFunction
      *   a segmented display by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">

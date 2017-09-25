@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YDataLogger.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YDataLogger.cs 27700 2017-06-01 12:27:09Z seb $
  *
  * Implements yFindDataLogger(), the high-level API for DataLogger functions
  *
@@ -245,12 +245,14 @@ public class YDataLogger : YFunction
      */
     public async Task<int> get_currentRunIndex()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CURRENTRUNINDEX_INVALID;
             }
         }
-        return _currentRunIndex;
+        res = _currentRunIndex;
+        return res;
     }
 
 
@@ -271,12 +273,14 @@ public class YDataLogger : YFunction
      */
     public async Task<long> get_timeUTC()
     {
+        long res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return TIMEUTC_INVALID;
             }
         }
-        return _timeUTC;
+        res = _timeUTC;
+        return res;
     }
 
 
@@ -326,12 +330,14 @@ public class YDataLogger : YFunction
      */
     public async Task<int> get_recording()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return RECORDING_INVALID;
             }
         }
-        return _recording;
+        res = _recording;
+        return res;
     }
 
 
@@ -383,12 +389,14 @@ public class YDataLogger : YFunction
      */
     public async Task<int> get_autoStart()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return AUTOSTART_INVALID;
             }
         }
-        return _autoStart;
+        res = _autoStart;
+        return res;
     }
 
 
@@ -425,14 +433,15 @@ public class YDataLogger : YFunction
 
     /**
      * <summary>
-     *   Return true if the data logger is synchronised with the localization beacon.
+     *   Returns true if the data logger is synchronised with the localization beacon.
      * <para>
      * </para>
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   either <c>YDataLogger.BEACONDRIVEN_OFF</c> or <c>YDataLogger.BEACONDRIVEN_ON</c>
+     *   either <c>YDataLogger.BEACONDRIVEN_OFF</c> or <c>YDataLogger.BEACONDRIVEN_ON</c>, according to true
+     *   if the data logger is synchronised with the localization beacon
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YDataLogger.BEACONDRIVEN_INVALID</c>.
@@ -440,12 +449,14 @@ public class YDataLogger : YFunction
      */
     public async Task<int> get_beaconDriven()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return BEACONDRIVEN_INVALID;
             }
         }
-        return _beaconDriven;
+        res = _beaconDriven;
+        return res;
     }
 
 
@@ -487,12 +498,14 @@ public class YDataLogger : YFunction
      */
     public async Task<int> get_clearHistory()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CLEARHISTORY_INVALID;
             }
         }
-        return _clearHistory;
+        res = _clearHistory;
+        return res;
     }
 
 
@@ -537,6 +550,13 @@ public class YDataLogger : YFunction
      *   a data logger by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">
@@ -710,13 +730,13 @@ public class YDataLogger : YFunction
         List<string> dslist = new List<string>();
         YDataSet dataset;
         List<YDataSet> res = new List<YDataSet>();
-        // may throw an exception
+
         dslist = this.imm_json_get_array(json);
         res.Clear();
         for (int ii = 0; ii < dslist.Count; ii++) {
             dataset = new YDataSet(this);
             await dataset._parse(dslist[ii]);
-            res.Add(dataset);;
+            res.Add(dataset);
         }
         return res;
     }

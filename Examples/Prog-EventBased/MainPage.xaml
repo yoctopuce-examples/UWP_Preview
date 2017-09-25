@@ -16,7 +16,7 @@
       <RowDefinition Height="auto"/>
       <RowDefinition Height="*"/>
     </Grid.RowDefinitions>
-    <TextBox Grid.Column="0" Grid.Row="0" Name="url" Text="usb" ></TextBox>
+    <TextBox Grid.Column="0" Grid.Row="0" Name="url" Text="ws://172.17.17.104" ></TextBox>
       <Button Grid.Column="0" Grid.Row="1" HorizontalAlignment="Stretch" Name="initButton" Click="Button_Click">Start</Button>
     <TextBox IsReadOnly="True" Name="Output" AcceptsReturn="True" Header="Output" Grid.Column="0" Grid.Row="2"/>
   </Grid>

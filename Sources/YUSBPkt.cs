@@ -1,7 +1,7 @@
 ﻿
 /*********************************************************************
  *
- * $Id: YUSBPkt.cs 25186 2016-08-12 17:15:06Z seb $
+ * $Id: YUSBPkt.cs 25307 2016-09-06 08:31:29Z seb $
  *
  * YUSBPkt Class: USB packet definitions
  *
@@ -135,7 +135,7 @@ namespace com.yoctopuce.YoctoAPI
         //decode
         public static YPktStreamHead imm_Decode(long pos, byte[] pkt)
         {
-            if (pkt.Length < YUSBPkt.USB_PKT_STREAM_HEAD + pos ) {
+            if (pkt.Length < YUSBPkt.USB_PKT_STREAM_HEAD + pos) {
                 return null;
             }
             uint b = (uint)(pkt[pos++] & 0xff);
@@ -340,7 +340,7 @@ namespace com.yoctopuce.YoctoAPI
         }
 
 
-        public static int imm_FormatTCP(HidOutputReport outReport,  byte[] request, int pos, bool padWithEmpty)
+        public static int imm_FormatTCP(HidOutputReport outReport, byte[] request, int pos, bool padWithEmpty)
         {
             int size, streamType, remaining;
 
@@ -362,7 +362,7 @@ namespace com.yoctopuce.YoctoAPI
 
             byte[] raw = new byte[USB_PKT_SIZE + 1];
             raw[0] = 0;
-            raw[1] = (byte)(0 + (streamType << 3));
+            raw[1] = (byte)( streamType << 3);
             raw[2] = (byte)(YPKT_STREAM + (size << 2));
             if (size > 0) {
                 Buffer.BlockCopy(request, pos, raw, 3, size);
@@ -379,7 +379,7 @@ namespace com.yoctopuce.YoctoAPI
         {
             byte[] raw = new byte[USB_PKT_SIZE + 1];
             raw[0] = 0;
-            raw[1] = (byte)(0 + (YGenericHub.YSTREAM_META << 3));
+            raw[1] =  (YGenericHub.YSTREAM_META << 3);
             raw[2] = (byte)(YPKT_STREAM + (5 << 2));
             raw[3] = YGenericHub.USB_META_UTCTIME;
             UInt32 currUtcTime = (UInt32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;

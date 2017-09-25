@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YSensor.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YSensor.cs 28559 2017-09-15 15:01:38Z seb $
  *
  * Implements yFindSensor(), the high-level API for Sensor functions
  *
@@ -109,6 +109,16 @@ public class YSensor : YFunction
     public const  string REPORTFREQUENCY_INVALID = YAPI.INVALID_STRING;
     /**
      * <summary>
+     *   invalid advMode value
+     * </summary>
+     */
+    public const int ADVMODE_IMMEDIATE = 0;
+    public const int ADVMODE_PERIOD_AVG = 1;
+    public const int ADVMODE_PERIOD_MIN = 2;
+    public const int ADVMODE_PERIOD_MAX = 3;
+    public const int ADVMODE_INVALID = -1;
+    /**
+     * <summary>
      *   invalid calibrationParam value
      * </summary>
      */
@@ -132,6 +142,7 @@ public class YSensor : YFunction
     protected double _currentRawValue = CURRENTRAWVALUE_INVALID;
     protected string _logFrequency = LOGFREQUENCY_INVALID;
     protected string _reportFrequency = REPORTFREQUENCY_INVALID;
+    protected int _advMode = ADVMODE_INVALID;
     protected string _calibrationParam = CALIBRATIONPARAM_INVALID;
     protected double _resolution = RESOLUTION_INVALID;
     protected int _sensorState = SENSORSTATE_INVALID;
@@ -303,6 +314,9 @@ public class YSensor : YFunction
         if (json_val.Has("reportFrequency")) {
             _reportFrequency = json_val.GetString("reportFrequency");
         }
+        if (json_val.Has("advMode")) {
+            _advMode = json_val.GetInt("advMode");
+        }
         if (json_val.Has("calibrationParam")) {
             _calibrationParam = json_val.GetString("calibrationParam");
         }
@@ -332,12 +346,14 @@ public class YSensor : YFunction
      */
     public async Task<string> get_unit()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return UNIT_INVALID;
             }
         }
-        return _unit;
+        res = _unit;
+        return res;
     }
 
 
@@ -370,7 +386,8 @@ public class YSensor : YFunction
             res = _currentValue;
         }
         res = res * _iresol;
-        return Math.Round(res) / _iresol;
+        res = Math.Round(res) / _iresol;
+        return res;
     }
 
 
@@ -426,7 +443,8 @@ public class YSensor : YFunction
             }
         }
         res = _lowestValue * _iresol;
-        return Math.Round(res) / _iresol;
+        res = Math.Round(res) / _iresol;
+        return res;
     }
 
 
@@ -482,7 +500,8 @@ public class YSensor : YFunction
             }
         }
         res = _highestValue * _iresol;
-        return Math.Round(res) / _iresol;
+        res = Math.Round(res) / _iresol;
+        return res;
     }
 
 
@@ -504,12 +523,14 @@ public class YSensor : YFunction
      */
     public async Task<double> get_currentRawValue()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CURRENTRAWVALUE_INVALID;
             }
         }
-        return _currentRawValue;
+        res = _currentRawValue;
+        return res;
     }
 
 
@@ -532,12 +553,14 @@ public class YSensor : YFunction
      */
     public async Task<string> get_logFrequency()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LOGFREQUENCY_INVALID;
             }
         }
-        return _logFrequency;
+        res = _logFrequency;
+        return res;
     }
 
 
@@ -592,12 +615,14 @@ public class YSensor : YFunction
      */
     public async Task<string> get_reportFrequency()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return REPORTFREQUENCY_INVALID;
             }
         }
-        return _reportFrequency;
+        res = _reportFrequency;
+        return res;
     }
 
 
@@ -635,17 +660,79 @@ public class YSensor : YFunction
 
     /**
      * <summary>
+     *   Returns the measuring mode used for the advertised value pushed to the parent hub.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   a value among <c>YSensor.ADVMODE_IMMEDIATE</c>, <c>YSensor.ADVMODE_PERIOD_AVG</c>,
+     *   <c>YSensor.ADVMODE_PERIOD_MIN</c> and <c>YSensor.ADVMODE_PERIOD_MAX</c> corresponding to the
+     *   measuring mode used for the advertised value pushed to the parent hub
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YSensor.ADVMODE_INVALID</c>.
+     * </para>
+     */
+    public async Task<int> get_advMode()
+    {
+        int res;
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+            if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return ADVMODE_INVALID;
+            }
+        }
+        res = _advMode;
+        return res;
+    }
+
+
+    /**
+     * <summary>
+     *   Changes the measuring mode used for the advertised value pushed to the parent hub.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   a value among <c>YSensor.ADVMODE_IMMEDIATE</c>, <c>YSensor.ADVMODE_PERIOD_AVG</c>,
+     *   <c>YSensor.ADVMODE_PERIOD_MIN</c> and <c>YSensor.ADVMODE_PERIOD_MAX</c> corresponding to the
+     *   measuring mode used for the advertised value pushed to the parent hub
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public async Task<int> set_advMode(int  newval)
+    {
+        string rest_val;
+        rest_val = (newval).ToString();
+        await _setAttr("advMode",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * <summary>
      *   throws an exception on error
      * </summary>
      */
     public async Task<string> get_calibrationParam()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CALIBRATIONPARAM_INVALID;
             }
         }
-        return _calibrationParam;
+        res = _calibrationParam;
+        return res;
     }
 
 
@@ -706,12 +793,14 @@ public class YSensor : YFunction
      */
     public async Task<double> get_resolution()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return RESOLUTION_INVALID;
             }
         }
-        return _resolution;
+        res = _resolution;
+        return res;
     }
 
 
@@ -734,12 +823,14 @@ public class YSensor : YFunction
      */
     public async Task<int> get_sensorState()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SENSORSTATE_INVALID;
             }
         }
-        return _sensorState;
+        res = _sensorState;
+        return res;
     }
 
 
@@ -776,6 +867,13 @@ public class YSensor : YFunction
      *   a sensor by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">
@@ -927,19 +1025,23 @@ public class YSensor : YFunction
             return 0;
         }
         if ((_calibrationParam).IndexOf(",") >= 0) {
+            // Plain text format
             iCalib = YAPIContext.imm_decodeFloats(_calibrationParam);
             _caltyp = ((iCalib[0]) / (1000));
             if (_caltyp > 0) {
                 if (_caltyp < YAPI.YOCTO_CALIB_TYPE_OFS) {
+                    // Unknown calibration type: calibrated value will be provided by the device
                     _caltyp = -1;
                     return 0;
                 }
                 imm_calhdl = _yapi.imm_getCalibrationHandler(_caltyp);
                 if (!(imm_calhdl != null)) {
+                    // Unknown calibration type: calibrated value will be provided by the device
                     _caltyp = -1;
                     return 0;
                 }
             }
+            // New 32bit text format
             _isScal = true;
             _isScal32 = true;
             _offset = 0;
@@ -964,11 +1066,14 @@ public class YSensor : YFunction
                 position = position + 2;
             }
         } else {
+            // Recorder-encoded format, including encoding
             iCalib = YAPIContext.imm_decodeWords(_calibrationParam);
+            // In case of unknown format, calibrated value will be provided by the device
             if (iCalib.Count < 2) {
                 _caltyp = -1;
                 return 0;
             }
+            // Save variable format (scale for scalar, or decimal exponent)
             _isScal = (iCalib[1] > 0);
             if (_isScal) {
                 _offset = iCalib[0];
@@ -987,12 +1092,14 @@ public class YSensor : YFunction
                     position = position - 1;
                 }
             }
+            // Shortcut when there is no calibration parameter
             if (iCalib.Count == 2) {
                 _caltyp = 0;
                 return 0;
             }
             _caltyp = iCalib[2];
             imm_calhdl = _yapi.imm_getCalibrationHandler(_caltyp);
+            // parse calibration points
             if (_caltyp <= 10) {
                 maxpos = _caltyp;
             } else {
@@ -1060,6 +1167,38 @@ public class YSensor : YFunction
 
     /**
      * <summary>
+     *   Returns the YDatalogger object of the device hosting the sensor.
+     * <para>
+     *   This method returns an object of
+     *   class YDatalogger that can control global parameters of the data logger. The returned object
+     *   should not be freed.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an YDataLogger object or null on error.
+     * </returns>
+     */
+    public virtual async Task<YDataLogger> get_dataLogger()
+    {
+        YDataLogger logger;
+        YModule modu;
+        string serial;
+        string hwid;
+
+        modu = await this.get_module();
+        serial = await modu.get_serialNumber();
+        if (serial == YAPI.INVALID_STRING) {
+            return null;
+        }
+        hwid = serial + ".dataLogger";
+        logger  = YDataLogger.FindDataLogger(hwid);
+        return logger;
+    }
+
+    /**
+     * <summary>
      *   Starts the data logger on the device.
      * <para>
      *   Note that the data logger
@@ -1074,7 +1213,7 @@ public class YSensor : YFunction
     public virtual async Task<int> startDataLogger()
     {
         byte[] res;
-        // may throw an exception
+
         res = await this._download("api/dataLogger/recording?recording=1");
         if (!((res).Length>0)) { this._throw( YAPI.IO_ERROR, "unable to start datalogger"); return YAPI.IO_ERROR; }
         return YAPI.SUCCESS;
@@ -1093,7 +1232,7 @@ public class YSensor : YFunction
     public virtual async Task<int> stopDataLogger()
     {
         byte[] res;
-        // may throw an exception
+
         res = await this._download("api/dataLogger/recording?recording=0");
         if (!((res).Length>0)) { this._throw( YAPI.IO_ERROR, "unable to stop datalogger"); return YAPI.IO_ERROR; }
         return YAPI.SUCCESS;
@@ -1141,7 +1280,7 @@ public class YSensor : YFunction
     {
         string funcid;
         string funit;
-        // may throw an exception
+
         funcid = await this.get_functionId();
         funit = await this.get_unit();
         return new YDataSet(this, funcid, funit, startTime, endTime);
@@ -1224,9 +1363,11 @@ public class YSensor : YFunction
     public virtual async Task<int> calibrateFromPoints(List<double> rawValues,List<double> refValues)
     {
         string rest_val;
-        // may throw an exception
+        int res;
+
         rest_val = await this._encodeCalibrationPoints(rawValues, refValues);
-        return await this._setAttr("calibrationParam", rest_val);
+        res = await this._setAttr("calibrationParam", rest_val);
+        return res;
     }
 
     /**
@@ -1306,6 +1447,7 @@ public class YSensor : YFunction
             return "0";
         }
         if (_isScal32) {
+            // 32-bit fixed-point encoding
             res = ""+Convert.ToString(YAPI.YOCTO_CALIB_TYPE_OFS);
             idx = 0;
             while (idx < npt) {
@@ -1314,6 +1456,7 @@ public class YSensor : YFunction
             }
         } else {
             if (_isScal) {
+                // 16-bit fixed-point encoding
                 res = ""+Convert.ToString(npt);
                 idx = 0;
                 while (idx < npt) {
@@ -1323,6 +1466,7 @@ public class YSensor : YFunction
                     idx = idx + 1;
                 }
             } else {
+                // 16-bit floating-point decimal encoding
                 res = ""+Convert.ToString(10 + npt);
                 idx = 0;
                 while (idx < npt) {
@@ -1375,7 +1519,9 @@ public class YSensor : YFunction
             startTime = endTime;
         }
         if (report[0] == 2) {
+            // 32bit timed report format
             if (report.Count <= 5) {
+                // sub-second report, 1-4 bytes
                 poww = 1;
                 avgRaw = 0;
                 byteVal = 0;
@@ -1398,6 +1544,7 @@ public class YSensor : YFunction
                 minVal = avgVal;
                 maxVal = avgVal;
             } else {
+                // averaged report: avg,avg-min,max-avg
                 sublen = 1 + ((report[1]) & (3));
                 poww = 1;
                 avgRaw = 0;
@@ -1447,7 +1594,9 @@ public class YSensor : YFunction
                 }
             }
         } else {
+            // 16bit timed report format
             if (report[0] == 0) {
+                // sub-second report, 1-4 bytes
                 poww = 1;
                 avgRaw = 0;
                 byteVal = 0;
@@ -1469,6 +1618,7 @@ public class YSensor : YFunction
                 minVal = avgVal;
                 maxVal = avgVal;
             } else {
+                // averaged report 2+4+2 bytes
                 minRaw = report[1] + 0x100 * report[2];
                 maxRaw = report[3] + 0x100 * report[4];
                 avgRaw = report[5] + 0x100 * report[6] + 0x10000 * report[7];

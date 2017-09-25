@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YAPI.cs 25204 2016-08-17 13:52:16Z seb $
+ * $Id: YAPI.cs 28015 2017-07-07 16:27:06Z mvuilleu $
  *
  * High-level programming interface, common to all modules
  *
@@ -71,7 +71,7 @@ namespace com.yoctopuce.YoctoAPI
         public const long INVALID_LONG = -9223372036854775807L;
         public const int INVALID_UINT = -1;
         public const string YOCTO_API_VERSION_STR = "1.10";
-        public const string YOCTO_API_BUILD_STR = "PATCH_WITH_BUILD";
+        public const string YOCTO_API_BUILD_STR = "28628";
         public const int YOCTO_API_VERSION_BCD = 0x0110;
         public const int YOCTO_VENDORID = 0x24e0;
         public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -182,7 +182,7 @@ namespace com.yoctopuce.YoctoAPI
          */
         public static string GetAPIVersion()
         {
-            return YOCTO_API_VERSION_STR + ".PATCH_WITH_BUILD" + YUSBHub.imm_getAPIVersion();
+            return YOCTO_API_VERSION_STR + ".28628" + YUSBHub.imm_getAPIVersion();
         }
 
         /**
@@ -696,6 +696,8 @@ namespace com.yoctopuce.YoctoAPI
 
         }
 
+
+
         /**
          * <summary>
          *   Maintains the device-to-library communication channel.
@@ -729,7 +731,83 @@ namespace com.yoctopuce.YoctoAPI
 
         /**
          * <summary>
-         *   Force a hub discovery, if a callback as been registered with <c>yRegisterDeviceRemovalCallback</c> it
+         *   Pauses the execution flow for a specified duration.
+         * <para>
+         *   This function implements a passive waiting loop, meaning that it does not
+         *   consume CPU cycles significantly. The processor is left available for
+         *   other threads and processes. During the pause, the library nevertheless
+         *   reads from time to time information from the Yoctopuce modules by
+         *   calling <c>yHandleEvents()</c>, in order to stay up-to-date.
+         * </para>
+         * <para>
+         *   This function may signal an error in case there is a communication problem
+         *   while contacting a module.
+         * </para>
+         * </summary>
+         * <param name="ms_duration">
+         *   an integer corresponding to the duration of the pause,
+         *   in milliseconds.
+         * </param>
+         * <param name="errmsg">
+         *   a string passed by reference to receive any error message.
+         * </param>
+         * <returns>
+         *   <c>YAPI.SUCCESS</c> when the call succeeds.
+         * </returns>
+         * <para>
+         *   On failure, throws an exception or returns a negative error code.
+         * </para>
+         */
+        public static async Task<int> Sleep(ulong ms_duration, YRefParam errmsg)
+        {
+            YAPIContext yctx = imm_GetYCtx();
+            try {
+                return await imm_GetYCtx().Sleep(ms_duration);
+            } catch (YAPI_Exception ex) {
+                errmsg.Value = ex.Message;
+                return ex.errorType;
+            }
+        }
+
+
+        /**
+         * <summary>
+         *   Pauses the execution flow for a specified duration.
+         * <para>
+         *   This function implements a passive waiting loop, meaning that it does not
+         *   consume CPU cycles significantly. The processor is left available for
+         *   other threads and processes. During the pause, the library nevertheless
+         *   reads from time to time information from the Yoctopuce modules by
+         *   calling <c>yHandleEvents()</c>, in order to stay up-to-date.
+         * </para>
+         * <para>
+         *   This function may signal an error in case there is a communication problem
+         *   while contacting a module.
+         * </para>
+         * </summary>
+         * <param name="ms_duration">
+         *   an integer corresponding to the duration of the pause,
+         *   in milliseconds.
+         * </param>
+         * <param name="errmsg">
+         *   a string passed by reference to receive any error message.
+         * </param>
+         * <returns>
+         *   <c>YAPI.SUCCESS</c> when the call succeeds.
+         * </returns>
+         * <para>
+         *   On failure, throws an exception or returns a negative error code.
+         * </para>
+         */
+        public static async Task<int> Sleep(ulong ms_duration)
+        {
+            return await imm_GetYCtx().Sleep(ms_duration);
+        }
+
+
+        /**
+         * <summary>
+         *   Force a hub discovery, if a callback as been registered with <c>yRegisterHubDiscoveryCallback</c> it
          *   will be called for each net work hub that will respond to the discovery.
          * <para>
          * </para>
@@ -755,7 +833,7 @@ namespace com.yoctopuce.YoctoAPI
 
         /**
          * <summary>
-         *   Force a hub discovery, if a callback as been registered with <c>yRegisterDeviceRemovalCallback</c> it
+         *   Force a hub discovery, if a callback as been registered with <c>yRegisterHubDiscoveryCallback</c> it
          *   will be called for each net work hub that will respond to the discovery.
          * <para>
          * </para>
@@ -871,8 +949,8 @@ namespace com.yoctopuce.YoctoAPI
          * </para>
          * </summary>
          * <param name="hubDiscoveryCallback">
-         *   a procedure taking two string parameter, or null
-         *   to unregister a previously registered  callback.
+         *   a procedure taking two string parameter, the serial
+         *   number and the hub URL. Use <c>null</c> to unregister a previously registered  callback.
          * </param>
          */
         public static async Task RegisterHubDiscoveryCallback(YAPI.HubDiscoveryHandler hubDiscoveryCallback)

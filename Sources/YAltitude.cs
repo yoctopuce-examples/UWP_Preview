@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAltitude.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YAltitude.cs 27700 2017-06-01 12:27:09Z seb $
  *
  * Implements FindAltitude(), the high-level API for Altitude functions
  *
@@ -52,7 +52,7 @@ namespace com.yoctopuce.YoctoAPI
  * <para>
  *   The Yoctopuce class YAltitude allows you to read and configure Yoctopuce altitude
  *   sensors. It inherits from the YSensor class the core functions to read measurements,
- *   register callback functions, access to the autonomous datalogger.
+ *   to register callback functions, to access the autonomous datalogger.
  *   This class adds the ability to configure the barometric pressure adjusted to
  *   sea level (QNH) for barometric sensors.
  * </para>
@@ -204,12 +204,14 @@ public class YAltitude : YSensor
      */
     public async Task<double> get_qnh()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return QNH_INVALID;
             }
         }
-        return _qnh;
+        res = _qnh;
+        return res;
     }
 
 
@@ -233,12 +235,14 @@ public class YAltitude : YSensor
      */
     public async Task<string> get_technology()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return TECHNOLOGY_INVALID;
             }
         }
-        return _technology;
+        res = _technology;
+        return res;
     }
 
 
@@ -275,6 +279,13 @@ public class YAltitude : YSensor
      *   an altimeter by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">

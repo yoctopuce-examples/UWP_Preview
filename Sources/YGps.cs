@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YGps.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YGps.cs 27700 2017-06-01 12:27:09Z seb $
  *
  * Implements FindGps(), the high-level API for Gps functions
  *
@@ -255,12 +255,14 @@ public class YGps : YFunction
      */
     public async Task<int> get_isFixed()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ISFIXED_INVALID;
             }
         }
-        return _isFixed;
+        res = _isFixed;
+        return res;
     }
 
 
@@ -281,12 +283,14 @@ public class YGps : YFunction
      */
     public async Task<long> get_satCount()
     {
+        long res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SATCOUNT_INVALID;
             }
         }
-        return _satCount;
+        res = _satCount;
+        return res;
     }
 
 
@@ -308,12 +312,14 @@ public class YGps : YFunction
      */
     public async Task<int> get_coordSystem()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COORDSYSTEM_INVALID;
             }
         }
-        return _coordSystem;
+        res = _coordSystem;
+        return res;
     }
 
 
@@ -363,12 +369,14 @@ public class YGps : YFunction
      */
     public async Task<string> get_latitude()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LATITUDE_INVALID;
             }
         }
-        return _latitude;
+        res = _latitude;
+        return res;
     }
 
 
@@ -389,12 +397,14 @@ public class YGps : YFunction
      */
     public async Task<string> get_longitude()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LONGITUDE_INVALID;
             }
         }
-        return _longitude;
+        res = _longitude;
+        return res;
     }
 
 
@@ -417,12 +427,14 @@ public class YGps : YFunction
      */
     public async Task<double> get_dilution()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DILUTION_INVALID;
             }
         }
-        return _dilution;
+        res = _dilution;
+        return res;
     }
 
 
@@ -445,12 +457,14 @@ public class YGps : YFunction
      */
     public async Task<double> get_altitude()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ALTITUDE_INVALID;
             }
         }
-        return _altitude;
+        res = _altitude;
+        return res;
     }
 
 
@@ -471,12 +485,14 @@ public class YGps : YFunction
      */
     public async Task<double> get_groundSpeed()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return GROUNDSPEED_INVALID;
             }
         }
-        return _groundSpeed;
+        res = _groundSpeed;
+        return res;
     }
 
 
@@ -499,12 +515,14 @@ public class YGps : YFunction
      */
     public async Task<double> get_direction()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DIRECTION_INVALID;
             }
         }
-        return _direction;
+        res = _direction;
+        return res;
     }
 
 
@@ -527,12 +545,14 @@ public class YGps : YFunction
      */
     public async Task<long> get_unixTime()
     {
+        long res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return UNIXTIME_INVALID;
             }
         }
-        return _unixTime;
+        res = _unixTime;
+        return res;
     }
 
 
@@ -553,12 +573,14 @@ public class YGps : YFunction
      */
     public async Task<string> get_dateTime()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DATETIME_INVALID;
             }
         }
-        return _dateTime;
+        res = _dateTime;
+        return res;
     }
 
 
@@ -579,12 +601,14 @@ public class YGps : YFunction
      */
     public async Task<int> get_utcOffset()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return UTCOFFSET_INVALID;
             }
         }
-        return _utcOffset;
+        res = _utcOffset;
+        return res;
     }
 
 
@@ -625,12 +649,14 @@ public class YGps : YFunction
      */
     public async Task<string> get_command()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COMMAND_INVALID;
             }
         }
-        return _command;
+        res = _command;
+        return res;
     }
 
 
@@ -675,6 +701,13 @@ public class YGps : YFunction
      *   a GPS by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">

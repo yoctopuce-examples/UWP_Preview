@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWatchdog.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YWatchdog.cs 27700 2017-06-01 12:27:09Z seb $
  *
  * Implements FindWatchdog(), the high-level API for Watchdog functions
  *
@@ -257,12 +257,14 @@ public class YWatchdog : YFunction
      */
     public async Task<int> get_state()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return STATE_INVALID;
             }
         }
-        return _state;
+        res = _state;
+        return res;
     }
 
 
@@ -314,12 +316,14 @@ public class YWatchdog : YFunction
      */
     public async Task<int> get_stateAtPowerOn()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return STATEATPOWERON_INVALID;
             }
         }
-        return _stateAtPowerOn;
+        res = _stateAtPowerOn;
+        return res;
     }
 
 
@@ -373,12 +377,14 @@ public class YWatchdog : YFunction
      */
     public async Task<long> get_maxTimeOnStateA()
     {
+        long res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MAXTIMEONSTATEA_INVALID;
             }
         }
-        return _maxTimeOnStateA;
+        res = _maxTimeOnStateA;
+        return res;
     }
 
 
@@ -429,12 +435,14 @@ public class YWatchdog : YFunction
      */
     public async Task<long> get_maxTimeOnStateB()
     {
+        long res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MAXTIMEONSTATEB_INVALID;
             }
         }
-        return _maxTimeOnStateB;
+        res = _maxTimeOnStateB;
+        return res;
     }
 
 
@@ -485,12 +493,14 @@ public class YWatchdog : YFunction
      */
     public async Task<int> get_output()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return OUTPUT_INVALID;
             }
         }
-        return _output;
+        res = _output;
+        return res;
     }
 
 
@@ -544,12 +554,14 @@ public class YWatchdog : YFunction
      */
     public async Task<long> get_pulseTimer()
     {
+        long res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PULSETIMER_INVALID;
             }
         }
-        return _pulseTimer;
+        res = _pulseTimer;
+        return res;
     }
 
 
@@ -609,12 +621,14 @@ public class YWatchdog : YFunction
      */
     public async Task<long> get_countdown()
     {
+        long res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COUNTDOWN_INVALID;
             }
         }
-        return _countdown;
+        res = _countdown;
+        return res;
     }
 
 
@@ -636,12 +650,14 @@ public class YWatchdog : YFunction
      */
     public async Task<int> get_autoStart()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return AUTOSTART_INVALID;
             }
         }
-        return _autoStart;
+        res = _autoStart;
+        return res;
     }
 
 
@@ -693,12 +709,14 @@ public class YWatchdog : YFunction
      */
     public async Task<int> get_running()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return RUNNING_INVALID;
             }
         }
-        return _running;
+        res = _running;
+        return res;
     }
 
 
@@ -775,12 +793,14 @@ public class YWatchdog : YFunction
      */
     public async Task<long> get_triggerDelay()
     {
+        long res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return TRIGGERDELAY_INVALID;
             }
         }
-        return _triggerDelay;
+        res = _triggerDelay;
+        return res;
     }
 
 
@@ -829,12 +849,14 @@ public class YWatchdog : YFunction
      */
     public async Task<long> get_triggerDuration()
     {
+        long res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return TRIGGERDURATION_INVALID;
             }
         }
-        return _triggerDuration;
+        res = _triggerDuration;
+        return res;
     }
 
 
@@ -899,6 +921,13 @@ public class YWatchdog : YFunction
      *   a watchdog by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">

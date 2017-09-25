@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YHumidity.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YHumidity.cs 27700 2017-06-01 12:27:09Z seb $
  *
  * Implements FindHumidity(), the high-level API for Humidity functions
  *
@@ -52,7 +52,7 @@ namespace com.yoctopuce.YoctoAPI
  * <para>
  *   The Yoctopuce class YHumidity allows you to read and configure Yoctopuce humidity
  *   sensors. It inherits from YSensor class the core functions to read measurements,
- *   register callback functions, access to the autonomous datalogger.
+ *   to register callback functions, to access the autonomous datalogger.
  * </para>
  * </summary>
  */
@@ -174,12 +174,14 @@ public class YHumidity : YSensor
      */
     public async Task<double> get_relHum()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return RELHUM_INVALID;
             }
         }
-        return _relHum;
+        res = _relHum;
+        return res;
     }
 
 
@@ -200,12 +202,14 @@ public class YHumidity : YSensor
      */
     public async Task<double> get_absHum()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ABSHUM_INVALID;
             }
         }
-        return _absHum;
+        res = _absHum;
+        return res;
     }
 
 
@@ -242,6 +246,13 @@ public class YHumidity : YSensor
      *   a humidity sensor by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">

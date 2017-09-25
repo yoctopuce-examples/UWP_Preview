@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YQt.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YQt.cs 27700 2017-06-01 12:27:09Z seb $
  *
  * Implements FindQt(), the high-level API for Qt functions
  *
@@ -134,6 +134,13 @@ public class YQt : YSensor
      *   a quaternion component by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">

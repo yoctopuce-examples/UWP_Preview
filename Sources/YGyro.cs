@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YGyro.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YGyro.cs 27700 2017-06-01 12:27:09Z seb $
  *
  * Implements FindGyro(), the high-level API for Gyro functions
  *
@@ -193,12 +193,14 @@ public class YGyro : YSensor
      */
     public async Task<int> get_bandwidth()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return BANDWIDTH_INVALID;
             }
         }
-        return _bandwidth;
+        res = _bandwidth;
+        return res;
     }
 
 
@@ -250,12 +252,14 @@ public class YGyro : YSensor
      */
     public async Task<double> get_xValue()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return XVALUE_INVALID;
             }
         }
-        return _xValue;
+        res = _xValue;
+        return res;
     }
 
 
@@ -277,12 +281,14 @@ public class YGyro : YSensor
      */
     public async Task<double> get_yValue()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return YVALUE_INVALID;
             }
         }
-        return _yValue;
+        res = _yValue;
+        return res;
     }
 
 
@@ -304,12 +310,14 @@ public class YGyro : YSensor
      */
     public async Task<double> get_zValue()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ZVALUE_INVALID;
             }
         }
-        return _zValue;
+        res = _zValue;
+        return res;
     }
 
 
@@ -346,6 +354,13 @@ public class YGyro : YSensor
      *   a gyroscope by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">
@@ -555,7 +570,7 @@ public class YGyro : YSensor
         double sqz;
         double norm;
         double delta;
-        // may throw an exception
+
         if (await this._loadQuaternion() != YAPI.SUCCESS) {
             return YAPI.DEVICE_NOT_FOUND;
         }
@@ -567,10 +582,12 @@ public class YGyro : YSensor
             norm = sqx + sqy + sqz + sqw;
             delta = _y * _w - _x * _z;
             if (delta > 0.499 * norm) {
+                // singularity at north pole
                 _pitch = 90.0;
                 _head  = Math.Round(2.0 * 1800.0/Math.PI * Math.Atan2(_x,-_w)) / 10.0;
             } else {
                 if (delta < -0.499 * norm) {
+                    // singularity at south pole
                     _pitch = -90.0;
                     _head  = Math.Round(-2.0 * 1800.0/Math.PI * Math.Atan2(_x,-_w)) / 10.0;
                 } else {

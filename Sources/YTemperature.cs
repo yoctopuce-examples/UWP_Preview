@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YTemperature.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YTemperature.cs 28559 2017-09-15 15:01:38Z seb $
  *
  * Implements FindTemperature(), the high-level API for Temperature functions
  *
@@ -51,8 +51,8 @@ namespace com.yoctopuce.YoctoAPI
  *   YTemperature Class: Temperature function interface
  * <para>
  *   The Yoctopuce class YTemperature allows you to read and configure Yoctopuce temperature
- *   sensors. It inherits from YSensor class the core functions to read measurements,
- *   register callback functions, access to the autonomous datalogger.
+ *   sensors. It inherits from YSensor class the core functions to read measurements, to
+ *   register callback functions, to access the autonomous datalogger.
  *   This class adds the ability to configure some specific parameters for some
  *   sensors (connection type, temperature mapping table).
  * </para>
@@ -81,6 +81,7 @@ public class YTemperature : YSensor
     public const int SENSORTYPE_RES_OHM = 11;
     public const int SENSORTYPE_RES_NTC = 12;
     public const int SENSORTYPE_RES_LINEAR = 13;
+    public const int SENSORTYPE_RES_INTERNAL = 14;
     public const int SENSORTYPE_INVALID = -1;
     /**
      * <summary>
@@ -209,8 +210,8 @@ public class YTemperature : YSensor
      *   <c>YTemperature.SENSORTYPE_TYPE_S</c>, <c>YTemperature.SENSORTYPE_TYPE_T</c>,
      *   <c>YTemperature.SENSORTYPE_PT100_4WIRES</c>, <c>YTemperature.SENSORTYPE_PT100_3WIRES</c>,
      *   <c>YTemperature.SENSORTYPE_PT100_2WIRES</c>, <c>YTemperature.SENSORTYPE_RES_OHM</c>,
-     *   <c>YTemperature.SENSORTYPE_RES_NTC</c> and <c>YTemperature.SENSORTYPE_RES_LINEAR</c> corresponding
-     *   to the temperature sensor type
+     *   <c>YTemperature.SENSORTYPE_RES_NTC</c>, <c>YTemperature.SENSORTYPE_RES_LINEAR</c> and
+     *   <c>YTemperature.SENSORTYPE_RES_INTERNAL</c> corresponding to the temperature sensor type
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YTemperature.SENSORTYPE_INVALID</c>.
@@ -218,18 +219,20 @@ public class YTemperature : YSensor
      */
     public async Task<int> get_sensorType()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SENSORTYPE_INVALID;
             }
         }
-        return _sensorType;
+        res = _sensorType;
+        return res;
     }
 
 
     /**
      * <summary>
-     *   Modifies the temperature sensor type.
+     *   Changes the temperature sensor type.
      * <para>
      *   This function is used
      *   to define the type of thermocouple (K,E...) used with the device.
@@ -247,7 +250,8 @@ public class YTemperature : YSensor
      *   <c>YTemperature.SENSORTYPE_TYPE_S</c>, <c>YTemperature.SENSORTYPE_TYPE_T</c>,
      *   <c>YTemperature.SENSORTYPE_PT100_4WIRES</c>, <c>YTemperature.SENSORTYPE_PT100_3WIRES</c>,
      *   <c>YTemperature.SENSORTYPE_PT100_2WIRES</c>, <c>YTemperature.SENSORTYPE_RES_OHM</c>,
-     *   <c>YTemperature.SENSORTYPE_RES_NTC</c> and <c>YTemperature.SENSORTYPE_RES_LINEAR</c>
+     *   <c>YTemperature.SENSORTYPE_RES_NTC</c>, <c>YTemperature.SENSORTYPE_RES_LINEAR</c> and
+     *   <c>YTemperature.SENSORTYPE_RES_INTERNAL</c> corresponding to the temperature sensor type
      * </param>
      * <para>
      * </para>
@@ -283,12 +287,14 @@ public class YTemperature : YSensor
      */
     public async Task<double> get_signalValue()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SIGNALVALUE_INVALID;
             }
         }
-        return Math.Round(_signalValue * 1000) / 1000;
+        res = Math.Round(_signalValue * 1000) / 1000;
+        return res;
     }
 
 
@@ -309,12 +315,14 @@ public class YTemperature : YSensor
      */
     public async Task<string> get_signalUnit()
     {
+        string res;
         if (_cacheExpiration == 0) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SIGNALUNIT_INVALID;
             }
         }
-        return _signalUnit;
+        res = _signalUnit;
+        return res;
     }
 
 
@@ -325,12 +333,14 @@ public class YTemperature : YSensor
      */
     public async Task<string> get_command()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COMMAND_INVALID;
             }
         }
-        return _command;
+        res = _command;
+        return res;
     }
 
 
@@ -375,6 +385,13 @@ public class YTemperature : YSensor
      *   a temperature sensor by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">
@@ -541,7 +558,7 @@ public class YTemperature : YSensor
 
     /**
      * <summary>
-     *   Configure NTC thermistor parameters in order to properly compute the temperature from
+     *   Configures NTC thermistor parameters in order to properly compute the temperature from
      *   the measured resistance.
      * <para>
      *   For increased precision, you can enter a complete mapping
@@ -624,7 +641,7 @@ public class YTemperature : YSensor
         siz = tempValues.Count;
         if (!(siz >= 2)) { this._throw( YAPI.INVALID_ARGUMENT, "thermistor response table must have at least two points"); return YAPI.INVALID_ARGUMENT; }
         if (!(siz == resValues.Count)) { this._throw( YAPI.INVALID_ARGUMENT, "table sizes mismatch"); return YAPI.INVALID_ARGUMENT; }
-        // may throw an exception
+
         res = await this.set_command("Z");
         if (!(res==YAPI.SUCCESS)) { this._throw( YAPI.IO_ERROR, "unable to reset thermistor parameters"); return YAPI.IO_ERROR; }
         // add records in growing resistance value
@@ -696,7 +713,7 @@ public class YTemperature : YSensor
         double currRes;
         tempValues.Clear();
         resValues.Clear();
-        // may throw an exception
+
         id = await this.get_functionId();
         id = (id).Substring( 11, (id).Length - 11);
         bin_json = await this._download("extra.json?page="+id);

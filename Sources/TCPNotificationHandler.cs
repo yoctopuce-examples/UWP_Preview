@@ -31,7 +31,6 @@ namespace com.yoctopuce.YoctoAPI
         {
             YHTTPRequest yreq = new YHTTPRequest((YHTTPHub)_hub, "Notification of " + _hub.RootUrl);
             try {
-                await yreq._requestReserve();
                 String notUrl;
                 if (_notifyPos < 0) {
                     notUrl = "GET /not.byn";
@@ -43,8 +42,8 @@ namespace com.yoctopuce.YoctoAPI
                 String fifo = "";
                 do {
                     byte[] partial;
-                    int readed = await yreq._requestProcesss();
-                    if (readed < 0) {
+                    bool isdone = await yreq._requestProcesss();
+                    if (isdone) {
                         //disconnected
                         _connected = false;
                         break;
@@ -99,7 +98,7 @@ namespace com.yoctopuce.YoctoAPI
             YHTTPRequest req = _httpReqByDev[device];
             byte[] result = await req.RequestSync(req_first_line, req_head_and_body, mstimeout);
             ulong stop = YAPI.GetTickCount();
-            //Debug.WriteLine(string.Format("SyncRes on {0} took {1}ms",device.SerialNumber,stop-start));
+            Debug.WriteLine(string.Format("SyncRes on {0} took {1}ms",device.SerialNumber,stop-start));
 
             return result;
         }
@@ -113,14 +112,14 @@ namespace com.yoctopuce.YoctoAPI
             YHTTPRequest req = _httpReqByDev[device];
             await req.RequestAsync(req_first_line, req_head_and_body, asyncResult, asyncContext);
             ulong stop = YAPI.GetTickCount();
-            //Debug.WriteLine(string.Format("ASyncRes on {0} took {1}ms", device.SerialNumber, stop - start));
+            Debug.WriteLine(string.Format("ASyncRes on {0} took {1}ms", device.SerialNumber, stop - start));
         }
 
         internal override async Task<bool> Stop(ulong timeout)
         {
             _mustRun = false;
             foreach (YHTTPRequest req in _httpReqByDev.Values) {
-                await req.WaitRequestEnd(timeout);
+                req.imm_EnsureIsEnded();
             }
             if (_runTask != null) {
                 await _runTask;

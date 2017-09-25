@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDualPower.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YDualPower.cs 27700 2017-06-01 12:27:09Z seb $
  *
  * Implements FindDualPower(), the high-level API for DualPower functions
  *
@@ -158,12 +158,14 @@ public class YDualPower : YFunction
      */
     public async Task<int> get_powerState()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return POWERSTATE_INVALID;
             }
         }
-        return _powerState;
+        res = _powerState;
+        return res;
     }
 
 
@@ -186,12 +188,14 @@ public class YDualPower : YFunction
      */
     public async Task<int> get_powerControl()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return POWERCONTROL_INVALID;
             }
         }
-        return _powerControl;
+        res = _powerControl;
+        return res;
     }
 
 
@@ -242,12 +246,14 @@ public class YDualPower : YFunction
      */
     public async Task<int> get_extVoltage()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return EXTVOLTAGE_INVALID;
             }
         }
-        return _extVoltage;
+        res = _extVoltage;
+        return res;
     }
 
 
@@ -284,6 +290,13 @@ public class YDualPower : YFunction
      *   a dual power control by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">

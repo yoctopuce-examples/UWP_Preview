@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YModule.cs 25173 2016-08-12 08:44:38Z seb $
+ * $Id: YModule.cs 27700 2017-06-01 12:27:09Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -422,12 +422,14 @@ public class YModule : YFunction
      */
     public async Task<string> get_productName()
     {
+        string res;
         if (_cacheExpiration == 0) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PRODUCTNAME_INVALID;
             }
         }
-        return _productName;
+        res = _productName;
+        return res;
     }
 
 
@@ -448,12 +450,14 @@ public class YModule : YFunction
      */
     public async Task<string> get_serialNumber()
     {
+        string res;
         if (_cacheExpiration == 0) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SERIALNUMBER_INVALID;
             }
         }
-        return _serialNumber;
+        res = _serialNumber;
+        return res;
     }
 
 
@@ -474,12 +478,14 @@ public class YModule : YFunction
      */
     public async Task<int> get_productId()
     {
+        int res;
         if (_cacheExpiration == 0) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PRODUCTID_INVALID;
             }
         }
-        return _productId;
+        res = _productId;
+        return res;
     }
 
 
@@ -500,12 +506,14 @@ public class YModule : YFunction
      */
     public async Task<int> get_productRelease()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PRODUCTRELEASE_INVALID;
             }
         }
-        return _productRelease;
+        res = _productRelease;
+        return res;
     }
 
 
@@ -526,12 +534,14 @@ public class YModule : YFunction
      */
     public async Task<string> get_firmwareRelease()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return FIRMWARERELEASE_INVALID;
             }
         }
-        return _firmwareRelease;
+        res = _firmwareRelease;
+        return res;
     }
 
 
@@ -553,12 +563,14 @@ public class YModule : YFunction
      */
     public async Task<int> get_persistentSettings()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PERSISTENTSETTINGS_INVALID;
             }
         }
-        return _persistentSettings;
+        res = _persistentSettings;
+        return res;
     }
 
 
@@ -587,12 +599,14 @@ public class YModule : YFunction
      */
     public async Task<int> get_luminosity()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LUMINOSITY_INVALID;
             }
         }
-        return _luminosity;
+        res = _luminosity;
+        return res;
     }
 
 
@@ -645,12 +659,14 @@ public class YModule : YFunction
      */
     public async Task<int> get_beacon()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return BEACON_INVALID;
             }
         }
-        return _beacon;
+        res = _beacon;
+        return res;
     }
 
 
@@ -699,12 +715,14 @@ public class YModule : YFunction
      */
     public async Task<long> get_upTime()
     {
+        long res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return UPTIME_INVALID;
             }
         }
-        return _upTime;
+        res = _upTime;
+        return res;
     }
 
 
@@ -725,12 +743,14 @@ public class YModule : YFunction
      */
     public async Task<int> get_usbCurrent()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return USBCURRENT_INVALID;
             }
         }
-        return _usbCurrent;
+        res = _usbCurrent;
+        return res;
     }
 
 
@@ -753,12 +773,14 @@ public class YModule : YFunction
      */
     public async Task<int> get_rebootCountdown()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return REBOOTCOUNTDOWN_INVALID;
             }
         }
-        return _rebootCountdown;
+        res = _rebootCountdown;
+        return res;
     }
 
 
@@ -788,19 +810,23 @@ public class YModule : YFunction
      */
     public async Task<int> get_userVar()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return USERVAR_INVALID;
             }
         }
-        return _userVar;
+        res = _userVar;
+        return res;
     }
 
 
     /**
      * <summary>
-     *   Returns the value previously stored in this attribute.
+     *   Stores a 32 bit value in the device RAM.
      * <para>
+     *   This attribute is at programmer disposal,
+     *   should he need to store a state variable.
      *   On startup and after a device reboot, the value is always reset to zero.
      * </para>
      * <para>
@@ -839,6 +865,13 @@ public class YModule : YFunction
      *   a module by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">
@@ -1117,7 +1150,7 @@ public class YModule : YFunction
     {
         string serial;
         byte[] settings;
-        // may throw an exception
+
         serial = await this.get_serialNumber();
         settings = await this.get_allSettings();
         if ((settings).Length == 0) {
@@ -1183,7 +1216,7 @@ public class YModule : YFunction
         string ext_settings;
         List<string> filelist = new List<string>();
         List<string> templist = new List<string>();
-        // may throw an exception
+
         settings = await this._download("api.json");
         if ((settings).Length == 0) {
             return settings;
@@ -1205,7 +1238,7 @@ public class YModule : YFunction
                     ext_settings = ext_settings + item;
                     sep = ",";
                 }
-            };
+            }
         }
         ext_settings = ext_settings + "],\n\"files\":[";
         if (await this.hasFunction("files")) {
@@ -1223,7 +1256,7 @@ public class YModule : YFunction
                     item = ""+ sep+"{\"name\":\""+ name+"\", \"data\":\""+file_data+"\"}\n";
                     ext_settings = ext_settings + item;
                     sep = ",";
-                };
+                }
             }
         }
         res = YAPI.DefaultEncoding.GetBytes("{ \"api\":" + YAPI.DefaultEncoding.GetString(settings) + ext_settings + "]}");
@@ -1239,7 +1272,7 @@ public class YModule : YFunction
         int ofs;
         int size;
         url = "api/" + funcId + ".json?command=Z";
-        // may throw an exception
+
         await this._download(url);
         // add records in growing resistance value
         values = this.imm_json_get_array(YAPI.DefaultEncoding.GetBytes(jsonExtra));
@@ -1267,7 +1300,7 @@ public class YModule : YFunction
             data = this.imm_get_json_path( extras[ii], "json");
             if (await this.hasFunction(functionId)) {
                 await this.loadThermistorExtra(functionId, data);
-            };
+            }
         }
         return YAPI.SUCCESS;
     }
@@ -1327,7 +1360,7 @@ public class YModule : YFunction
                 name = this.imm_decode_json_string(name);
                 data = this.imm_get_json_path( files[ii], "data");
                 data = this.imm_decode_json_string(data);
-                await this._upload(name, YAPIContext.imm_hexStrToBin(data));;
+                await this._upload(name, YAPIContext.imm_hexStrToBin(data));
             }
         }
         return YAPI.SUCCESS;
@@ -1355,7 +1388,7 @@ public class YModule : YFunction
         int count;
         int i;
         string fid;
-        // may throw an exception
+
         count  = await this.functionCount();
         i = 0;
         while (i < count) {
@@ -1389,7 +1422,7 @@ public class YModule : YFunction
         int i;
         string ftype;
         List<string> res = new List<string>();
-        // may throw an exception
+
         count = await this.functionCount();
         i = 0;
         while (i < count) {
@@ -1487,9 +1520,11 @@ public class YModule : YFunction
         paramScale = funScale;
         paramOffset = funOffset;
         if (funVer < 3) {
+            // Read the effective device scale if available
             if (funVer == 2) {
                 words = YAPIContext.imm_decodeWords(currentFuncValue);
                 if ((words[0] == 1366) && (words[1] == 12500)) {
+                    // Yocto-3D RefFrame used a special encoding
                     funScale = 1;
                     funOffset = 0;
                 } else {
@@ -1507,9 +1542,11 @@ public class YModule : YFunction
         calibData.Clear();
         calibType = 0;
         if (paramVer < 3) {
+            // Handle old 16 bit parameters formats
             if (paramVer == 2) {
                 words = YAPIContext.imm_decodeWords(param);
                 if ((words[0] == 1366) && (words[1] == 12500)) {
+                    // Yocto-3D RefFrame used a special encoding
                     paramScale = 1;
                     paramOffset = 0;
                 } else {
@@ -1562,13 +1599,16 @@ public class YModule : YFunction
             i = 0;
             while (i < calibData.Count) {
                 if (paramScale > 0) {
+                    // scalar decoding
                     calibData[i] = (calibData[i] - paramOffset) / paramScale;
                 } else {
+                    // floating-point decoding
                     calibData[i] = YAPIContext.imm_decimalToDouble((int) Math.Round(calibData[i]));
                 }
                 i = i + 1;
             }
         } else {
+            // Handle latest 32bit parameter format
             iCalib = YAPIContext.imm_decodeFloats(param);
             calibType = (int) Math.Round(iCalib[0] / 1000.0);
             if (calibType >= 30) {
@@ -1581,6 +1621,7 @@ public class YModule : YFunction
             }
         }
         if (funVer >= 3) {
+            // Encode parameters in new format
             if (calibData.Count == 0) {
                 param = "0,";
             } else {
@@ -1599,6 +1640,7 @@ public class YModule : YFunction
             }
         } else {
             if (funVer >= 1) {
+                // Encode parameters for older devices
                 nPoints = ((calibData.Count) / (2));
                 param = (nPoints).ToString();
                 i = 0;
@@ -1612,6 +1654,7 @@ public class YModule : YFunction
                     i = i + 1;
                 }
             } else {
+                // Initial V0 encoding used for old Yocto-Light
                 if (calibData.Count == 4) {
                     param = (Math.Round(1000 * (calibData[3] - calibData[1]) / calibData[2] - calibData[0])).ToString();
                 }
@@ -1686,6 +1729,7 @@ public class YModule : YFunction
         old_dslist = this.imm_json_get_array(old_json_flat);
         for (int ii = 0; ii < old_dslist.Count; ii++) {
             each_str = this.imm_json_get_string(YAPI.DefaultEncoding.GetBytes(old_dslist[ii]));
+            // split json path and attr
             leng = (each_str).Length;
             eqpos = (each_str).IndexOf("=");
             if ((eqpos < 0) || (leng == 0)) {
@@ -1697,14 +1741,16 @@ public class YModule : YFunction
             value = (each_str).Substring( eqpos, leng - eqpos);
             old_jpath.Add(jpath);
             old_jpath_len.Add((jpath).Length);
-            old_val_arr.Add(value);;
+            old_val_arr.Add(value);
         }
-        // may throw an exception
+
         actualSettings = await this._download("api.json");
         actualSettings = this.imm_flattenJsonStruct(actualSettings);
         new_dslist = this.imm_json_get_array(actualSettings);
         for (int ii = 0; ii < new_dslist.Count; ii++) {
+            // remove quotes
             each_str = this.imm_json_get_string(YAPI.DefaultEncoding.GetBytes(new_dslist[ii]));
+            // split json path and attr
             leng = (each_str).Length;
             eqpos = (each_str).IndexOf("=");
             if ((eqpos < 0) || (leng == 0)) {
@@ -1716,7 +1762,7 @@ public class YModule : YFunction
             value = (each_str).Substring( eqpos, leng - eqpos);
             new_jpath.Add(jpath);
             new_jpath_len.Add((jpath).Length);
-            new_val_arr.Add(value);;
+            new_val_arr.Add(value);
         }
         i = 0;
         while (i < new_jpath.Count) {
@@ -1907,7 +1953,7 @@ public class YModule : YFunction
             i = i + 1;
         }
         for (int ii = 0; ii < restoreLast.Count; ii++) {
-            await this._download(restoreLast[ii]);;
+            await this._download(restoreLast[ii]);
         }
         return YAPI.SUCCESS;
     }
@@ -1971,7 +2017,7 @@ public class YModule : YFunction
     public virtual async Task<string> get_lastLogs()
     {
         byte[] content;
-        // may throw an exception
+
         content = await this._download("logs.txt");
         return YAPI.DefaultEncoding.GetString(content);
     }

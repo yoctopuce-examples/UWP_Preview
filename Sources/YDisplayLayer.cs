@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplayLayer.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YDisplayLayer.cs 27094 2017-04-06 21:00:57Z seb $
  *
  * Implements FindDisplayLayer(), the high-level API for DisplayLayer functions
  *
@@ -282,7 +282,7 @@ public class YDisplayLayer
      * </para>
      * </summary>
      * <param name="mode">
-     *   <t>true</t> to enable antialiasing, <t>false</t> to
+     *   <c>true</c> to enable antialiasing, <c>false</c> to
      *   disable it.
      * </param>
      * <returns>
@@ -478,14 +478,14 @@ public class YDisplayLayer
      * </param>
      * <param name="anchor">
      *   the text anchor point, chosen among the <c>YDisplayLayer.ALIGN</c> enumeration:
-     *   <c>YDisplayLayer.ALIGN_TOP_LEFT</c>,    <c>YDisplayLayer.ALIGN_CENTER_LEFT</c>,   
-     *   <c>YDisplayLayer.ALIGN_BASELINE_LEFT</c>,    <c>YDisplayLayer.ALIGN_BOTTOM_LEFT</c>,
-     *   <c>YDisplayLayer.ALIGN_TOP_CENTER</c>,  <c>YDisplayLayer.ALIGN_CENTER</c>,        
-     *   <c>YDisplayLayer.ALIGN_BASELINE_CENTER</c>,  <c>YDisplayLayer.ALIGN_BOTTOM_CENTER</c>,
-     *   <c>YDisplayLayer.ALIGN_TOP_DECIMAL</c>, <c>YDisplayLayer.ALIGN_CENTER_DECIMAL</c>,
-     *   <c>YDisplayLayer.ALIGN_BASELINE_DECIMAL</c>, <c>YDisplayLayer.ALIGN_BOTTOM_DECIMAL</c>,
-     *   <c>YDisplayLayer.ALIGN_TOP_RIGHT</c>,   <c>YDisplayLayer.ALIGN_CENTER_RIGHT</c>,  
-     *   <c>YDisplayLayer.ALIGN_BASELINE_RIGHT</c>,   <c>YDisplayLayer.ALIGN_BOTTOM_RIGHT</c>.
+     *   <c>YDisplayLayer.ALIGN.TOP_LEFT</c>,    <c>YDisplayLayer.ALIGN.CENTER_LEFT</c>,   
+     *   <c>YDisplayLayer.ALIGN.BASELINE_LEFT</c>,    <c>YDisplayLayer.ALIGN.BOTTOM_LEFT</c>,
+     *   <c>YDisplayLayer.ALIGN.TOP_CENTER</c>,  <c>YDisplayLayer.ALIGN.CENTER</c>,        
+     *   <c>YDisplayLayer.ALIGN.BASELINE_CENTER</c>,  <c>YDisplayLayer.ALIGN.BOTTOM_CENTER</c>,
+     *   <c>YDisplayLayer.ALIGN.TOP_DECIMAL</c>, <c>YDisplayLayer.ALIGN.CENTER_DECIMAL</c>,
+     *   <c>YDisplayLayer.ALIGN.BASELINE_DECIMAL</c>, <c>YDisplayLayer.ALIGN.BOTTOM_DECIMAL</c>,
+     *   <c>YDisplayLayer.ALIGN.TOP_RIGHT</c>,   <c>YDisplayLayer.ALIGN.CENTER_RIGHT</c>,  
+     *   <c>YDisplayLayer.ALIGN.BASELINE_RIGHT</c>,   <c>YDisplayLayer.ALIGN.BOTTOM_RIGHT</c>.
      * </param>
      * <param name="text">
      *   the text string to draw

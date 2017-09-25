@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YColorLedCluster.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YColorLedCluster.cs 28443 2017-09-01 14:45:46Z mvuilleu $
  *
  * Implements FindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -172,12 +172,14 @@ public class YColorLedCluster : YFunction
      */
     public async Task<int> get_activeLedCount()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ACTIVELEDCOUNT_INVALID;
             }
         }
-        return _activeLedCount;
+        res = _activeLedCount;
+        return res;
     }
 
 
@@ -226,12 +228,14 @@ public class YColorLedCluster : YFunction
      */
     public async Task<int> get_maxLedCount()
     {
+        int res;
         if (_cacheExpiration == 0) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MAXLEDCOUNT_INVALID;
             }
         }
-        return _maxLedCount;
+        res = _maxLedCount;
+        return res;
     }
 
 
@@ -252,12 +256,14 @@ public class YColorLedCluster : YFunction
      */
     public async Task<int> get_blinkSeqMaxCount()
     {
+        int res;
         if (_cacheExpiration == 0) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return BLINKSEQMAXCOUNT_INVALID;
             }
         }
-        return _blinkSeqMaxCount;
+        res = _blinkSeqMaxCount;
+        return res;
     }
 
 
@@ -278,12 +284,14 @@ public class YColorLedCluster : YFunction
      */
     public async Task<int> get_blinkSeqMaxSize()
     {
+        int res;
         if (_cacheExpiration == 0) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return BLINKSEQMAXSIZE_INVALID;
             }
         }
-        return _blinkSeqMaxSize;
+        res = _blinkSeqMaxSize;
+        return res;
     }
 
 
@@ -294,12 +302,14 @@ public class YColorLedCluster : YFunction
      */
     public async Task<string> get_command()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COMMAND_INVALID;
             }
         }
-        return _command;
+        res = _command;
+        return res;
     }
 
 
@@ -344,6 +354,13 @@ public class YColorLedCluster : YFunction
      *   a RGB LED cluster by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">
@@ -714,6 +731,57 @@ public class YColorLedCluster : YFunction
 
     /**
      * <summary>
+     *   Adds to a sequence a jump to another sequence.
+     * <para>
+     *   When a pixel will reach this jump,
+     *   it will be automatically relinked to the new sequence, and will run it starting
+     *   from the beginning.
+     * </para>
+     * </summary>
+     * <param name="seqIndex">
+     *   sequence index.
+     * </param>
+     * <param name="linkSeqIndex">
+     *   index of the sequence to chain.
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual async Task<int> addJumpToBlinkSeq(int seqIndex,int linkSeqIndex)
+    {
+        return await this.sendCommand("AC"+Convert.ToString(seqIndex)+",100,"+Convert.ToString(linkSeqIndex)+",1000");
+    }
+
+    /**
+     * <summary>
+     *   Adds a to a sequence a hard stop code.
+     * <para>
+     *   When a pixel will reach this stop code,
+     *   instead of restarting the sequence in a loop it will automatically be unlinked
+     *   from the sequence.
+     * </para>
+     * </summary>
+     * <param name="seqIndex">
+     *   sequence index.
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> when the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual async Task<int> addUnlinkToBlinkSeq(int seqIndex)
+    {
+        return await this.sendCommand("AC"+Convert.ToString(seqIndex)+",100,-1,1000");
+    }
+
+    /**
+     * <summary>
      *   Links adjacent LEDs to a specific sequence.
      * <para>
      *   These LEDs start to execute
@@ -1074,7 +1142,7 @@ public class YColorLedCluster : YFunction
             buff[3*idx+2] = (byte)(((rgb) & (255)) & 0xff);
             idx = idx + 1;
         }
-        // may throw an exception
+
         res = await this._upload("rgb:0:"+Convert.ToString(ledIndex), buff);
         return res;
     }
@@ -1118,7 +1186,7 @@ public class YColorLedCluster : YFunction
             buff[3*idx+2] = (byte)(((rgb) & (255)) & 0xff);
             idx = idx + 1;
         }
-        // may throw an exception
+
         res = await this._upload("rgb:"+Convert.ToString(delay), buff);
         return res;
     }
@@ -1187,7 +1255,7 @@ public class YColorLedCluster : YFunction
             buff[3*idx+2] = (byte)(((hsl) & (255)) & 0xff);
             idx = idx + 1;
         }
-        // may throw an exception
+
         res = await this._upload("hsl:0:"+Convert.ToString(ledIndex), buff);
         return res;
     }
@@ -1231,7 +1299,7 @@ public class YColorLedCluster : YFunction
             buff[3*idx+2] = (byte)(((hsl) & (255)) & 0xff);
             idx = idx + 1;
         }
-        // may throw an exception
+
         res = await this._upload("hsl:"+Convert.ToString(delay), buff);
         return res;
     }
@@ -1292,7 +1360,7 @@ public class YColorLedCluster : YFunction
         int r;
         int g;
         int b;
-        // may throw an exception
+
         buff = await this._download("rgb.bin?typ=0&pos="+Convert.ToString(3*ledIndex)+"&len="+Convert.ToString(3*count));
         res.Clear();
         idx = 0;
@@ -1335,7 +1403,7 @@ public class YColorLedCluster : YFunction
         int r;
         int g;
         int b;
-        // may throw an exception
+
         buff = await this._download("rgb.bin?typ=4&pos="+Convert.ToString(3*ledIndex)+"&len="+Convert.ToString(3*count));
         res.Clear();
         idx = 0;
@@ -1377,7 +1445,7 @@ public class YColorLedCluster : YFunction
         List<int> res = new List<int>();
         int idx;
         int seq;
-        // may throw an exception
+
         buff = await this._download("rgb.bin?typ=1&pos="+Convert.ToString(ledIndex)+"&len="+Convert.ToString(count));
         res.Clear();
         idx = 0;
@@ -1419,7 +1487,7 @@ public class YColorLedCluster : YFunction
         int hl;
         int lh;
         int ll;
-        // may throw an exception
+
         buff = await this._download("rgb.bin?typ=2&pos="+Convert.ToString(4*seqIndex)+"&len="+Convert.ToString(4*count));
         res.Clear();
         idx = 0;
@@ -1460,7 +1528,7 @@ public class YColorLedCluster : YFunction
         int idx;
         int lh;
         int ll;
-        // may throw an exception
+
         buff = await this._download("rgb.bin?typ=6&pos="+Convert.ToString(seqIndex)+"&len="+Convert.ToString(count));
         res.Clear();
         idx = 0;
@@ -1498,7 +1566,7 @@ public class YColorLedCluster : YFunction
         List<int> res = new List<int>();
         int idx;
         int started;
-        // may throw an exception
+
         buff = await this._download("rgb.bin?typ=5&pos="+Convert.ToString(seqIndex)+"&len="+Convert.ToString(count));
         res.Clear();
         idx = 0;
@@ -1535,7 +1603,7 @@ public class YColorLedCluster : YFunction
         List<int> res = new List<int>();
         int idx;
         int started;
-        // may throw an exception
+
         buff = await this._download("rgb.bin?typ=3&pos="+Convert.ToString(seqIndex)+"&len="+Convert.ToString(count));
         res.Clear();
         idx = 0;

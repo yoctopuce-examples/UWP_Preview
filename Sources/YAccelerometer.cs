@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAccelerometer.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YAccelerometer.cs 27700 2017-06-01 12:27:09Z seb $
  *
  * Implements FindAccelerometer(), the high-level API for Accelerometer functions
  *
@@ -176,12 +176,14 @@ public class YAccelerometer : YSensor
      */
     public async Task<int> get_bandwidth()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return BANDWIDTH_INVALID;
             }
         }
-        return _bandwidth;
+        res = _bandwidth;
+        return res;
     }
 
 
@@ -232,12 +234,14 @@ public class YAccelerometer : YSensor
      */
     public async Task<double> get_xValue()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return XVALUE_INVALID;
             }
         }
-        return _xValue;
+        res = _xValue;
+        return res;
     }
 
 
@@ -258,12 +262,14 @@ public class YAccelerometer : YSensor
      */
     public async Task<double> get_yValue()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return YVALUE_INVALID;
             }
         }
-        return _yValue;
+        res = _yValue;
+        return res;
     }
 
 
@@ -284,12 +290,14 @@ public class YAccelerometer : YSensor
      */
     public async Task<double> get_zValue()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ZVALUE_INVALID;
             }
         }
-        return _zValue;
+        res = _zValue;
+        return res;
     }
 
 
@@ -300,12 +308,14 @@ public class YAccelerometer : YSensor
      */
     public async Task<int> get_gravityCancellation()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return GRAVITYCANCELLATION_INVALID;
             }
         }
-        return _gravityCancellation;
+        res = _gravityCancellation;
+        return res;
     }
 
 
@@ -350,6 +360,13 @@ public class YAccelerometer : YSensor
      *   an accelerometer by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">

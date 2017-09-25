@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPower.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YPower.cs 27700 2017-06-01 12:27:09Z seb $
  *
  * Implements FindPower(), the high-level API for Power functions
  *
@@ -52,7 +52,7 @@ namespace com.yoctopuce.YoctoAPI
  * <para>
  *   The Yoctopuce class YPower allows you to read and configure Yoctopuce power
  *   sensors. It inherits from YSensor class the core functions to read measurements,
- *   register callback functions, access to the autonomous datalogger.
+ *   to register callback functions, to access the autonomous datalogger.
  *   This class adds the ability to access the energy counter and the power factor.
  * </para>
  * </summary>
@@ -151,12 +151,14 @@ public class YPower : YSensor
      */
     public async Task<double> get_cosPhi()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COSPHI_INVALID;
             }
         }
-        return _cosPhi;
+        res = _cosPhi;
+        return res;
     }
 
 
@@ -187,12 +189,14 @@ public class YPower : YSensor
      */
     public async Task<double> get_meter()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return METER_INVALID;
             }
         }
-        return _meter;
+        res = _meter;
+        return res;
     }
 
 
@@ -213,12 +217,14 @@ public class YPower : YSensor
      */
     public async Task<int> get_meterTimer()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return METERTIMER_INVALID;
             }
         }
-        return _meterTimer;
+        res = _meterTimer;
+        return res;
     }
 
 
@@ -255,6 +261,13 @@ public class YPower : YSensor
      *   a electrical power sensor by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">

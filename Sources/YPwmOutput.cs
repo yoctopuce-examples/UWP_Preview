@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPwmOutput.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YPwmOutput.cs 27700 2017-06-01 12:27:09Z seb $
  *
  * Implements FindPwmOutput(), the high-level API for PwmOutput functions
  *
@@ -199,12 +199,14 @@ public class YPwmOutput : YFunction
      */
     public async Task<int> get_enabled()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ENABLED_INVALID;
             }
         }
-        return _enabled;
+        res = _enabled;
+        return res;
     }
 
 
@@ -283,12 +285,14 @@ public class YPwmOutput : YFunction
      */
     public async Task<double> get_frequency()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return FREQUENCY_INVALID;
             }
         }
-        return _frequency;
+        res = _frequency;
+        return res;
     }
 
 
@@ -337,12 +341,14 @@ public class YPwmOutput : YFunction
      */
     public async Task<double> get_period()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PERIOD_INVALID;
             }
         }
-        return _period;
+        res = _period;
+        return res;
     }
 
 
@@ -391,12 +397,14 @@ public class YPwmOutput : YFunction
      */
     public async Task<double> get_dutyCycle()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DUTYCYCLE_INVALID;
             }
         }
-        return _dutyCycle;
+        res = _dutyCycle;
+        return res;
     }
 
 
@@ -446,12 +454,14 @@ public class YPwmOutput : YFunction
      */
     public async Task<double> get_pulseDuration()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PULSEDURATION_INVALID;
             }
         }
-        return _pulseDuration;
+        res = _pulseDuration;
+        return res;
     }
 
 
@@ -462,12 +472,14 @@ public class YPwmOutput : YFunction
      */
     public async Task<string> get_pwmTransition()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PWMTRANSITION_INVALID;
             }
         }
-        return _pwmTransition;
+        res = _pwmTransition;
+        return res;
     }
 
 
@@ -497,12 +509,14 @@ public class YPwmOutput : YFunction
      */
     public async Task<int> get_enabledAtPowerOn()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ENABLEDATPOWERON_INVALID;
             }
         }
-        return _enabledAtPowerOn;
+        res = _enabledAtPowerOn;
+        return res;
     }
 
 
@@ -585,12 +599,14 @@ public class YPwmOutput : YFunction
      */
     public async Task<double> get_dutyCycleAtPowerOn()
     {
+        double res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DUTYCYCLEATPOWERON_INVALID;
             }
         }
-        return _dutyCycleAtPowerOn;
+        res = _dutyCycleAtPowerOn;
+        return res;
     }
 
 
@@ -627,6 +643,13 @@ public class YPwmOutput : YFunction
      *   a PWM by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMessageBox.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YMessageBox.cs 27700 2017-06-01 12:27:09Z seb $
  *
  * Implements FindMessageBox(), the high-level API for MessageBox functions
  *
@@ -184,12 +184,14 @@ public class YMessageBox : YFunction
      */
     public async Task<int> get_slotsInUse()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SLOTSINUSE_INVALID;
             }
         }
-        return _slotsInUse;
+        res = _slotsInUse;
+        return res;
     }
 
 
@@ -210,12 +212,14 @@ public class YMessageBox : YFunction
      */
     public async Task<int> get_slotsCount()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SLOTSCOUNT_INVALID;
             }
         }
-        return _slotsCount;
+        res = _slotsCount;
+        return res;
     }
 
 
@@ -226,12 +230,14 @@ public class YMessageBox : YFunction
      */
     public async Task<string> get_slotsBitmap()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SLOTSBITMAP_INVALID;
             }
         }
-        return _slotsBitmap;
+        res = _slotsBitmap;
+        return res;
     }
 
 
@@ -252,12 +258,14 @@ public class YMessageBox : YFunction
      */
     public async Task<int> get_pduSent()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PDUSENT_INVALID;
             }
         }
-        return _pduSent;
+        res = _pduSent;
+        return res;
     }
 
 
@@ -306,12 +314,14 @@ public class YMessageBox : YFunction
      */
     public async Task<int> get_pduReceived()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PDURECEIVED_INVALID;
             }
         }
-        return _pduReceived;
+        res = _pduReceived;
+        return res;
     }
 
 
@@ -350,12 +360,14 @@ public class YMessageBox : YFunction
      */
     public async Task<string> get_command()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COMMAND_INVALID;
             }
         }
-        return _command;
+        res = _command;
+        return res;
     }
 
 
@@ -400,6 +412,13 @@ public class YMessageBox : YFunction
      *   a MessageBox interface by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">
@@ -541,8 +560,7 @@ public class YMessageBox : YFunction
         List<string> arrPdu = new List<string>();
         string hexPdu;
         YSms sms;
-        
-        // may throw an exception
+
         binPdu = await this._download("sms.json?pos="+Convert.ToString(slot)+"&len=1");
         arrPdu = this.imm_json_get_array(binPdu);
         hexPdu = this.imm_decode_json_string(arrPdu[0]);
@@ -556,7 +574,6 @@ public class YMessageBox : YFunction
     {
         int i;
         int uni;
-        
         _gsm2unicode.Clear();
         // 00-07
         _gsm2unicode.Add(64);
@@ -627,13 +644,13 @@ public class YMessageBox : YFunction
         }
         i = 0;
         while (i < 4) {
+            // mark escape sequences
             _iso2gsm[91+i] = (byte)(27 & 0xff);
             _iso2gsm[123+i] = (byte)(27 & 0xff);
             i = i + 1;
         }
         // Done
         _gsm2unicodeReady = true;
-        
         return YAPI.SUCCESS;
     }
 
@@ -644,7 +661,6 @@ public class YMessageBox : YFunction
         int reslen;
         List<int> res = new List<int>();
         int uni;
-        
         if (!(_gsm2unicodeReady)) {
             await this.initGsm2Unicode();
         }
@@ -730,7 +746,6 @@ public class YMessageBox : YFunction
         byte[] resbin;
         string resstr;
         int uni;
-        
         if (!(_gsm2unicodeReady)) {
             await this.initGsm2Unicode();
         }
@@ -824,7 +839,6 @@ public class YMessageBox : YFunction
         int extra;
         byte[] res;
         int wpos;
-        
         if (!(_gsm2unicodeReady)) {
             await this.initGsm2Unicode();
         }
@@ -839,6 +853,7 @@ public class YMessageBox : YFunction
                 extra = extra + 1;
             }
             if (gsm7 == 0) {
+                // cannot use standard GSM encoding
                 res = new byte[0];
                 return res;
             }
@@ -910,8 +925,7 @@ public class YMessageBox : YFunction
         List<YSms> newAgg = new List<YSms>();
         List<string> signatures = new List<string>();
         YSms sms;
-        
-        // may throw an exception
+
         bitmapStr = await this.get_slotsBitmap();
         if (bitmapStr == _prevBitmapStr) {
             return YAPI.SUCCESS;
@@ -1015,7 +1029,6 @@ public class YMessageBox : YFunction
             i = i + 1;
         }
         _messages = newMsg;
-        
         return YAPI.SUCCESS;
     }
 
@@ -1041,7 +1054,7 @@ public class YMessageBox : YFunction
     public virtual async Task<int> clearPduCounters()
     {
         int retcode;
-        // may throw an exception
+
         retcode = await this.set_pduReceived(0);
         if (retcode != YAPI.SUCCESS) {
             return retcode;
@@ -1078,7 +1091,7 @@ public class YMessageBox : YFunction
     public virtual async Task<int> sendTextMessage(string recipient,string message)
     {
         YSms sms;
-        // may throw an exception
+
         sms = new YSms(this);
         await sms.set_recipient(recipient);
         await sms.addText(message);
@@ -1114,7 +1127,7 @@ public class YMessageBox : YFunction
     public virtual async Task<int> sendFlashMessage(string recipient,string message)
     {
         YSms sms;
-        // may throw an exception
+
         sms = new YSms(this);
         await sms.set_recipient(recipient);
         await sms.set_msgClass(0);
@@ -1165,7 +1178,6 @@ public class YMessageBox : YFunction
     public virtual async Task<List<YSms>> get_messages()
     {
         await this.checkNewMessages();
-        
         return _messages;
     }
 

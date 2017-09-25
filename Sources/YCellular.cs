@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellular.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YCellular.cs 27700 2017-06-01 12:27:09Z seb $
  *
  * Implements FindCellular(), the high-level API for Cellular functions
  *
@@ -288,12 +288,14 @@ public class YCellular : YFunction
      */
     public async Task<int> get_linkQuality()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LINKQUALITY_INVALID;
             }
         }
-        return _linkQuality;
+        res = _linkQuality;
+        return res;
     }
 
 
@@ -314,12 +316,14 @@ public class YCellular : YFunction
      */
     public async Task<string> get_cellOperator()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CELLOPERATOR_INVALID;
             }
         }
-        return _cellOperator;
+        res = _cellOperator;
+        return res;
     }
 
 
@@ -340,12 +344,14 @@ public class YCellular : YFunction
      */
     public async Task<string> get_cellIdentifier()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CELLIDENTIFIER_INVALID;
             }
         }
-        return _cellIdentifier;
+        res = _cellIdentifier;
+        return res;
     }
 
 
@@ -368,12 +374,14 @@ public class YCellular : YFunction
      */
     public async Task<int> get_cellType()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CELLTYPE_INVALID;
             }
         }
-        return _cellType;
+        res = _cellType;
+        return res;
     }
 
 
@@ -398,12 +406,14 @@ public class YCellular : YFunction
      */
     public async Task<string> get_imsi()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return IMSI_INVALID;
             }
         }
-        return _imsi;
+        res = _imsi;
+        return res;
     }
 
 
@@ -424,12 +434,14 @@ public class YCellular : YFunction
      */
     public async Task<string> get_message()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MESSAGE_INVALID;
             }
         }
-        return _message;
+        res = _message;
+        return res;
     }
 
 
@@ -454,12 +466,14 @@ public class YCellular : YFunction
      */
     public async Task<string> get_pin()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PIN_INVALID;
             }
         }
-        return _pin;
+        res = _pin;
+        return res;
     }
 
 
@@ -523,12 +537,14 @@ public class YCellular : YFunction
      */
     public async Task<string> get_lockedOperator()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LOCKEDOPERATOR_INVALID;
             }
         }
-        return _lockedOperator;
+        res = _lockedOperator;
+        return res;
     }
 
 
@@ -581,12 +597,14 @@ public class YCellular : YFunction
      */
     public async Task<int> get_airplaneMode()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return AIRPLANEMODE_INVALID;
             }
         }
-        return _airplaneMode;
+        res = _airplaneMode;
+        return res;
     }
 
 
@@ -639,12 +657,14 @@ public class YCellular : YFunction
      */
     public async Task<int> get_enableData()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ENABLEDATA_INVALID;
             }
         }
-        return _enableData;
+        res = _enableData;
+        return res;
     }
 
 
@@ -702,12 +722,14 @@ public class YCellular : YFunction
      */
     public async Task<string> get_apn()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return APN_INVALID;
             }
         }
-        return _apn;
+        res = _apn;
+        return res;
     }
 
 
@@ -760,12 +782,14 @@ public class YCellular : YFunction
      */
     public async Task<string> get_apnSecret()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return APNSECRET_INVALID;
             }
         }
-        return _apnSecret;
+        res = _apnSecret;
+        return res;
     }
 
 
@@ -794,12 +818,14 @@ public class YCellular : YFunction
      */
     public async Task<int> get_pingInterval()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PINGINTERVAL_INVALID;
             }
         }
-        return _pingInterval;
+        res = _pingInterval;
+        return res;
     }
 
 
@@ -848,12 +874,14 @@ public class YCellular : YFunction
      */
     public async Task<int> get_dataSent()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DATASENT_INVALID;
             }
         }
-        return _dataSent;
+        res = _dataSent;
+        return res;
     }
 
 
@@ -902,12 +930,14 @@ public class YCellular : YFunction
      */
     public async Task<int> get_dataReceived()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DATARECEIVED_INVALID;
             }
         }
-        return _dataReceived;
+        res = _dataReceived;
+        return res;
     }
 
 
@@ -946,12 +976,14 @@ public class YCellular : YFunction
      */
     public async Task<string> get_command()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COMMAND_INVALID;
             }
         }
-        return _command;
+        res = _command;
+        return res;
     }
 
 
@@ -996,6 +1028,13 @@ public class YCellular : YFunction
      *   a cellular interface by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">
@@ -1149,7 +1188,7 @@ public class YCellular : YFunction
     {
         string gsmMsg;
         gsmMsg = await this.get_message();
-        if (!(!((gsmMsg).Substring(0, 13) == "Enter SIM PUK"))) { this._throw(YAPI.INVALID_ARGUMENT, "PUK not expected at this time"); return YAPI.INVALID_ARGUMENT; }
+        if (!((gsmMsg).Substring(0, 13) == "Enter SIM PUK")) { this._throw(YAPI.INVALID_ARGUMENT, "PUK not expected at this time"); return YAPI.INVALID_ARGUMENT; }
         if (newPin == "") {
             return await this.set_command("AT+CPIN="+puk+",0000;+CLCK=SC,0,0000");
         }
@@ -1200,7 +1239,7 @@ public class YCellular : YFunction
     public virtual async Task<int> clearDataCounters()
     {
         int retcode;
-        // may throw an exception
+
         retcode = await this.set_dataReceived(0);
         if (retcode != YAPI.SUCCESS) {
             return retcode;
@@ -1274,11 +1313,13 @@ public class YCellular : YFunction
                 idx = idx - 1;
             }
             if (buff[idx] == 64) {
+                // continuation detected
                 suffixlen = bufflen - idx;
                 cmd = "at.txt?cmd="+(buffstr).Substring( buffstrlen - suffixlen, suffixlen);
                 buffstr = (buffstr).Substring( 0, buffstrlen - suffixlen);
                 waitMore = waitMore - 1;
             } else {
+                // request complete
                 waitMore = 0;
             }
             res = ""+ res+""+buffstr;
@@ -1306,7 +1347,7 @@ public class YCellular : YFunction
         int idx;
         int slen;
         List<string> res = new List<string>();
-        // may throw an exception
+
         cops = await this._AT("+COPS=?");
         slen = (cops).Length;
         res.Clear();
@@ -1359,7 +1400,7 @@ public class YCellular : YFunction
         int tad;
         string oper;
         List<YCellRecord> res = new List<YCellRecord>();
-        // may throw an exception
+
         moni = await this._AT("+CCED=0;#MONI=7;#MONI");
         mccs = (moni).Substring(7, 3);
         if ((mccs).Substring(0, 1) == "0") {
@@ -1407,7 +1448,6 @@ public class YCellular : YFunction
                     }
                 }
             }
-            ;;
         }
         return res;
     }

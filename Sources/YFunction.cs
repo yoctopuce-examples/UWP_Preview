@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YFunction.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YFunction.cs 27700 2017-06-01 12:27:09Z seb $
  *
  * YFunction Class (virtual class, used internally)
  *
@@ -193,12 +193,14 @@ public class YFunction
      */
     public async Task<string> get_logicalName()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LOGICALNAME_INVALID;
             }
         }
-        return _logicalName;
+        res = _logicalName;
+        return res;
     }
 
 
@@ -253,12 +255,14 @@ public class YFunction
      */
     public async Task<string> get_advertisedValue()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ADVERTISEDVALUE_INVALID;
             }
         }
-        return _advertisedValue;
+        res = _advertisedValue;
+        return res;
     }
 
 
@@ -303,6 +307,13 @@ public class YFunction
      *   a function by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">
@@ -427,7 +438,7 @@ public class YFunction
 
     /**
      * <summary>
-     *   Disable the propagation of every new advertised value to the parent hub.
+     *   Disables the propagation of every new advertised value to the parent hub.
      * <para>
      *   You can use this function to save bandwidth and CPU on computers with limited
      *   resources, or to prevent unwanted invocations of the HTTP callback.
@@ -449,7 +460,7 @@ public class YFunction
 
     /**
      * <summary>
-     *   Re-enable the propagation of every new advertised value to the parent hub.
+     *   Re-enables the propagation of every new advertised value to the parent hub.
      * <para>
      *   This function reverts the effect of a previous call to <c>muteValueCallbacks()</c>.
      *   Remember to call the <c>saveToFlash()</c> method of the module if the
@@ -466,6 +477,34 @@ public class YFunction
     public virtual async Task<int> unmuteValueCallbacks()
     {
         return await this.set_advertisedValue("");
+    }
+
+    /**
+     * <summary>
+     *   Returns the current value of a single function attribute, as a text string, as quickly as
+     *   possible but without using the cached value.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="attrName">
+     *   the name of the requested attribute
+     * </param>
+     * <returns>
+     *   a string with the value of the the attribute
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns an empty string.
+     * </para>
+     */
+    public virtual async Task<string> loadAttribute(string attrName)
+    {
+        string url;
+        byte[] attrVal;
+        url = "api/"+ await this.get_functionId()+"/"+attrName;
+        attrVal = await this._download(url);
+        return YAPI.DefaultEncoding.GetString(attrVal);
     }
 
     public virtual async Task<int> _parserHelper()

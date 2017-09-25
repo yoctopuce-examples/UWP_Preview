@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDigitalIO.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YDigitalIO.cs 27700 2017-06-01 12:27:09Z seb $
  *
  * Implements FindDigitalIO(), the high-level API for DigitalIO functions
  *
@@ -87,6 +87,12 @@ public class YDigitalIO : YFunction
     public const  int PORTPOLARITY_INVALID = YAPI.INVALID_UINT;
     /**
      * <summary>
+     *   invalid portDiags value
+     * </summary>
+     */
+    public const  int PORTDIAGS_INVALID = YAPI.INVALID_UINT;
+    /**
+     * <summary>
      *   invalid portSize value
      * </summary>
      */
@@ -110,6 +116,7 @@ public class YDigitalIO : YFunction
     protected int _portDirection = PORTDIRECTION_INVALID;
     protected int _portOpenDrain = PORTOPENDRAIN_INVALID;
     protected int _portPolarity = PORTPOLARITY_INVALID;
+    protected int _portDiags = PORTDIAGS_INVALID;
     protected int _portSize = PORTSIZE_INVALID;
     protected int _outputVoltage = OUTPUTVOLTAGE_INVALID;
     protected string _command = COMMAND_INVALID;
@@ -162,6 +169,9 @@ public class YDigitalIO : YFunction
         if (json_val.Has("portPolarity")) {
             _portPolarity = json_val.GetInt("portPolarity");
         }
+        if (json_val.Has("portDiags")) {
+            _portDiags = json_val.GetInt("portDiags");
+        }
         if (json_val.Has("portSize")) {
             _portSize = json_val.GetInt("portSize");
         }
@@ -191,12 +201,14 @@ public class YDigitalIO : YFunction
      */
     public async Task<int> get_portState()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PORTSTATE_INVALID;
             }
         }
-        return _portState;
+        res = _portState;
+        return res;
     }
 
 
@@ -248,12 +260,14 @@ public class YDigitalIO : YFunction
      */
     public async Task<int> get_portDirection()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PORTDIRECTION_INVALID;
             }
         }
-        return _portDirection;
+        res = _portDirection;
+        return res;
     }
 
 
@@ -306,12 +320,14 @@ public class YDigitalIO : YFunction
      */
     public async Task<int> get_portOpenDrain()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PORTOPENDRAIN_INVALID;
             }
         }
-        return _portOpenDrain;
+        res = _portOpenDrain;
+        return res;
     }
 
 
@@ -365,18 +381,21 @@ public class YDigitalIO : YFunction
      */
     public async Task<int> get_portPolarity()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PORTPOLARITY_INVALID;
             }
         }
-        return _portPolarity;
+        res = _portPolarity;
+        return res;
     }
 
 
     /**
      * <summary>
-     *   Changes the polarity of all the bits of the port: 0 makes a bit an input, 1 makes it an output.
+     *   Changes the polarity of all the bits of the port: For each bit set to 0, the matching I/O works the regular,
+     *   intuitive way; for each bit set to 1, the I/O works in reverse mode.
      * <para>
      *   Remember to call the <c>saveToFlash()</c> method  to make sure the setting will be kept after a reboot.
      * </para>
@@ -384,8 +403,9 @@ public class YDigitalIO : YFunction
      * </para>
      * </summary>
      * <param name="newval">
-     *   an integer corresponding to the polarity of all the bits of the port: 0 makes a bit an input, 1
-     *   makes it an output
+     *   an integer corresponding to the polarity of all the bits of the port: For each bit set to 0, the
+     *   matching I/O works the regular,
+     *   intuitive way; for each bit set to 1, the I/O works in reverse mode
      * </param>
      * <para>
      * </para>
@@ -406,6 +426,37 @@ public class YDigitalIO : YFunction
 
     /**
      * <summary>
+     *   Returns the port state diagnostics (Yocto-IO and Yocto-MaxiIO-V2 only).
+     * <para>
+     *   Bit 0 indicates a shortcut on
+     *   output 0, etc. Bit 8 indicates a power failure, and bit 9 signals overheating (overcurrent).
+     *   During normal use, all diagnostic bits should stay clear.
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the port state diagnostics (Yocto-IO and Yocto-MaxiIO-V2 only)
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YDigitalIO.PORTDIAGS_INVALID</c>.
+     * </para>
+     */
+    public async Task<int> get_portDiags()
+    {
+        int res;
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+            if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return PORTDIAGS_INVALID;
+            }
+        }
+        res = _portDiags;
+        return res;
+    }
+
+
+    /**
+     * <summary>
      *   Returns the number of bits implemented in the I/O port.
      * <para>
      * </para>
@@ -421,12 +472,14 @@ public class YDigitalIO : YFunction
      */
     public async Task<int> get_portSize()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PORTSIZE_INVALID;
             }
         }
-        return _portSize;
+        res = _portSize;
+        return res;
     }
 
 
@@ -448,12 +501,14 @@ public class YDigitalIO : YFunction
      */
     public async Task<int> get_outputVoltage()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return OUTPUTVOLTAGE_INVALID;
             }
         }
-        return _outputVoltage;
+        res = _outputVoltage;
+        return res;
     }
 
 
@@ -494,12 +549,14 @@ public class YDigitalIO : YFunction
      */
     public async Task<string> get_command()
     {
+        string res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COMMAND_INVALID;
             }
         }
-        return _command;
+        res = _command;
+        return res;
     }
 
 
@@ -544,6 +601,13 @@ public class YDigitalIO : YFunction
      *   a digital IO port by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">

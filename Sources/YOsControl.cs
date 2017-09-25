@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YOsControl.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YOsControl.cs 27700 2017-06-01 12:27:09Z seb $
  *
  * Implements FindOsControl(), the high-level API for OsControl functions
  *
@@ -129,12 +129,14 @@ public class YOsControl : YFunction
      */
     public async Task<int> get_shutdownCountdown()
     {
+        int res;
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SHUTDOWNCOUNTDOWN_INVALID;
             }
         }
-        return _shutdownCountdown;
+        res = _shutdownCountdown;
+        return res;
     }
 
 
@@ -179,6 +181,13 @@ public class YOsControl : YFunction
      *   OS control by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
+     * </para>
+     * <para>
+     *   If a call to this object's is_online() method returns FALSE although
+     *   you are certain that the matching device is plugged, make sure that you did
+     *   call registerHub() at application initialization time.
+     * </para>
+     * <para>
      * </para>
      * </summary>
      * <param name="func">
