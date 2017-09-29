@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YGenericHub.cs 25204 2016-08-17 13:52:16Z seb $
+ * $Id: YGenericHub.cs 28647 2017-09-26 12:21:17Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -36,6 +36,7 @@
  *  WARRANTY, OR OTHERWISE.
  *
  *********************************************************************/
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
@@ -45,10 +46,8 @@ using System.Threading.Tasks;
 
 namespace com.yoctopuce.YoctoAPI
 {
-
     internal abstract class YGenericHub
     {
-
         internal const int NOTIFY_V2_LEGACY = 0; // unused (reserved for compatibility with legacy notifications)
         internal const int NOTIFY_V2_6RAWBYTES = 1; // largest type: data is always 6 bytes
         internal const int NOTIFY_V2_TYPEDDATA = 2; // other types: first data byte holds the decoding format
@@ -56,6 +55,7 @@ namespace com.yoctopuce.YoctoAPI
 
         // stream type
         internal const int YSTREAM_EMPTY = 0;
+
         internal const int YSTREAM_TCP = 1;
         internal const int YSTREAM_TCP_CLOSE = 2;
         internal const int YSTREAM_NOTICE = 3;
@@ -112,7 +112,10 @@ namespace com.yoctopuce.YoctoAPI
         protected internal object _notifyHandle = null;
         protected internal ulong _devListValidity = 500;
         protected internal ulong _devListExpires = 0;
-        protected internal readonly ConcurrentDictionary<int, string> _serialByYdx = new ConcurrentDictionary<int, string>();
+
+        protected internal readonly ConcurrentDictionary<int, string> _serialByYdx =
+            new ConcurrentDictionary<int, string>();
+
         protected internal Dictionary<string, YDevice> _devices = new Dictionary<string, YDevice>();
         protected internal readonly bool _reportConnnectionLost;
         private string _hubSerialNumber = null;
@@ -172,9 +175,9 @@ namespace com.yoctopuce.YoctoAPI
                     case PUBVAL_YOCTO_FLOAT_E3:
                         // 32bit integer in little endian format or Yoctopuce 10-3 format
                         int numVal = funcval[ofs++] & 0xff;
-                        numVal += (int)(funcval[ofs++] & 0xff) << 8;
-                        numVal += (int)(funcval[ofs++] & 0xff) << 16;
-                        numVal += (int)(funcval[ofs++] & 0xff) << 24;
+                        numVal += (int) (funcval[ofs++] & 0xff) << 8;
+                        numVal += (int) (funcval[ofs++] & 0xff) << 16;
+                        numVal += (int) (funcval[ofs++] & 0xff) << 24;
                         if (funcValType == PUBVAL_C_LONG) {
                             return string.Format("{0:D}", numVal);
                         } else {
@@ -220,9 +223,9 @@ namespace com.yoctopuce.YoctoAPI
         }
 
 
-        protected internal virtual async Task updateFromWpAndYp(List<WPEntry> whitePages, Dictionary<string, List<YPEntry>> yellowPages)
+        protected internal virtual async Task updateFromWpAndYp(List<WPEntry> whitePages,
+            Dictionary<string, List<YPEntry>> yellowPages)
         {
-
             // by default consider all known device as unplugged
             List<YDevice> toRemove = new List<YDevice>(_devices.Values);
 
@@ -263,13 +266,10 @@ namespace com.yoctopuce.YoctoAPI
                 }
             }
             _yctx._yHash.imm_reindexYellowPages(yellowPages);
-
         }
 
         internal virtual string SerialNumber {
-            get {
-                return _hubSerialNumber;
-            }
+            get { return _hubSerialNumber; }
         }
 
         public virtual string imm_get_urlOf(string serialNumber)
@@ -312,7 +312,8 @@ namespace com.yoctopuce.YoctoAPI
         }
 
         //called from Jni
-        protected internal virtual void imm_handleTimedNotification(string serial, string funcid, double deviceTime, sbyte[] report)
+        protected internal virtual void imm_handleTimedNotification(string serial, string funcid, double deviceTime,
+            sbyte[] report)
         {
             List<int> arrayList = new List<int>(report.Length);
             foreach (sbyte b in report) {
@@ -323,7 +324,8 @@ namespace com.yoctopuce.YoctoAPI
         }
 
 
-        protected internal virtual void imm_handleTimedNotification(string serial, string funcid, double deviceTime, List<int> report)
+        protected internal virtual void imm_handleTimedNotification(string serial, string funcid, double deviceTime,
+            List<int> report)
         {
             string hwid = serial + "." + funcid;
             YFunction func = _yctx._GetTimedReportCallback(hwid);
@@ -345,20 +347,21 @@ namespace com.yoctopuce.YoctoAPI
 
         internal delegate Task UpdateProgress(int percent, string message);
 
-        internal abstract Task<List<string>> firmwareUpdate(string serial, YFirmwareFile firmware, byte[] settings, UpdateProgress progress);
+        internal abstract Task<List<string>> firmwareUpdate(string serial, YFirmwareFile firmware, byte[] settings,
+            UpdateProgress progress);
 
         internal delegate void RequestAsyncResult(object context, byte[] result, int error, string errmsg);
 
         internal delegate void RequestProgress(object context, int acked, int total);
 
-        internal abstract Task devRequestAsync(YDevice device, string req_first_line, byte[] req_head_and_body, RequestAsyncResult asyncResult, object asyncContext);
+        internal abstract Task devRequestAsync(YDevice device, string req_first_line, byte[] req_head_and_body,
+            RequestAsyncResult asyncResult, object asyncContext);
 
-        internal abstract Task<byte[]> devRequestSync(YDevice device, string req_first_line, byte[] req_head_and_body, RequestProgress progress, object context);
-
+        internal abstract Task<byte[]> devRequestSync(YDevice device, string req_first_line, byte[] req_head_and_body,
+            RequestProgress progress, object context);
 
         protected internal class HTTPParams
         {
-
             internal readonly string _host;
             internal readonly int _port;
             internal readonly string _user;
@@ -408,33 +411,23 @@ namespace com.yoctopuce.YoctoAPI
             }
 
             internal virtual string Host {
-                get {
-                    return _host;
-                }
+                get { return _host; }
             }
 
             internal virtual string Pass {
-                get {
-                    return _pass;
-                }
+                get { return _pass; }
             }
 
             internal virtual int Port {
-                get {
-                    return _port;
-                }
+                get { return _port; }
             }
 
             internal virtual string User {
-                get {
-                    return _user;
-                }
+                get { return _user; }
             }
 
             internal virtual string Url {
-                get {
-                    return imm_getUrl(false, true);
-                }
+                get { return imm_getUrl(false, true); }
             }
 
 
@@ -459,9 +452,7 @@ namespace com.yoctopuce.YoctoAPI
             }
 
             public virtual bool WebSocket {
-                get {
-                    return _proto.Equals("ws");
-                }
+                get { return _proto.Equals("ws"); }
             }
 
             public virtual bool imm_hasAuthParam()
@@ -469,6 +460,7 @@ namespace com.yoctopuce.YoctoAPI
                 return !_user.Equals("");
             }
         }
-    }
 
+        abstract internal string get_debugMsg(string serial);
+    }
 }

@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YFunction.cs 27700 2017-06-01 12:27:09Z seb $
+ * $Id: YFunction.cs 28650 2017-09-26 14:39:44Z mvuilleu $
  *
  * YFunction Class (virtual class, used internally)
  *
@@ -36,6 +36,7 @@
  *  WARRANTY, OR OTHERWISE.
  *
  *********************************************************************/
+
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -43,10 +44,6 @@ using System.Threading.Tasks;
 
 namespace com.yoctopuce.YoctoAPI
 {
-
-
-
-
     //--- (generated code: YFunction class start)
 /**
  * <summary>
@@ -80,7 +77,9 @@ public class YFunction
         protected internal int _lastErrorType;
         protected internal string _lastErrorMsg;
         protected internal object _userData;
+
         protected internal readonly Dictionary<string, YDataStream> _dataStreams;
+
         //--- (generated code: YFunction definitions)
     /**
      * <summary>
@@ -587,10 +586,8 @@ public class YFunction
             try {
                 string hwid = _yapi._yHash.imm_resolveHwID(_className, _func);
                 return _className + "(" + _func + ")=" + hwid;
-            } catch (YAPI_Exception) {
-            }
+            } catch (YAPI_Exception) { }
             return _className + "(" + _func + ")=unresolved";
-
         }
 
 #pragma warning disable 1998
@@ -647,7 +644,6 @@ public class YFunction
         {
             YPEntry yp = _yapi._yHash.imm_resolveFunction(_className, _func);
             return yp.getFriendlyName(_yapi);
-
         }
 
 #pragma warning restore 1998
@@ -673,7 +669,7 @@ public class YFunction
             for (i = 0; i < changeval.Length; i++) {
                 c = changeval[i];
                 if (c <= ' ' || (c > 'z' && c != '~') || c == '"' || c == '%' || c == '&' ||
-                           c == '+' || c == '<' || c == '=' || c == '>' || c == '\\' || c == '^' || c == '`') {
+                    c == '+' || c == '<' || c == '=' || c == '>' || c == '\\' || c == '^' || c == '`') {
                     int hh;
                     if ((c == 0xc2 || c == 0xc3) && (i + 1 < changeval.Length) && (changeval[i + 1] & 0xc0) == 0x80) {
                         // UTF8-encoded ISO-8859-1 character: translate to plain ISO-8859-1
@@ -772,7 +768,6 @@ public class YFunction
 
         internal virtual string imm_get_json_path_struct(YJSONObject jsonObject, string[] paths, int ofs)
         {
-
             string key = paths[ofs];
             if (!jsonObject.Has(key)) {
                 return "";
@@ -821,7 +816,7 @@ public class YFunction
             YJSONObject jsonObject = null;
             jsonObject = new YJSONObject(json);
             jsonObject.Parse();
-            string[] split = path.Split(new char[] { '\\', '|' });
+            string[] split = path.Split(new char[] {'\\', '|'});
             return imm_get_json_path_struct(jsonObject, split, 0);
         }
 
@@ -840,7 +835,7 @@ public class YFunction
         {
             YDevice dev = await getYDevice();
             _hwId = _yapi._yHash.imm_resolveHwID(_className, _func);
-            string[] split = _hwId.Split(new char[] { '\\', '.' });
+            string[] split = _hwId.Split(new char[] {'\\', '.'});
             _funId = split[1];
             _serial = split[0];
             YJSONObject loadval = null;
@@ -851,7 +846,6 @@ public class YFunction
                 YJSONObject jsonval = new YJSONObject(yreq);
                 jsonval.Parse();
                 loadval = jsonval.GetYJSONObject(_funId);
-
             } else {
                 dev.imm_clearCache();
             }
@@ -931,9 +925,7 @@ public class YFunction
         }
 
         public virtual int ErrorType {
-            get {
-                return _lastErrorType;
-            }
+            get { return _lastErrorType; }
         }
 
         public virtual int errorType()
@@ -959,9 +951,7 @@ public class YFunction
         }
 
         public virtual string ErrorMessage {
-            get {
-                return _lastErrorMsg;
-            }
+            get { return _lastErrorMsg; }
         }
 
         public virtual string errorMessage()
@@ -986,8 +976,7 @@ public class YFunction
             try {
                 YDevice dev = await getYDevice();
                 dev.imm_clearCache();
-            } catch (YAPI_Exception) {
-            }
+            } catch (YAPI_Exception) { }
             if (_cacheExpiration != 0) {
                 _cacheExpiration = YAPI.GetTickCount();
             }
@@ -1030,8 +1019,7 @@ public class YFunction
                 try {
                     string serial = _yapi._yHash.imm_resolveSerial(_className, _func);
                     return YModule.FindModuleInContext(_yapi, serial + ".module");
-                } catch (YAPI_Exception) {
-                }
+                } catch (YAPI_Exception) { }
             }
             try {
                 // device not resolved for now, force a communication for a last chance resolution
@@ -1039,8 +1027,7 @@ public class YFunction
                     string serial = _yapi._yHash.imm_resolveSerial(_className, _func);
                     return YModule.FindModuleInContext(_yapi, serial + ".module");
                 }
-            } catch (YAPI_Exception) {
-            }
+            } catch (YAPI_Exception) { }
             // return a true yFindModule object even if it is not a module valid for communicating
             return YModule.FindModuleInContext(_yapi, "module_of_" + _className + "_" + _func);
         }
@@ -1072,7 +1059,6 @@ public class YFunction
         }
 
 
-
         /// <summary>
         /// Returns the value of the userData attribute, as previously stored using method
         /// set_userData.
@@ -1086,7 +1072,6 @@ public class YFunction
         }
 
 
-
         /// <summary>
         /// Stores a user context provided as argument in the userData attribute of the function.
         /// This attribute is never touched by the API, and is at disposal of the caller to store a context.
@@ -1098,6 +1083,11 @@ public class YFunction
             _userData = data;
         }
 #pragma warning restore 1998
-    }
 
+        public async Task<string> get_debugMsg()
+        {
+            YDevice device = await getYDevice();
+            return device.get_debugMsg();
+        }
+    }
 }

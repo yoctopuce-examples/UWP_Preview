@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YUSBHub.cs 25191 2016-08-15 12:43:02Z seb $
+ * $Id: YUSBHub.cs 28647 2017-09-26 12:21:17Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -155,6 +155,8 @@ namespace com.yoctopuce.YoctoAPI
             String serial = device.SerialNumber;
             byte[] req = imm_prepareRequest(req_first_line, req_head_and_body);
             await _ywatcher.DevRequestAsync(serial, req, asyncResult, asyncContext);
+            //Debug.WriteLine("async req to " + serial + " " + req_first_line);
+
         }
 
         internal override async Task<byte[]> devRequestSync(YDevice device, string req_first_line, byte[] req_head_and_body, RequestProgress progress, object context)
@@ -162,6 +164,11 @@ namespace com.yoctopuce.YoctoAPI
             String serial = device.SerialNumber;
             byte[] req = imm_prepareRequest(req_first_line, req_head_and_body);
             return await _ywatcher.DevRequestSync(serial, req, progress, context);
+        }
+
+        internal override string get_debugMsg(string serial)
+        {
+            return _ywatcher.dumpDebug(serial);
         }
 
 

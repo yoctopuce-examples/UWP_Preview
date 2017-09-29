@@ -1,10 +1,10 @@
 /*********************************************************************
  *
- * $Id: YSerialPort.cs 27948 2017-06-30 14:46:55Z mvuilleu $
+ * $Id: YSerialPort.cs 28670 2017-09-27 08:28:39Z seb $
  *
  * Implements FindSerialPort(), the high-level API for SerialPort functions
  *
- * - - - - - - - - - License information: - - - - - - - - - 
+ * - - - - - - - - - License information: - - - - - - - - -
  *
  *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *
@@ -23,7 +23,7 @@
  *  obligations.
  *
  *  THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
- *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
+ *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING
  *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS
  *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
  *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
@@ -43,9 +43,9 @@ using System.Threading.Tasks;
 namespace com.yoctopuce.YoctoAPI
 {
 
-//--- (YSerialPort return codes)
-//--- (end of YSerialPort return codes)
-//--- (YSerialPort class start)
+//--- (generated code: YSerialPort return codes)
+//--- (end of generated code: YSerialPort return codes)
+//--- (generated code: YSerialPort class start)
 /**
  * <summary>
  *   YSerialPort Class: SerialPort function interface
@@ -60,8 +60,8 @@ namespace com.yoctopuce.YoctoAPI
  */
 public class YSerialPort : YFunction
 {
-//--- (end of YSerialPort class start)
-//--- (YSerialPort definitions)
+//--- (end of generated code: YSerialPort class start)
+//--- (generated code: YSerialPort definitions)
     /**
      * <summary>
      *   invalid rxCount value
@@ -160,7 +160,7 @@ public class YSerialPort : YFunction
 
     public new delegate Task ValueCallback(YSerialPort func, string value);
     public new delegate Task TimedReportCallback(YSerialPort func, YMeasure measure);
-    //--- (end of YSerialPort definitions)
+    //--- (end of generated code: YSerialPort definitions)
 
 
     /**
@@ -173,8 +173,8 @@ public class YSerialPort : YFunction
     protected YSerialPort(YAPIContext ctx, string func)
         : base(ctx, func, "SerialPort")
     {
-        //--- (YSerialPort attributes initialization)
-        //--- (end of YSerialPort attributes initialization)
+        //--- (generated code: YSerialPort attributes initialization)
+        //--- (end of generated code: YSerialPort attributes initialization)
     }
 
     /**
@@ -189,7 +189,7 @@ public class YSerialPort : YFunction
     {
     }
 
-    //--- (YSerialPort implementation)
+    //--- (generated code: YSerialPort implementation)
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
@@ -1175,7 +1175,6 @@ public class YSerialPort : YFunction
         int mult;
         int endpos;
         int res;
-
         // first check if we have the requested character in the look-ahead buffer
         bufflen = (_rxbuff).Length;
         if ((_rxptr >= _rxbuffptr) && (_rxptr < _rxbuffptr+bufflen)) {
@@ -1183,7 +1182,6 @@ public class YSerialPort : YFunction
             _rxptr = _rxptr + 1;
             return res;
         }
-
         // try to preload more than one byte to speed-up byte-per-byte access
         currpos = _rxptr;
         reqlen = 1024;
@@ -1210,7 +1208,6 @@ public class YSerialPort : YFunction
         }
         // still mixed, need to process character by character
         _rxptr = currpos;
-
 
         buff = await this._download("rxdata.bin?pos="+Convert.ToString(_rxptr)+"&len=1");
         bufflen = (buff).Length - 1;
@@ -1740,6 +1737,57 @@ public class YSerialPort : YFunction
         buff = await this._download("cts.txt");
         if (!((buff).Length == 1)) { this._throw( YAPI.IO_ERROR, "invalid CTS reply"); return YAPI.IO_ERROR; }
         res = buff[0] - 48;
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Retrieves messages (both direction) in the serial port buffer, starting at current position.
+     * <para>
+     *   This function will only compare and return printable characters in the message strings.
+     *   Binary protocols are handled as hexadecimal strings.
+     * </para>
+     * <para>
+     *   If no message is found, the search waits for one up to the specified maximum timeout
+     *   (in milliseconds).
+     * </para>
+     * </summary>
+     * <param name="maxWait">
+     *   the maximum number of milliseconds to wait for a message if none is found
+     *   in the receive buffer.
+     * </param>
+     * <returns>
+     *   an array of YSnoopingRecord objects containing the messages found, if any.
+     *   Binary messages are converted to hexadecimal representation.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns an empty array.
+     * </para>
+     */
+    public virtual async Task<List<YSnoopingRecord>> snoopMessages(int maxWait)
+    {
+        string url;
+        byte[] msgbin;
+        List<string> msgarr = new List<string>();
+        int msglen;
+        List<YSnoopingRecord> res = new List<YSnoopingRecord>();
+        int idx;
+
+        url = "rxmsg.json?pos="+Convert.ToString( _rxptr)+"&maxw="+Convert.ToString(maxWait)+"&t=0";
+        msgbin = await this._download(url);
+        msgarr = this.imm_json_get_array(msgbin);
+        msglen = msgarr.Count;
+        if (msglen == 0) {
+            return res;
+        }
+        // last element of array is the new position
+        msglen = msglen - 1;
+        _rxptr = YAPIContext.imm_atoi(msgarr[msglen]);
+        idx = 0;
+        while (idx < msglen) {
+            res.Add(new YSnoopingRecord(msgarr[idx]));
+            idx = idx + 1;
+        }
         return res;
     }
 
@@ -2466,7 +2514,7 @@ public class YSerialPort : YFunction
     }
 
 #pragma warning restore 1998
-    //--- (end of YSerialPort implementation)
+    //--- (end of generated code: YSerialPort implementation)
 }
 }
 

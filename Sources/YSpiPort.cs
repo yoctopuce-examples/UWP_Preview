@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSpiPort.cs 27700 2017-06-01 12:27:09Z seb $
+ * $Id: YSpiPort.cs 28670 2017-09-27 08:28:39Z seb $
  *
  * Implements FindSpiPort(), the high-level API for SpiPort functions
  *
@@ -1304,7 +1304,6 @@ public class YSpiPort : YFunction
         int mult;
         int endpos;
         int res;
-
         // first check if we have the requested character in the look-ahead buffer
         bufflen = (_rxbuff).Length;
         if ((_rxptr >= _rxbuffptr) && (_rxptr < _rxbuffptr+bufflen)) {
@@ -1312,7 +1311,6 @@ public class YSpiPort : YFunction
             _rxptr = _rxptr + 1;
             return res;
         }
-
         // try to preload more than one byte to speed-up byte-per-byte access
         currpos = _rxptr;
         reqlen = 1024;
@@ -1339,7 +1337,6 @@ public class YSpiPort : YFunction
         }
         // still mixed, need to process character by character
         _rxptr = currpos;
-
 
         buff = await this._download("rxdata.bin?pos="+Convert.ToString(_rxptr)+"&len=1");
         bufflen = (buff).Length - 1;

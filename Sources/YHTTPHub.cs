@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YHTTPHub.cs 25246 2016-08-22 15:28:10Z seb $
+ * $Id: YHTTPHub.cs 28647 2017-09-26 12:21:17Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -464,6 +464,11 @@ namespace com.yoctopuce.YoctoAPI
             }
             return await _notificationHandler.devRequestSync(device, req_first_line, req_head_and_body, tcpTimeout,
                 progress, context);
+        }
+
+        internal override string get_debugMsg(string serial)
+        {
+            throw new NotImplementedException();
         }
 
         internal virtual string Host {

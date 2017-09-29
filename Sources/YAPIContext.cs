@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YAPIContext.cs 25303 2016-09-02 16:00:33Z seb $
+ * $Id: YAPIContext.cs 28647 2017-09-26 12:21:17Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -36,6 +36,7 @@
  *  WARRANTY, OR OTHERWISE.
  *
  *********************************************************************/
+
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -43,13 +44,10 @@ using System.Threading.Tasks;
 
 namespace com.yoctopuce.YoctoAPI
 {
-
     public class YAPIContext
     {
-
         internal class DataEvent
         {
-
             internal readonly YFunction _fun;
             internal readonly string _value;
             internal readonly List<int> _report;
@@ -74,7 +72,7 @@ namespace com.yoctopuce.YoctoAPI
             public virtual async Task invoke()
             {
                 if (_value == null) {
-                    YSensor sensor = (YSensor)_fun;
+                    YSensor sensor = (YSensor) _fun;
                     YMeasure mesure = await sensor._decodeTimedReport(_timestamp, _report);
                     await sensor._invokeTimedReportCallback(mesure);
                 } else {
@@ -82,15 +80,12 @@ namespace com.yoctopuce.YoctoAPI
                     await _fun._invokeValueCallback(_value);
                 }
             }
-
         }
 
         internal class PlugEvent
         {
-
             public enum Event
             {
-
                 PLUG,
                 UNPLUG,
                 CHANGE
@@ -107,10 +102,10 @@ namespace com.yoctopuce.YoctoAPI
         }
 
 
-
         private static double[] decExp = new double[] {
-    1.0e-6, 1.0e-5, 1.0e-4, 1.0e-3, 1.0e-2, 1.0e-1, 1.0,
-    1.0e1, 1.0e2, 1.0e3, 1.0e4, 1.0e5, 1.0e6, 1.0e7, 1.0e8, 1.0e9 };
+            1.0e-6, 1.0e-5, 1.0e-4, 1.0e-3, 1.0e-2, 1.0e-1, 1.0,
+            1.0e1, 1.0e2, 1.0e3, 1.0e4, 1.0e5, 1.0e6, 1.0e7, 1.0e8, 1.0e9
+        };
 
         // Convert Yoctopuce 16-bit decimal floats to standard double-precision floats
         //
@@ -129,7 +124,7 @@ namespace com.yoctopuce.YoctoAPI
                 val = -val;
             }
             int exp = val >> 11;
-            res = (double)(mantis) * decExp[exp];
+            res = (double) (mantis) * decExp[exp];
             return (negate ? -res : res);
         }
 
@@ -164,7 +159,6 @@ namespace com.yoctopuce.YoctoAPI
         }
 
 
-
         internal static List<int> imm_decodeWords(string sdat)
         {
             List<int> udat = new List<int>();
@@ -179,11 +173,11 @@ namespace com.yoctopuce.YoctoAPI
                 } else if (c == 'Y') {
                     val = 0x7fff;
                 } else if (c >= 'a') {
-                    int srcpos = (int)(udat.Count - 1 - (c - 'a'));
+                    int srcpos = (int) (udat.Count - 1 - (c - 'a'));
                     if (srcpos < 0) {
                         val = 0;
                     } else {
-                        val = (uint)udat[srcpos];
+                        val = (uint) udat[srcpos];
                     }
                 } else {
                     if (p + 2 > sdat.Length) {
@@ -197,7 +191,7 @@ namespace com.yoctopuce.YoctoAPI
                         c = '\\';
                     val += (c - '0') << 10;
                 }
-                udat.Add((int)val);
+                udat.Add((int) val);
             }
             return udat;
         }
@@ -212,7 +206,7 @@ namespace com.yoctopuce.YoctoAPI
                 int dec = 0;
                 int decInc = 0;
                 int c = sdat[p++];
-                while (c != (int)'-' && (c < (int)'0' || c > (int)'9')) {
+                while (c != (int) '-' && (c < (int) '0' || c > (int) '9')) {
                     if (p >= sdat.Length) {
                         return idat;
                     }
@@ -288,13 +282,13 @@ namespace com.yoctopuce.YoctoAPI
 
         internal static string imm_floatToStr(double value)
         {
-            int rounded = (int)Math.Round(value * 1000);
+            int rounded = (int) Math.Round(value * 1000);
             string res = "";
             if (rounded < 0) {
                 res += "-";
                 rounded = -rounded;
             }
-            res += Convert.ToString((int)(rounded / 1000));
+            res += Convert.ToString((int) (rounded / 1000));
             int decim = rounded % 1000;
             if (decim > 0) {
                 res += ".";
@@ -357,11 +351,9 @@ namespace com.yoctopuce.YoctoAPI
                         val += c - 'A' + 10;
                     } else {
                         val += c - 'a' + 10;
-
                     }
-
                 }
-                res[i] = (byte)val;
+                res[i] = (byte) val;
             }
             return res;
         }
@@ -373,7 +365,6 @@ namespace com.yoctopuce.YoctoAPI
             System.Buffer.BlockCopy(array_b, 0, res, array_a.Length, array_b.Length);
             return res;
         }
-
 
 
         // Return the class name for a given function ID or full Hardware Id
@@ -395,9 +386,11 @@ namespace com.yoctopuce.YoctoAPI
 
 
         public ulong DefaultCacheValidity = 5;
+
         //todo: Replace global encding to the YAPIContext one
         //internal string _defaultEncoding = YAPI.DefaultEncoding;
         private int _apiMode;
+
         internal bool _exceptionsDisabled = false;
         internal readonly List<YGenericHub> _hubs = new List<YGenericHub>(1); // array of root urls
         private bool _firstArrival;
@@ -410,7 +403,9 @@ namespace com.yoctopuce.YoctoAPI
         public event YAPI.LogHandler _logCallback;
         private event YAPI.HubDiscoveryHandler _HubDiscoveryCallback;
 
-        private readonly Dictionary<int, YAPI.CalibrationHandler> _calibHandlers = new Dictionary<int, YAPI.CalibrationHandler>();
+        private readonly Dictionary<int, YAPI.CalibrationHandler> _calibHandlers =
+            new Dictionary<int, YAPI.CalibrationHandler>();
+
         private readonly YSSDP _ssdp;
         internal readonly YHash _yHash;
         private readonly List<YFunction> _ValueCallbackList = new List<YFunction>();
@@ -439,7 +434,8 @@ namespace com.yoctopuce.YoctoAPI
         }
 
 
-        internal double linearCalibrationHandler(double rawValue, int calibType, List<int> param, List<double> rawValues, List<double> refValues)
+        internal double linearCalibrationHandler(double rawValue, int calibType, List<int> param,
+            List<double> rawValues, List<double> refValues)
         {
             // calibration types n=1..10 and 11.20 are meant for linear calibration using n points
             int npt;
@@ -535,7 +531,8 @@ namespace com.yoctopuce.YoctoAPI
                 resolved = _yHash.imm_resolveSerial(className, func);
             } catch (YAPI_Exception ex) {
                 if (ex.errorType == YAPI.DEVICE_NOT_FOUND && _hubs.Count == 0) {
-                    throw new YAPI_Exception(ex.errorType, "Impossible to contact any device because no hub has been registered");
+                    throw new YAPI_Exception(ex.errorType,
+                        "Impossible to contact any device because no hub has been registered");
                 } else {
                     await _updateDeviceList_internal(true, false);
                     resolved = _yHash.imm_resolveSerial(className, func);
@@ -550,7 +547,6 @@ namespace com.yoctopuce.YoctoAPI
                 if (dev == null) {
                     throw new YAPI_Exception(YAPI.DEVICE_NOT_FOUND, "Device [" + resolved + "] not online");
                 }
-
             }
             return dev;
         }
@@ -576,8 +572,7 @@ namespace com.yoctopuce.YoctoAPI
                     if (fhwid != null && fhwid.Equals(hwid)) {
                         return func;
                     }
-                } catch (YAPI_Exception) {
-                }
+                } catch (YAPI_Exception) { }
             }
             return null;
         }
@@ -603,13 +598,13 @@ namespace com.yoctopuce.YoctoAPI
                     if (fhwid != null && fhwid.Equals(hwid)) {
                         return func;
                     }
-                } catch (YAPI_Exception) {
-                }
+                } catch (YAPI_Exception) { }
             }
             return null;
         }
 
-        private async Task<int> AddNewHub(string url, bool reportConnnectionLost, System.IO.Stream request, System.IO.Stream response, object session)
+        private async Task<int> AddNewHub(string url, bool reportConnnectionLost, System.IO.Stream request,
+            System.IO.Stream response, object session)
         {
             foreach (YGenericHub h in _hubs) {
                 if (h.imm_isSameHub(url, request, response, session)) {
@@ -707,6 +702,7 @@ namespace com.yoctopuce.YoctoAPI
         {
             _exceptionsDisabled = true;
         }
+
         /**
          *
          */
@@ -723,8 +719,6 @@ namespace com.yoctopuce.YoctoAPI
         {
             return YAPI.GetAPIVersion();
         }
-
-
 
 
         /**
@@ -805,7 +799,8 @@ namespace com.yoctopuce.YoctoAPI
             await unregisterHubEx(url, null, null, null);
         }
 
-        private async Task unregisterHubEx(string url, System.IO.Stream request, System.IO.Stream response, object session)
+        private async Task unregisterHubEx(string url, System.IO.Stream request, System.IO.Stream response,
+            object session)
         {
             foreach (YGenericHub h in _hubs) {
                 if (h.imm_isSameHub(url, request, response, session)) {
@@ -839,7 +834,6 @@ namespace com.yoctopuce.YoctoAPI
                 newhub = new YHTTPHub(this, 0, parsedurl, true);
             }
             return await newhub.ping(mstimeout);
-
         }
 
 
@@ -903,7 +897,6 @@ namespace com.yoctopuce.YoctoAPI
         }
 
 
-
         /**
          *
          */
@@ -920,7 +913,7 @@ namespace com.yoctopuce.YoctoAPI
          */
         public static ulong GetTickCount()
         {
-            return (ulong)DateTime.Now.Ticks / 10000;
+            return (ulong) DateTime.Now.Ticks / 10000;
         }
 
         /**
@@ -960,8 +953,7 @@ namespace com.yoctopuce.YoctoAPI
             _HubDiscoveryCallback = hubDiscoveryCallback;
             try {
                 await TriggerHubDiscovery();
-            } catch (YAPI_Exception) {
-            }
+            } catch (YAPI_Exception) { }
         }
 
         /**
@@ -973,6 +965,13 @@ namespace com.yoctopuce.YoctoAPI
         }
 
 
+        public string get_debugMsg(string serial)
+        {
+            string res = "";
+            foreach (YGenericHub h in _hubs) {
+                res += h.get_debugMsg(serial);
+            }
+            return res;
+        }
     }
-
 }

@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YDevice.cs 25251 2016-08-22 16:25:31Z seb $
+ * $Id: YDevice.cs 28648 2017-09-26 12:32:59Z seb $
  *
  * Internal YDevice class
  *
@@ -341,7 +341,11 @@ namespace com.yoctopuce.YoctoAPI
             return YAPI.SUCCESS;
         }
 
-       
+
+        public string get_debugMsg()
+        {
+            return _hub.get_debugMsg(SerialNumber);
+        }
     }
 
 }

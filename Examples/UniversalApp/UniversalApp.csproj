@@ -317,6 +317,9 @@
     <Compile Include="..\..\Sources\YSms.cs">
       <Link>Yoctopuce\YSms.cs</Link>
     </Compile>
+    <Compile Include="..\..\Sources\YSnoopingRecord.cs">
+      <Link>Yoctopuce\YSnoopingRecord.cs</Link>
+    </Compile>
     <Compile Include="..\..\Sources\YSpiPort.cs">
       <Link>Yoctopuce\YSpiPort.cs</Link>
     </Compile>
