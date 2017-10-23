@@ -75,11 +75,9 @@ namespace UniversalApp
                 initButton.IsEnabled = false;
                 enumButton.IsEnabled = true;
                 freebutton.IsEnabled = true;
-
             } catch (YAPI_Exception ex) {
                 Output.Text = "Error:" + ex.Message + "\n";
             }
-
         }
 
         private void Button_Click_free(object sender, RoutedEventArgs e)
@@ -89,12 +87,6 @@ namespace UniversalApp
             enumButton.IsEnabled = false;
             freebutton.IsEnabled = false;
         }
-
-
-
-
-
-
 
 
         public ulong greftime;
@@ -109,10 +101,8 @@ namespace UniversalApp
                 cnt2++;
                 dump.AppendLine(YAPI.GetTickCount() - greftime + ":" + value);
             }
+            await Task.FromResult(0);
         }
-
-
-
 
 
         private async void Button_Click_perf(object sender, RoutedEventArgs e)
@@ -141,24 +131,39 @@ namespace UniversalApp
                     return;
                 }
                 m = await relay1.get_module();
-                await input1.resetCounter();
                 Output.Text += "  Use Relay " + await m.get_serialNumber() + " (" + await m.get_firmwareRelease() + ")\n";
                 reftime = YAPIContext.GetTickCount();
+                await relay1.set_state(YRelay.STATE_A);
+                await relay1.get_output();
+                await input1.resetCounter();
+                pulse_counter = await input1.get_pulseCounter();
+                if (pulse_counter != 0) {
+                    Output.Text += "ERROR: invalid puse counter = " + Convert.ToString(pulse_counter) + "\n";
+                }
                 i = 0;
-                while (i < 64) {
+                long count = 32;
+                Debug.WriteLine("Start multiples set test");
+                while (i < count) {
                     await relay1.set_state(YRelay.STATE_B);
                     await relay1.set_state(YRelay.STATE_A);
                     i = i + 1;
                 }
+                await Task.Delay(200);
+                //await relay1.get_state();
                 pulse_counter = await input1.get_pulseCounter();
-                if (pulse_counter != 128) {
+                if (pulse_counter != 2 * count) {
+                    string dbgmsg = await relay1.get_debugMsg();
+                    dbgmsg += "-------------------\n";
+                    dbgmsg += YAPI.get_debugMsg(null);
                     Output.Text += "ERROR: puse counter = " + Convert.ToString(pulse_counter) + "\n";
+                    Output.Text += dbgmsg;
                     return;
                 }
 
+                Debug.WriteLine("End multiples set test");
+
                 reftime = YAPIContext.GetTickCount() - reftime;
-                Output.Text += "   - Average 'set'     time: " + Convert.ToString((int)reftime) + " / 128 = " +
-                               YAPIContext.imm_floatToStr((double)reftime / 128.0) + "ms\n";
+                Output.Text += "   - Average 'set'     time: " + Convert.ToString((int) reftime) + " / 128 = " + YAPIContext.imm_floatToStr((double) reftime / 128.0) + "ms\n";
                 await YAPI.Sleep(3000);
                 reftime = YAPIContext.GetTickCount();
                 i = 0;
@@ -172,8 +177,7 @@ namespace UniversalApp
                     i = i + 1;
                 }
                 reftime = YAPIContext.GetTickCount() - reftime;
-                Output.Text += "   - Average 'set/get' time: " + Convert.ToString((int)reftime) + " / 32 = " +
-                               YAPIContext.imm_floatToStr((double)reftime / 32) + "ms\n";
+                Output.Text += "   - Average 'set/get' time: " + Convert.ToString((int) reftime) + " / 32 = " + YAPIContext.imm_floatToStr((double) reftime / 32) + "ms\n";
                 await input1.set_pulseCounter(0);
                 await input1.registerValueCallback(callback);
                 await YAPI.Sleep(3000);
@@ -192,15 +196,15 @@ namespace UniversalApp
                     greftime = YAPIContext.GetTickCount();
                     reftime = greftime - reftime;
                     cnt1 = cnt1 + 1;
-                    sum1 = sum1 + (int)reftime;
+                    sum1 = sum1 + (int) reftime;
                     await YAPI.Sleep(50);
                     i = i + 1;
                 }
-                Output.Text += "   - Average command time:   " + Convert.ToString(sum1) + " / " + Convert.ToString(cnt1) +
-                               " = " + YAPIContext.imm_floatToStr((double)sum1 / cnt1) + "ms\n";
-                Output.Text += "   - Average round-trip time:" + YAPIContext.imm_floatToStr((double)sum2 / cnt2) + " (on " + cnt2 + " samples)\n";
+                Output.Text += "   - Average command time:   " + Convert.ToString(sum1) + " / " + Convert.ToString(cnt1) + " = " + YAPIContext.imm_floatToStr((double) sum1 / cnt1) + "ms\n";
+                Output.Text += "   - Average round-trip time:" + YAPIContext.imm_floatToStr((double) sum2 / cnt2) + " (on " + cnt2 + " samples)\n";
                 pulse_counter = await input1.get_pulseCounter();
                 Output.Text += "   - puse counter = " + Convert.ToString(pulse_counter) + "\n";
+                Output.Text += "End of perf test\n";
             } catch (YAPI_Exception ex) {
                 Output.Text += "Error:" + ex.Message;
             }

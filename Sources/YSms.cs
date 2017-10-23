@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSms.cs 27422 2017-05-11 10:01:51Z seb $
+ * $Id: YSms.cs 28732 2017-10-02 13:34:20Z seb $
  *
  * Implements FindSms(), the high-level API for Sms functions
  *
@@ -864,7 +864,7 @@ public class YSms
         int wpos;
         int carry;
         int nbits;
-        int thisb;
+        int thi_b;
         // nbits = number of bits in carry
         udsize = await this.udataSize();
         udhsize = (_udh).Length;
@@ -906,11 +906,11 @@ public class YSms
                     carry = _udata[i];
                     nbits = 7;
                 } else {
-                    thisb = _udata[i];
-                    res[wpos] = (byte)(((carry) | ((((((thisb) << (nbits)))) & (255)))) & 0xff);
+                    thi_b = _udata[i];
+                    res[wpos] = (byte)(((carry) | ((((((thi_b) << (nbits)))) & (255)))) & 0xff);
                     wpos = wpos + 1;
                     nbits = nbits - 1;
-                    carry = ((thisb) >> ((7 - nbits)));
+                    carry = ((thi_b) >> ((7 - nbits)));
                 }
                 i = i + 1;
             }
@@ -1129,7 +1129,7 @@ public class YSms
         int i;
         int carry;
         int nbits;
-        int thisb;
+        int thi_b;
         _pdu = pdu;
         _npdu = 1;
         // parse meta-data
@@ -1190,9 +1190,9 @@ public class YSms
                 udhlen = (((8 + 8*udhsize + 6)) / (7));
                 nbits = 7*udhlen - 8 - 8*udhsize;
                 if (nbits > 0) {
-                    thisb = pdu[rpos];
+                    thi_b = pdu[rpos];
                     rpos = rpos + 1;
-                    carry = ((thisb) >> (nbits));
+                    carry = ((thi_b) >> (nbits));
                     nbits = 8 - nbits;
                 }
             } else {
@@ -1214,10 +1214,10 @@ public class YSms
                     carry = 0;
                     nbits = 0;
                 } else {
-                    thisb = pdu[rpos];
+                    thi_b = pdu[rpos];
                     rpos = rpos + 1;
-                    _udata[i] = (byte)(((carry) | ((((((thisb) << (nbits)))) & (127)))) & 0xff);
-                    carry = ((thisb) >> ((7 - nbits)));
+                    _udata[i] = (byte)(((carry) | ((((((thi_b) << (nbits)))) & (127)))) & 0xff);
+                    carry = ((thi_b) >> ((7 - nbits)));
                     nbits = nbits + 1;
                 }
                 i = i + 1;

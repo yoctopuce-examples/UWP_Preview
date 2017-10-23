@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YUSBDevice.cs 28647 2017-09-26 12:21:17Z seb $
+ * $Id: YUSBDevice.cs 28980 2017-10-20 17:00:11Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -184,6 +184,7 @@ namespace com.yoctopuce.YoctoAPI
         protected const int NOTIFY_PKT_STREAMREADY = 6;
         protected const int NOTIFY_PKT_LOG = 7;
         protected const int NOTIFY_PKT_FUNCNAMEYDX = 8;
+        protected const int NOTIFY_PKT_PRODINFO = 9;
 
         private const ulong META_UTC_DELAY = 60000;
 
@@ -320,71 +321,76 @@ namespace com.yoctopuce.YoctoAPI
                 return;
             }
 
-            byte[] bb = args.Report.Data.ToArray();
-            long ofs = 1; //skip first byte that is not part of the packet
-            List<YPktStreamHead> streams = new List<YPktStreamHead>();
-            while (ofs < bb.Length) {
-                YPktStreamHead s = YPktStreamHead.imm_Decode(ofs, bb);
-                if (s == null) {
-                    break;
+            try {
+                byte[] bb = args.Report.Data.ToArray();
+                long ofs = 1; //skip first byte that is not part of the packet
+                List<YPktStreamHead> streams = new List<YPktStreamHead>();
+                while (ofs < bb.Length) {
+                    YPktStreamHead s = YPktStreamHead.imm_Decode(ofs, bb);
+                    if (s == null) {
+                        break;
+                    }
+                    //Debug.WriteLine(s.ToString());
+                    streams.Add(s);
+                    ofs += s.Len + 2;
                 }
-                //Debug.WriteLine(s.ToString());
-                streams.Add(s);
-                ofs += s.Len + 2;
-            }
 
-            YPktStreamHead streamHead = streams[0];
-            switch (_devState) {
-                case DevState.ResetSend:
-                    if (streamHead.PktType != YUSBPkt.YPKT_CONF || streamHead.StreamType != YUSBPkt.USB_CONF_RESET) {
-                        return;
-                    }
-                    byte low = streamHead.imm_GetByte(streamHead.Ofs);
-                    uint hig = streamHead.imm_GetByte(streamHead.Ofs + 1);
-                    uint devapi = (hig << 8) + low;
-                    _devVersion = devapi;
-                    if (imm_CheckVersionCompatibility(devapi) < 0) {
-                        return;
-                    }
-                    await Start(_pktAckDelay);
-                    break;
-                case DevState.StartSend:
-                    if (streamHead.PktType != YUSBPkt.YPKT_CONF || streamHead.StreamType != YUSBPkt.USB_CONF_START) {
-                        return;
-                    }
-                    if (_devVersion >= YUSBPkt.YPKT_USB_VERSION_BCD) {
-                        _pktAckDelay = streamHead.imm_GetByte(streamHead.Ofs + 1);
-                    }
-                    else {
-                        _pktAckDelay = 0;
-                    }
-                    _lastpktno = streamHead.PktNumber;
-                    _devState = DevState.StartReceived;
-                    break;
-                case DevState.StreamReadyReceived:
-                case DevState.StartReceived:
-                    if (_devState == DevState.StreamReadyReceived || _devState == DevState.StartReceived) {
-                        if (_pktAckDelay > 0 && _lastpktno == streamHead.PktNumber) {
-                            //late retry : drop it since we already have the packet.
+                YPktStreamHead streamHead = streams[0];
+                switch (_devState) {
+                    case DevState.ResetSend:
+                        if (streamHead.PktType != YUSBPkt.YPKT_CONF || streamHead.StreamType != YUSBPkt.USB_CONF_RESET) {
                             return;
                         }
-                        uint expectedPktNo = (_lastpktno + 1) & 7;
-                        if (streamHead.PktNumber != expectedPktNo) {
-                            String message = "Missing packet (look of pkt " + expectedPktNo + " but get " +
-                                             streamHead.PktNumber + ")";
-                            _yctx._Log(message + "\n");
-                            _yctx._Log("Set YAPI.RESEND_MISSING_PKT on YAPI.InitAPI()\n");
-                            _devState = DevState.IOError;
-                            _watcher.imm_removeUsableDevice(this);
+                        byte low = streamHead.imm_GetByte(streamHead.Ofs);
+                        uint hig = streamHead.imm_GetByte(streamHead.Ofs + 1);
+                        uint devapi = (hig << 8) + low;
+                        _devVersion = devapi;
+                        if (imm_CheckVersionCompatibility(devapi) < 0) {
                             return;
+                        }
+                        await Start(_pktAckDelay);
+                        break;
+                    case DevState.StartSend:
+                        if (streamHead.PktType != YUSBPkt.YPKT_CONF || streamHead.StreamType != YUSBPkt.USB_CONF_START) {
+                            return;
+                        }
+                        if (_devVersion >= YUSBPkt.YPKT_USB_VERSION_BCD) {
+                            _pktAckDelay = streamHead.imm_GetByte(streamHead.Ofs + 1);
+                        } else {
+                            _pktAckDelay = 0;
                         }
                         _lastpktno = streamHead.PktNumber;
-                        await streamHandler(streams);
-                        await checkMetaUTC();
-                    }
-                    break;
-                default:
-                    return;
+                        _devState = DevState.StartReceived;
+                        break;
+                    case DevState.StreamReadyReceived:
+                    case DevState.StartReceived:
+                        if (_devState == DevState.StreamReadyReceived || _devState == DevState.StartReceived) {
+                            if (_pktAckDelay > 0 && _lastpktno == streamHead.PktNumber) {
+                                //late retry : drop it since we already have the packet.
+                                return;
+                            }
+                            uint expectedPktNo = (_lastpktno + 1) & 7;
+                            if (streamHead.PktNumber != expectedPktNo) {
+                                String message = "Missing packet (look of pkt " + expectedPktNo + " but get " + streamHead.PktNumber + ")";
+                                _yctx._Log(message + "\n");
+                                _yctx._Log("Set YAPI.RESEND_MISSING_PKT on YAPI.InitAPI()\n");
+                                _devState = DevState.IOError;
+                                _watcher.imm_removeUsableDevice(this);
+                                return;
+                            }
+                            _lastpktno = streamHead.PktNumber;
+                            await streamHandler(streams);
+                            await checkMetaUTC();
+                        }
+                        break;
+                    default:
+                        return;
+                }
+            } catch (YAPI_Exception ex) {
+                _yctx._Log(ex.Message + "\n");
+                _yctx._Log("Set YAPI.RESEND_MISSING_PKT on YAPI.InitAPI()\n");
+                _devState = DevState.IOError;
+                _watcher.imm_removeUsableDevice(this);
             }
         }
 
@@ -557,7 +563,10 @@ namespace com.yoctopuce.YoctoAPI
                         _usbYP[functionId].Index = funydx;
                         _usbYP[functionId].LogicalName = funcname;
                         break;
+                    case NOTIFY_PKT_PRODINFO:
+                        break;
                     default:
+                        //fixme: Find why this happening on my dev computer 
                         throw new YAPI_Exception(YAPI.IO_ERROR, "Invalid Notification");
                 }
             }

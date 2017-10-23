@@ -521,7 +521,7 @@ namespace com.yoctopuce.YoctoAPI
 
         //todo: use custom StringBuilder for better perfomance
 
-        private async Task decodeTCPNotif(String tcpNofif)
+        private void decodeTCPNotif(String tcpNofif)
         {
             _notificationsFifo += tcpNofif;
             int pos;
@@ -534,7 +534,7 @@ namespace com.yoctopuce.YoctoAPI
                     String line = _notificationsFifo.Substring(0, pos + 1);
                     if (line.IndexOf((char)27) == -1) {
                         // drop notification that contain esc char
-                        await handleNetNotification(line);
+                        handleNetNotification(line);
                     }
                 }
                 _notificationsFifo = _notificationsFifo.Substring(pos + 1);
@@ -567,7 +567,7 @@ namespace com.yoctopuce.YoctoAPI
                     byte[] chars = new byte[messageReader.UnconsumedBufferLength];
                     messageReader.ReadBytes(chars);
                     String tcpNotif = YAPI.DefaultEncoding.GetString(chars);
-                    await decodeTCPNotif(tcpNotif);
+                    decodeTCPNotif(tcpNotif);
                     break;
                 case YGenericHub.YSTREAM_EMPTY:
                     return;

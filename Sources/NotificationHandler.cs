@@ -82,7 +82,7 @@ namespace com.yoctopuce.YoctoAPI
             return funcVal;
         }
 
-        protected internal virtual async Task handleNetNotification(string notification_line)
+        protected internal virtual void handleNetNotification(string notification_line)
         {
             string ev = notification_line.Trim();
             if (ev.Length >= 3 && ev[0] >= NOTIFY_NETPKT_FLUSHV2YDX && ev[0] <= NOTIFY_NETPKT_TIMEAVGYDX) {
@@ -114,7 +114,8 @@ namespace com.yoctopuce.YoctoAPI
                                 }
                                 break;
                             case NOTIFY_NETPKT_DEVLOGYDX:
-                                await ydev.triggerLogPull();
+                                //fixme:
+                                //await ydev.triggerLogPull();
                                 break;
                             case NOTIFY_NETPKT_TIMEVALYDX:
                             case NOTIFY_NETPKT_TIMEAVGYDX:

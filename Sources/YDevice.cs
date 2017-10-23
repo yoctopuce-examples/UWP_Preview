@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YDevice.cs 28648 2017-09-26 12:32:59Z seb $
+ * $Id: YDevice.cs 28886 2017-10-16 10:12:32Z seb $
  *
  * Internal YDevice class
  *
@@ -226,7 +226,7 @@ namespace com.yoctopuce.YoctoAPI
 
         internal virtual async Task<string> requestHTTPSyncAsString(string request, byte[] rest_of_request) {
             byte[] bytes = await requestHTTPSync(request, rest_of_request);
-            return YAPI.DefaultEncoding.GetString(bytes);
+            return YAPI.DefaultEncoding.GetString(bytes,0, bytes.Length);
         }
 
         internal virtual async Task requestHTTPAsync(string request, byte[] rest_of_request, YGenericHub.RequestAsyncResult asyncResult, object context) {
@@ -271,7 +271,7 @@ namespace com.yoctopuce.YoctoAPI
                 _logIsPulling = false;
                 return;
             }
-            string resultStr = YAPI.DefaultEncoding.GetString(result);
+            string resultStr = YAPI.DefaultEncoding.GetString(result,0, result.Length);
             int pos = resultStr.LastIndexOf("@", StringComparison.Ordinal);
             if (pos < 0) {
                 _logIsPulling = false;

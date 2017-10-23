@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YAPIContext.cs 28647 2017-09-26 12:21:17Z seb $
+ * $Id: YAPIContext.cs 28987 2017-10-23 09:39:15Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -39,6 +39,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -52,6 +53,7 @@ namespace com.yoctopuce.YoctoAPI
             internal readonly string _value;
             internal readonly List<int> _report;
             internal readonly double _timestamp;
+
 
             public DataEvent(YFunction fun, string value)
             {
@@ -102,10 +104,7 @@ namespace com.yoctopuce.YoctoAPI
         }
 
 
-        private static double[] decExp = new double[] {
-            1.0e-6, 1.0e-5, 1.0e-4, 1.0e-3, 1.0e-2, 1.0e-1, 1.0,
-            1.0e1, 1.0e2, 1.0e3, 1.0e4, 1.0e5, 1.0e6, 1.0e7, 1.0e8, 1.0e9
-        };
+        private static double[] decExp = new double[] {1.0e-6, 1.0e-5, 1.0e-4, 1.0e-3, 1.0e-2, 1.0e-1, 1.0, 1.0e1, 1.0e2, 1.0e3, 1.0e4, 1.0e5, 1.0e6, 1.0e7, 1.0e8, 1.0e9};
 
         // Convert Yoctopuce 16-bit decimal floats to standard double-precision floats
         //
@@ -403,13 +402,16 @@ namespace com.yoctopuce.YoctoAPI
         public event YAPI.LogHandler _logCallback;
         private event YAPI.HubDiscoveryHandler _HubDiscoveryCallback;
 
-        private readonly Dictionary<int, YAPI.CalibrationHandler> _calibHandlers =
-            new Dictionary<int, YAPI.CalibrationHandler>();
+        private readonly Dictionary<int, YAPI.CalibrationHandler> _calibHandlers = new Dictionary<int, YAPI.CalibrationHandler>();
 
         private readonly YSSDP _ssdp;
         internal readonly YHash _yHash;
         private readonly List<YFunction> _ValueCallbackList = new List<YFunction>();
         private readonly List<YFunction> _TimedReportCallbackList = new List<YFunction>();
+        
+        internal readonly Dictionary<string, YPEntry.BaseClass> _BaseType = new Dictionary<string, YPEntry.BaseClass>();
+
+       
 
         // fixme: review SSDP code        
         internal async void HubDiscoveryCallback(string serial, string urlToRegister, string urlToUnregister)
@@ -434,8 +436,7 @@ namespace com.yoctopuce.YoctoAPI
         }
 
 
-        internal double linearCalibrationHandler(double rawValue, int calibType, List<int> param,
-            List<double> rawValues, List<double> refValues)
+        internal double linearCalibrationHandler(double rawValue, int calibType, List<int> param, List<double> rawValues, List<double> refValues)
         {
             // calibration types n=1..10 and 11.20 are meant for linear calibration using n points
             int npt;
@@ -498,6 +499,10 @@ namespace com.yoctopuce.YoctoAPI
                 _calibHandlers[i] = linearCalibrationHandler;
             }
             _calibHandlers[YAPI.YOCTO_CALIB_TYPE_OFS] = linearCalibrationHandler;
+            _BaseType.Clear();
+            _BaseType["Function"] = YPEntry.BaseClass.Function;
+            _BaseType["Sensor"] = YPEntry.BaseClass.Sensor;
+
         }
 
         internal void _pushPlugEvent(PlugEvent.Event ev, string serial)
@@ -531,8 +536,7 @@ namespace com.yoctopuce.YoctoAPI
                 resolved = _yHash.imm_resolveSerial(className, func);
             } catch (YAPI_Exception ex) {
                 if (ex.errorType == YAPI.DEVICE_NOT_FOUND && _hubs.Count == 0) {
-                    throw new YAPI_Exception(ex.errorType,
-                        "Impossible to contact any device because no hub has been registered");
+                    throw new YAPI_Exception(ex.errorType, "Impossible to contact any device because no hub has been registered");
                 } else {
                     await _updateDeviceList_internal(true, false);
                     resolved = _yHash.imm_resolveSerial(className, func);
@@ -603,8 +607,7 @@ namespace com.yoctopuce.YoctoAPI
             return null;
         }
 
-        private async Task<int> AddNewHub(string url, bool reportConnnectionLost, System.IO.Stream request,
-            System.IO.Stream response, object session)
+        private async Task<int> AddNewHub(string url, bool reportConnnectionLost, System.IO.Stream request, System.IO.Stream response, object session)
         {
             foreach (YGenericHub h in _hubs) {
                 if (h.imm_isSameHub(url, request, response, session)) {
@@ -685,6 +688,7 @@ namespace com.yoctopuce.YoctoAPI
 
         internal void _Log(string message)
         {
+            Debug.Write(message);
             if (_logCallback != null) {
                 _logCallback(message);
             }
@@ -695,9 +699,8 @@ namespace com.yoctopuce.YoctoAPI
 
 
         /**
- *
- */
-
+        *
+        */
         public void DisableExceptions()
         {
             _exceptionsDisabled = true;
@@ -799,8 +802,7 @@ namespace com.yoctopuce.YoctoAPI
             await unregisterHubEx(url, null, null, null);
         }
 
-        private async Task unregisterHubEx(string url, System.IO.Stream request, System.IO.Stream response,
-            object session)
+        private async Task unregisterHubEx(string url, System.IO.Stream request, System.IO.Stream response, object session)
         {
             foreach (YGenericHub h in _hubs) {
                 if (h.imm_isSameHub(url, request, response, session)) {
@@ -860,7 +862,9 @@ namespace com.yoctopuce.YoctoAPI
                     }
                     pv = _data_events.First.Value;
                     _data_events.RemoveFirst();
-                    await pv.invoke();
+                    if (pv != null) {
+                        await pv.invoke();
+                    }
                 }
             } catch (YAPI_Exception ex) {
                 if (_exceptionsDisabled) {

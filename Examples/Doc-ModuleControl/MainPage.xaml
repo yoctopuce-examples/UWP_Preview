@@ -1,0 +1,43 @@
+﻿<Page
+  x:Class="Demo.MainPage"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:local="using:Demo"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  mc:Ignorable="d">
+    <Page.DataContext>
+        <local:Demo x:Name ="demo" HubURL="usb" Target="" Beacon="True" ></local:Demo>
+    </Page.DataContext>
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBlock  Grid.Column="0" Text="Hub URL:"/>
+            <TextBox Grid.Column="1" Grid.Row="1" x:Name="tb_net_url" Margin="10" TextWrapping="Wrap" Text="{Binding HubURL,Mode=OneWay}"/>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="Target:"/>
+            <TextBox Grid.Column="1" Grid.Row="2" x:Name="serialName" Margin="10" TextWrapping="Wrap" PlaceholderText="YCTOPOC1-00000" Text="{Binding Target,Mode=OneWay}"/>
+        </Grid>
+        <Grid Grid.Row="2">
+            <ToggleSwitch Grid.Column="1" Grid.Row="2" x:Name="beaconToggle" Header="Beacon:" Margin="10"
+                    IsOn="{Binding Beacon,Mode=OneWay}" />
+        </Grid>
+        <Button Grid.Row="3" x:Name="button" Content="Run" Margin="10" Click="button_Click" />
+        <TextBlock Grid.Row="4" x:Name="textBlock" TextWrapping="Wrap" Text="{Binding Output,Mode=TwoWay}" />
+    </Grid>
+</Page>

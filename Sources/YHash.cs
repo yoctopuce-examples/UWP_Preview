@@ -106,11 +106,11 @@ namespace com.yoctopuce.YoctoAPI
         // Find the best known identifier (hardware Id) for a given function
         internal virtual YPEntry imm_resolveFunction(string className, string func)
         {
-            if (!YAPI._BaseType.ContainsKey(className)) {
+            if (!_yctx._BaseType.ContainsKey(className)) {
                 return imm_getFnByType(className).imm_getYPEntry(func);
             } else {
                 // using an abstract baseType
-                YPEntry.BaseClass baseType = YAPI._BaseType[className];
+                YPEntry.BaseClass baseType = _yctx._BaseType[className];
                 foreach (YFunctionType subClassType in _fnByType.Values) {
                     try {
                         YPEntry yp = subClassType.imm_getYPEntry(func);
@@ -169,7 +169,7 @@ namespace com.yoctopuce.YoctoAPI
         internal virtual string imm_getFirstHardwareId(string className)
         {
 
-            if (!YAPI._BaseType.ContainsKey(className)) {
+            if (!_yctx._BaseType.ContainsKey(className)) {
                 YFunctionType ft = imm_getFnByType(className);
                 YPEntry yp = ft.imm_getFirstYPEntry();
                 if (yp == null) {
@@ -178,7 +178,7 @@ namespace com.yoctopuce.YoctoAPI
                 return yp.HardwareId;
             } else {
                 // using an abstract baseType
-                YPEntry.BaseClass baseType = YAPI._BaseType[className];
+                YPEntry.BaseClass baseType = _yctx._BaseType[className];
                 foreach (YFunctionType subClassType in _fnByType.Values) {
                     YPEntry yp = subClassType.imm_getFirstYPEntry();
                     if (yp != null && yp.getBaseClass().Equals(baseType)) {
@@ -192,7 +192,7 @@ namespace com.yoctopuce.YoctoAPI
         // Find the hardwareId for the next instance of a given function class
         internal virtual string imm_getNextHardwareId(string className, string hwid)
         {
-            if (!YAPI._BaseType.ContainsKey(className)) {
+            if (!_yctx._BaseType.ContainsKey(className)) {
                 YFunctionType ft = imm_getFnByType(className);
                 YPEntry yp = ft.imm_getNextYPEntry(hwid);
                 if (yp == null) {
@@ -201,7 +201,7 @@ namespace com.yoctopuce.YoctoAPI
                 return yp.HardwareId;
             } else {
                 // enumeration of an abstract class
-                YPEntry.BaseClass baseType = YAPI._BaseType[className];
+                YPEntry.BaseClass baseType = _yctx._BaseType[className];
                 string prevclass = YAPIContext.imm_functionClass(hwid);
                 YPEntry res = imm_getFnByType(prevclass).imm_getNextYPEntry(hwid);
                 if (res != null) {

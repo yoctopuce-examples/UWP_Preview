@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YHTTPRequest.cs 25419 2016-09-22 12:37:40Z seb $
+ * $Id: YHTTPRequest.cs 28796 2017-10-09 15:00:15Z seb $
  *
  * internal yHTTPRequest object
  *
@@ -35,7 +35,9 @@
  *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
  *  WARRANTY, OR OTHERWISE.
  *
- *********************************************************************/using System;
+ *********************************************************************/
+
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -49,12 +51,16 @@ namespace com.yoctopuce.YoctoAPI
     {
         public const int MAX_REQUEST_MS = 5000;
         private const int YIO_IDLE_TCP_TIMEOUT = 5000;
+
+        internal delegate void HandleIncommingData(byte[] result, int size);
+
+        private HandleIncommingData _progressCallback;
+
+
         private object _context;
         private YGenericHub.RequestAsyncResult _resultCallback;
-        private volatile bool _isDone;
-        private TaskCompletionSource<byte[]> _tcs;
         private readonly YHTTPHub _hub;
-        private StreamSocket _socket ;
+        private StreamSocket _socket;
         private bool _reuse_socket;
         private string _firstLine;
         private byte[] _rest_of_request;
@@ -71,54 +77,51 @@ namespace com.yoctopuce.YoctoAPI
         private ulong _reqNum;
         private Stream _out;
         private Stream _in;
+        private Task<byte[]> _currentReq = null;
 
         internal YHTTPRequest(YHTTPHub hub, string dbglabel)
         {
             _hub = hub;
             _dbglabel = dbglabel;
             _reqNum = global_reqNum++;
-            _isDone = true;
         }
 
         private void log(string msg)
         {
-            Debug.WriteLine(string.Format("{0}:{1}:{2}:{3}",Environment.CurrentManagedThreadId, _dbglabel, _reqNum, msg));
+            //Debug.WriteLine(string.Format("{0}:{1}:{2}:{3}", Environment.CurrentManagedThreadId, _dbglabel, _reqNum, msg));
         }
 
 
-        internal bool imm_EnsureIsEnded()
+        internal async Task EnsureLastRequestDone()
         {
-            if (_isDone)
-                return true;
-            ulong now = YAPI.GetTickCount();
-            ulong timeout = _startRequestTime + _requestTimeout;
-            if (timeout <= now) {
-                return false;
+            if (_currentReq != null) {
+                ulong now = YAPI.GetTickCount();
+                ulong timeout = _startRequestTime + _requestTimeout;
+                if (timeout <= now) {
+                    throw new YAPI_Exception(YAPI.TIMEOUT, "Last Http request did not finished");
+                }
+                int msTimeout = (int) (timeout - now);
+                Task task = await Task.WhenAny(_currentReq, Task.Delay(msTimeout));
+                if (task != _currentReq) {
+                    throw new YAPI_Exception(YAPI.TIMEOUT, "Last Http request did not finished");
+                }
+                _currentReq = null;
             }
-            int msTimeout = (int)(timeout - now);
-            bool ended = _tcs.Task.Wait(msTimeout);
-            return ended;
         }
 
 
-        internal async Task _requestStart(string firstLine, byte[] rest_of_request, ulong mstimeout, object context, YGenericHub.RequestAsyncResult resultCallback)
+        internal async Task<byte[]> doRequestTask(string firstLine, byte[] rest_of_request, ulong mstimeout, object context, YGenericHub.RequestAsyncResult resultCallback, HandleIncommingData progressCb)
         {
             byte[] full_request;
-            if (!imm_EnsureIsEnded()) {
-                throw new YAPI_Exception(YAPI.TIMEOUT, "Last Http request did not finished");
-            }
-
             _firstLine = firstLine;
             _rest_of_request = rest_of_request;
             _context = context;
-
             log(String.Format("Start({0}):{1}", _reuse_socket ? "reuse" : "new", firstLine));
             _startRequestTime = YAPI.GetTickCount();
             _requestTimeout = mstimeout;
             _resultCallback = resultCallback;
-            _isDone = false;
+            _progressCallback = progressCb;
             _header_found = false;
-            _tcs = new TaskCompletionSource<byte[]>();
             string persistent_tag = firstLine.Substring(firstLine.Length - 2);
             if (persistent_tag.Equals("&.")) {
                 firstLine += " \r\n";
@@ -135,144 +138,88 @@ namespace com.yoctopuce.YoctoAPI
                 Array.Copy(YAPI.DefaultEncoding.GetBytes(str_request), 0, full_request, 0, len);
                 Array.Copy(rest_of_request, 0, full_request, len, rest_of_request.Length);
             }
-            bool retry;
-            do {
-                retry = false;
-                try {
-                    if (!_reuse_socket) {
-                        // Creates an unconnected socket
-                        _socket = new StreamSocket();
-                        // Connect the socket to the remote endpoint. Catch any errors.
-                        HostName serverHost = new HostName(_hub._http_params.Host);
-                        int port = _hub._http_params.Port;
-                        _socket.Control.NoDelay = true;
-                        await _socket.ConnectAsync(serverHost, port.ToString());
-                        _out = _socket.OutputStream.AsStreamForWrite();
-                        _in = _socket.InputStream.AsStreamForRead();
-                    }
-                    _result.SetLength(0);
-                    _header.Length = 0;
-                } catch (Exception e) {
-                    log("Exception on socket connection:" + e.Message);
-                    imm_requestStop();
-                    throw new YAPI_Exception(YAPI.IO_ERROR, e.Message);
-                }
-                // write request
-                try {
-                    await _out.WriteAsync(full_request, 0, full_request.Length);
-                    await _out.FlushAsync();
-                    _lastReceiveTime = 0;
-                    if (_reuse_socket) {
-                        // ensure socket is still valid
-                        bool canRead = _in.CanRead;
-                        //Debug.WriteLine("Reuse socket :{0} /{1}", canTimeout, canRead);
-                        if (canRead) {
-                            byte[] buffer = new byte[1024];
-                            int read = await _in.ReadAsync(buffer, 0, buffer.Length);
-                            if (read <= 0) {
-                                // end of connection
-                                //Debug.WriteLine("invalid Reuse socket :{0} restart", read);
-                                _reuse_socket = false;
-                                retry = true;
-                            } else {
-                                //Debug.WriteLine("Reuse socket :{0} readed", read);
-                                string partial_head = YAPI.DefaultEncoding.GetString(buffer, 0, read);
-                                _header.Append(partial_head);
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    log(e.ToString());
-                    if (_reuse_socket) {
-                        retry = true;
-                    } else {
-                        imm_requestStop();
-                        throw new YAPI_Exception(YAPI.IO_ERROR, e.Message);
-                    }
-                }
-                _reuse_socket = false;
-            } while (retry);
-
-        }
-
-
-        internal void imm_requestStop()
-        {
-            log(String.Format("Stop({0})", _reuse_socket ? "reuse" : "new"));
-            if (!_reuse_socket) {
-                if (_socket != null) {
-                    try {
-                        _socket.Dispose();
-                    } catch (Exception ex) {
-                        log("Exception on close:" + ex.Message);
-
-                    }
-                    _socket = null;
-                }
-            }
-        }
-
-        internal async Task _requestReset()
-        {
-            imm_requestStop();
-            await _requestStart(_firstLine, _rest_of_request, _requestTimeout, _context, _resultCallback);
-        }
-
-
-        internal async Task<bool> _requestProcesss()
-        {
-            int read = 0;
-
-            if (_isDone) {
-                log("_requestProcesss early return");
-                return true;
-            }
-            byte[] buffer = new byte[1024];
+            _result.SetLength(0);
+            _header.Length = 0;
             try {
-                int waitms;
-                if (_requestTimeout > 0) {
-                    ulong read_timeout = _startRequestTime + _requestTimeout - YAPI.GetTickCount();
-                    if (read_timeout < 0) {
-                        throw new YAPI_Exception(YAPI.TIMEOUT, string.Format("Hub did not send data during {0:D}ms", YAPI.GetTickCount() - _lastReceiveTime));
-                    }
-                    if (read_timeout > YIO_IDLE_TCP_TIMEOUT) {
-                        read_timeout = YIO_IDLE_TCP_TIMEOUT;
-                    }
-                    waitms = (int)read_timeout;
-                } else {
-                    waitms = YIO_IDLE_TCP_TIMEOUT;
+                if (!_reuse_socket) {
+                    // Creates an unconnected socket
+                    _socket = new StreamSocket();
+                    // Connect the socket to the remote endpoint. Catch any errors.
+                    HostName serverHost = new HostName(_hub._http_params.Host);
+                    int port = _hub._http_params.Port;
+                    _socket.Control.NoDelay = true;
+                    await _socket.ConnectAsync(serverHost, port.ToString());
+                    _out = _socket.OutputStream.AsStreamForWrite();
+                    _in = _socket.InputStream.AsStreamForRead();
                 }
-                //todo: find a way to quit this function before timeout when the main thread call stop notification
-                // ex: main thread is calling YHTTPHub.stopNotifications when the TCPNotification thread is calling _requestProcess
-                read = await _in.ReadAsync(buffer, 0, buffer.Length);
-                ulong now = YAPI.GetTickCount();
-                log(String.Format("_requestProcesss read ={0:d} after{1}", read, now - _startRequestTime));
-            } catch (IOException e) {
+            } catch (Exception e) {
+                log("Exception on socket connection:" + e.Message);
                 throw new YAPI_Exception(YAPI.IO_ERROR, e.Message);
             }
-            if (read <= 0) {
-                // end of connection
-                _reuse_socket = false;
-                _tcs.SetResult(_rest_of_request);
-                _isDone = true;
-                return true;
-            } else if (read > 0) {
-                _lastReceiveTime = YAPI.GetTickCount();
-                if (imm_HandleIncommingData(buffer, read)) {
-                    await _requestReset();
-                    return false;
+            // write request
+            try {
+                await _out.WriteAsync(full_request, 0, full_request.Length);
+                await _out.FlushAsync();
+                _lastReceiveTime = 0;
+            } catch (Exception e) {
+                log(e.ToString());
+                throw new YAPI_Exception(YAPI.IO_ERROR, e.Message);
+            }
+            _reuse_socket = false;
+            bool eof = false;
+            while (!eof) {
+                int read = 0;
+                byte[] buffer = new byte[1024];
+                try {
+                    int waitms;
+                    ulong now;
+                    if (_requestTimeout > 0) {
+                        now = YAPI.GetTickCount();
+                        ulong read_timeout = _startRequestTime + _requestTimeout;
+                        if (read_timeout < now) {
+                            throw new YAPI_Exception(YAPI.TIMEOUT, string.Format("Hub did not send data during {0:D}ms", YAPI.GetTickCount() - _lastReceiveTime));
+                        }
+                        read_timeout -= now;
+                        if (read_timeout > YIO_IDLE_TCP_TIMEOUT) {
+                            read_timeout = YIO_IDLE_TCP_TIMEOUT;
+                        }
+                        waitms = (int) read_timeout;
+                    } else {
+                        waitms = YIO_IDLE_TCP_TIMEOUT;
+                    }
+                    Task<int> readTask = _in.ReadAsync(buffer, 0, buffer.Length);
+                    Task task = await Task.WhenAny(readTask, Task.Delay(waitms));
+                    now = YAPI.GetTickCount();
+                    if (task != readTask) {
+                        throw new YAPI_Exception(YAPI.TIMEOUT, string.Format("Request took too long {0:D}ms", now - _startRequestTime));
+                    }
+                    read = readTask.Result;
+                    //log(String.Format("_requestProcesss read ={0:d} after{1}", read, now - _startRequestTime));
+                } catch (IOException e) {
+                    throw new YAPI_Exception(YAPI.IO_ERROR, e.Message);
                 }
-                if (_reuse_socket) {
-                    byte[] tmp = _result.ToArray();
-                    if (tmp[tmp.Length - 1] == 10 && tmp[tmp.Length - 2] == 13) {
-                        _tcs.SetResult(_rest_of_request);
-                        _isDone = true;
+                if (read <= 0) {
+                    // end of connection
+                    _reuse_socket = false;
+                    log("end of connection " + _dbglabel);
+                    eof = true;
+                } else if (read > 0) {
+                    _lastReceiveTime = YAPI.GetTickCount();
+                    if (imm_HandleIncommingData(buffer, read)) {
+                        //todo handle request restart due to autentification
+                        throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "Authentificaitno not yet supported");
+                    }
+                    if (_reuse_socket) {
+                        byte[] tmp = _result.ToArray();
+                        if (tmp[tmp.Length - 1] == 10 && tmp[tmp.Length - 2] == 13) {
+                            eof = true;
+                        }
                     }
                 }
-
             }
-            return false;
+            return _result.ToArray();
         }
+
 
         // return true if we need to retry the same request with authenctication
         private bool imm_HandleIncommingData(byte[] buffer, int read)
@@ -309,72 +256,41 @@ namespace com.yoctopuce.YoctoAPI
                     }
                     _hub.imm_authSucceded();
                     byte[] data = YAPI.DefaultEncoding.GetBytes(full_header_str.Substring(pos));
-                    _result.Write(data, 0, data.Length);
+                    if (_progressCallback != null) {
+                        _progressCallback(data, data.Length);
+                    } else {
+                        _result.Write(data, 0, data.Length);
+                    }
                 }
             } else {
-                _result.Write(buffer, 0, read);
+                if (_progressCallback != null) {
+                    _progressCallback(buffer, read);
+                } else {
+                    _result.Write(buffer, 0, read);
+                }
             }
             return false;
         }
 
 
-        internal byte[] imm_getPartialResult()
-        {
-            byte[] res;
-            if (!_header_found) {
-                return null;
-            }
-            if (_result.Length == 0) {
-                if (_isDone) {
-                    throw new YAPI_Exception(YAPI.NO_MORE_DATA, "end of file reached");
-                }
-                return null;
-            }
-            res = _result.ToArray();
-            _result.SetLength(0);
-            return res;
-        }
-
-
         internal async Task<byte[]> RequestSync(string req_first_line, byte[] req_head_and_body, uint mstimeout)
         {
-            byte[] res;
-            await _requestStart(req_first_line, req_head_and_body, mstimeout, null, null);
-            res = await FinishRequest();
-            return res;
-        }
-
-        private async Task<byte[]> FinishRequest()
-        {
-            byte[] res;
-            try {
-                while (!_isDone) {
-                    await _requestProcesss();
-                }
-                res = _result.ToArray();
-                _result.SetLength(0);
-            }
-            catch (YAPI_Exception ex) {
-                imm_requestStop();
-                log("request failed" + ex.Message);
-                throw;
-            }
-            imm_requestStop();
-            return res;
+            await EnsureLastRequestDone();
+            return await doRequestTask(req_first_line, req_head_and_body, mstimeout, null, null, null);
         }
 
 
         internal async Task RequestAsync(string req_first_line, byte[] req_head_and_body, YGenericHub.RequestAsyncResult callback, object context)
         {
-            await _requestStart(req_first_line, req_head_and_body, YHTTPHub.YIO_DEFAULT_TCP_TIMEOUT, context, callback);
-            FinishRequest();
+            await EnsureLastRequestDone();
+            _currentReq = doRequestTask(req_first_line, req_head_and_body, YHTTPHub.YIO_DEFAULT_TCP_TIMEOUT, context, callback, null);
         }
 
-
-
-
-
-
+        internal async Task RequestProgress(string req_first_line, HandleIncommingData progressCb)
+        {
+            await EnsureLastRequestDone();
+            await doRequestTask(req_first_line, null, 0, null, null, progressCb);
+            Debug.WriteLine("RequestProgress is done");
+        }
     }
-
 }

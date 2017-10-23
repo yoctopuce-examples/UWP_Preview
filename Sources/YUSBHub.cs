@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YUSBHub.cs 28647 2017-09-26 12:21:17Z seb $
+ * $Id: YUSBHub.cs 28980 2017-10-20 17:00:11Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -69,7 +69,6 @@ namespace com.yoctopuce.YoctoAPI
 
         internal YUSBHub(YAPIContext yctx, int idx, bool requestPermission) : base(yctx, new HTTPParams("usb://"), idx, true)
         {
-            Debug.WriteLine("alloc YUSBHub");
             _ywatcher = new YUSBWatcher(this);
         }
 #pragma warning disable 1998
@@ -87,7 +86,6 @@ namespace com.yoctopuce.YoctoAPI
         internal override void imm_release()
         {
             _ywatcher.Stop();
-            Debug.WriteLine("release YUSBHub");
         }
 
 
