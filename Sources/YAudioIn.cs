@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAudioIn.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YAudioIn.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindAudioIn(), the high-level API for AudioIn functions
  *
@@ -132,20 +132,20 @@ public class YAudioIn : YFunction
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("volume")) {
-            _volume = json_val.GetInt("volume");
+        if (json_val.has("volume")) {
+            _volume = json_val.getInt("volume");
         }
-        if (json_val.Has("mute")) {
-            _mute = json_val.GetInt("mute") > 0 ? 1 : 0;
+        if (json_val.has("mute")) {
+            _mute = json_val.getInt("mute") > 0 ? 1 : 0;
         }
-        if (json_val.Has("volumeRange")) {
-            _volumeRange = json_val.GetString("volumeRange");
+        if (json_val.has("volumeRange")) {
+            _volumeRange = json_val.getString("volumeRange");
         }
-        if (json_val.Has("signal")) {
-            _signal = json_val.GetInt("signal");
+        if (json_val.has("signal")) {
+            _signal = json_val.getInt("signal");
         }
-        if (json_val.Has("noSignalFor")) {
-            _noSignalFor = json_val.GetInt("noSignalFor");
+        if (json_val.has("noSignalFor")) {
+            _noSignalFor = json_val.getInt("noSignalFor");
         }
         base.imm_parseAttr(json_val);
     }

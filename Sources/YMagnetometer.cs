@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMagnetometer.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YMagnetometer.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindMagnetometer(), the high-level API for Magnetometer functions
  *
@@ -132,17 +132,17 @@ public class YMagnetometer : YSensor
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("bandwidth")) {
-            _bandwidth = json_val.GetInt("bandwidth");
+        if (json_val.has("bandwidth")) {
+            _bandwidth = json_val.getInt("bandwidth");
         }
-        if (json_val.Has("xValue")) {
-            _xValue = Math.Round(json_val.GetDouble("xValue") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("xValue")) {
+            _xValue = Math.Round(json_val.getDouble("xValue") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("yValue")) {
-            _yValue = Math.Round(json_val.GetDouble("yValue") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("yValue")) {
+            _yValue = Math.Round(json_val.getDouble("yValue") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("zValue")) {
-            _zValue = Math.Round(json_val.GetDouble("zValue") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("zValue")) {
+            _zValue = Math.Round(json_val.getDouble("zValue") * 1000.0 / 65536.0) / 1000.0;
         }
         base.imm_parseAttr(json_val);
     }

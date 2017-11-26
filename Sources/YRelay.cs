@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRelay.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YRelay.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindRelay(), the high-level API for Relay functions
  *
@@ -167,26 +167,26 @@ public class YRelay : YFunction
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("state")) {
-            _state = json_val.GetInt("state") > 0 ? 1 : 0;
+        if (json_val.has("state")) {
+            _state = json_val.getInt("state") > 0 ? 1 : 0;
         }
-        if (json_val.Has("stateAtPowerOn")) {
-            _stateAtPowerOn = json_val.GetInt("stateAtPowerOn");
+        if (json_val.has("stateAtPowerOn")) {
+            _stateAtPowerOn = json_val.getInt("stateAtPowerOn");
         }
-        if (json_val.Has("maxTimeOnStateA")) {
-            _maxTimeOnStateA = json_val.GetLong("maxTimeOnStateA");
+        if (json_val.has("maxTimeOnStateA")) {
+            _maxTimeOnStateA = json_val.getLong("maxTimeOnStateA");
         }
-        if (json_val.Has("maxTimeOnStateB")) {
-            _maxTimeOnStateB = json_val.GetLong("maxTimeOnStateB");
+        if (json_val.has("maxTimeOnStateB")) {
+            _maxTimeOnStateB = json_val.getLong("maxTimeOnStateB");
         }
-        if (json_val.Has("output")) {
-            _output = json_val.GetInt("output") > 0 ? 1 : 0;
+        if (json_val.has("output")) {
+            _output = json_val.getInt("output") > 0 ? 1 : 0;
         }
-        if (json_val.Has("pulseTimer")) {
-            _pulseTimer = json_val.GetLong("pulseTimer");
+        if (json_val.has("pulseTimer")) {
+            _pulseTimer = json_val.getLong("pulseTimer");
         }
-        if (json_val.Has("countdown")) {
-            _countdown = json_val.GetLong("countdown");
+        if (json_val.has("countdown")) {
+            _countdown = json_val.getLong("countdown");
         }
         base.imm_parseAttr(json_val);
     }

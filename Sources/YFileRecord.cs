@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFileRecord.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YFileRecord.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindFileRecord(), the high-level API for FileRecord functions
  *
@@ -69,10 +69,10 @@ public class YFileRecord
         {
             YJSONObject json;
             json = new YJSONObject(json_str);
-            json.Parse();
-            _name = json.GetString("name");
-            _crc = json.GetInt("crc");
-            _size = json.GetInt("size");
+            json.parse();
+            _name = json.getString("name");
+            _crc = json.getInt("crc");
+            _size = json.getInt("size");
         }
 
         //--- (generated code: YFileRecord implementation)

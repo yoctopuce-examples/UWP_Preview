@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMotor.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YMotor.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindMotor(), the high-level API for Motor functions
  *
@@ -170,32 +170,32 @@ public class YMotor : YFunction
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("motorStatus")) {
-            _motorStatus = json_val.GetInt("motorStatus");
+        if (json_val.has("motorStatus")) {
+            _motorStatus = json_val.getInt("motorStatus");
         }
-        if (json_val.Has("drivingForce")) {
-            _drivingForce = Math.Round(json_val.GetDouble("drivingForce") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("drivingForce")) {
+            _drivingForce = Math.Round(json_val.getDouble("drivingForce") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("brakingForce")) {
-            _brakingForce = Math.Round(json_val.GetDouble("brakingForce") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("brakingForce")) {
+            _brakingForce = Math.Round(json_val.getDouble("brakingForce") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("cutOffVoltage")) {
-            _cutOffVoltage = Math.Round(json_val.GetDouble("cutOffVoltage") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("cutOffVoltage")) {
+            _cutOffVoltage = Math.Round(json_val.getDouble("cutOffVoltage") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("overCurrentLimit")) {
-            _overCurrentLimit = json_val.GetInt("overCurrentLimit");
+        if (json_val.has("overCurrentLimit")) {
+            _overCurrentLimit = json_val.getInt("overCurrentLimit");
         }
-        if (json_val.Has("frequency")) {
-            _frequency = Math.Round(json_val.GetDouble("frequency") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("frequency")) {
+            _frequency = Math.Round(json_val.getDouble("frequency") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("starterTime")) {
-            _starterTime = json_val.GetInt("starterTime");
+        if (json_val.has("starterTime")) {
+            _starterTime = json_val.getInt("starterTime");
         }
-        if (json_val.Has("failSafeTimeout")) {
-            _failSafeTimeout = json_val.GetInt("failSafeTimeout");
+        if (json_val.has("failSafeTimeout")) {
+            _failSafeTimeout = json_val.getInt("failSafeTimeout");
         }
-        if (json_val.Has("command")) {
-            _command = json_val.GetString("command");
+        if (json_val.has("command")) {
+            _command = json_val.getString("command");
         }
         base.imm_parseAttr(json_val);
     }

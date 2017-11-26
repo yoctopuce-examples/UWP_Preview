@@ -8,30 +8,27 @@ namespace Demo
 {
     public class Demo : DemoBase
     {
-        public Demo(string url, TextBlock textBlock) : base(url, textBlock)
-        { }
 
-        public string target { get; set; }
-        public string newname { get; set; }
+        public string HubURL { get; set; }
+        public string Target { get; set; }
+        public string LogicalName { get; set; }
 
         public override async Task<int> Run()
         {
             try {
                 YModule m;
 
-                await YAPI.RegisterHub(_hubULR);
+                await YAPI.RegisterHub(HubURL);
 
-                m = YModule.FindModule(target); // use serial or logical name
-
+                m = YModule.FindModule(Target); // use serial or logical name
                 if (await m.isOnline()) {
-                    if (!YAPI.CheckLogicalName(newname)) {
-                        WriteLine("Invalid name (" + newname + ")");
+                    if (!YAPI.CheckLogicalName(LogicalName)) {
+                        WriteLine("Invalid name (" + LogicalName + ")");
                         return -1;
                     }
 
-                    await m.set_logicalName(newname);
+                    await m.set_logicalName(LogicalName);
                     await m.saveToFlash(); // do not forget this
-
                     Write("Module: serial= " + await m.get_serialNumber());
                     WriteLine(" / name= " + await m.get_logicalName());
                 } else {

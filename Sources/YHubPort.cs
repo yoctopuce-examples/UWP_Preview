@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YHubPort.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YHubPort.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindHubPort(), the high-level API for HubPort functions
  *
@@ -126,14 +126,14 @@ public class YHubPort : YFunction
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("enabled")) {
-            _enabled = json_val.GetInt("enabled") > 0 ? 1 : 0;
+        if (json_val.has("enabled")) {
+            _enabled = json_val.getInt("enabled") > 0 ? 1 : 0;
         }
-        if (json_val.Has("portState")) {
-            _portState = json_val.GetInt("portState");
+        if (json_val.has("portState")) {
+            _portState = json_val.getInt("portState");
         }
-        if (json_val.Has("baudRate")) {
-            _baudRate = json_val.GetInt("baudRate");
+        if (json_val.has("baudRate")) {
+            _baudRate = json_val.getInt("baudRate");
         }
         base.imm_parseAttr(json_val);
     }

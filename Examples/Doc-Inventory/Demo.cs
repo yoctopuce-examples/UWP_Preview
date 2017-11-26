@@ -8,7 +8,6 @@ namespace Demo
 {
     public class Demo : DemoBase
     {
-
         public string HubURL { get; set; }
 
         public override async Task<int> Run()

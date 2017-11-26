@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWeighScale.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YWeighScale.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindWeighScale(), the high-level API for WeighScale functions
  *
@@ -145,23 +145,23 @@ public class YWeighScale : YSensor
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("excitation")) {
-            _excitation = json_val.GetInt("excitation");
+        if (json_val.has("excitation")) {
+            _excitation = json_val.getInt("excitation");
         }
-        if (json_val.Has("adaptRatio")) {
-            _adaptRatio = Math.Round(json_val.GetDouble("adaptRatio") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("adaptRatio")) {
+            _adaptRatio = Math.Round(json_val.getDouble("adaptRatio") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("compTemperature")) {
-            _compTemperature = Math.Round(json_val.GetDouble("compTemperature") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("compTemperature")) {
+            _compTemperature = Math.Round(json_val.getDouble("compTemperature") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("compensation")) {
-            _compensation = Math.Round(json_val.GetDouble("compensation") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("compensation")) {
+            _compensation = Math.Round(json_val.getDouble("compensation") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("zeroTracking")) {
-            _zeroTracking = Math.Round(json_val.GetDouble("zeroTracking") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("zeroTracking")) {
+            _zeroTracking = Math.Round(json_val.getDouble("zeroTracking") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("command")) {
-            _command = json_val.GetString("command");
+        if (json_val.has("command")) {
+            _command = json_val.getString("command");
         }
         base.imm_parseAttr(json_val);
     }

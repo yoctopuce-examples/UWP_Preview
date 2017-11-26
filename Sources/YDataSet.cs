@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YDataSet.cs 28024 2017-07-10 08:50:02Z mvuilleu $
+ * $Id: YDataSet.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements yFindDataSet(), the high-level API for DataSet functions
  *
@@ -129,21 +129,21 @@ public class YDataSet
             long endTime = 0;
 
             json = new YJSONObject(json_str);
-            json.Parse();
-            _functionId = json.GetString("id");
-            _unit = json.GetString("unit");
-            if (json.Has("calib")) {
-                _calib = YAPIContext.imm_decodeFloats(json.GetString("calib"));
+            json.parse();
+            _functionId = json.getString("id");
+            _unit = json.getString("unit");
+            if (json.has("calib")) {
+                _calib = YAPIContext.imm_decodeFloats(json.getString("calib"));
                 _calib[0] = _calib[0] / 1000;
             } else {
-                _calib = YAPIContext.imm_decodeWords(json.GetString("cal"));
+                _calib = YAPIContext.imm_decodeWords(json.getString("cal"));
             }
             _streams = new List<YDataStream>();
             _preview = new List<YMeasure>();
             _measures = new List<YMeasure>();
-            jstreams = json.GetYJSONArray("streams");
+            jstreams = json.getYJSONArray("streams");
             for (int i = 0; i < jstreams.Length; i++) {
-                YDataStream stream = _parent.imm_findDataStream(this, jstreams.GetString(i));
+                YDataStream stream = _parent.imm_findDataStream(this, jstreams.getString(i));
                 streamStartTime = await stream.get_startTimeUTC() - await stream.get_dataSamplesIntervalMs() / 1000;
                 streamEndTime = await stream.get_startTimeUTC() + await stream.get_duration();
                 if (_startTime > 0 && streamEndTime <= _startTime) {

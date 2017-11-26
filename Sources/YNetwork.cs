@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YNetwork.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YNetwork.cs 29083 2017-11-03 17:48:44Z seb $
  *
  * Implements FindNetwork(), the high-level API for Network functions
  *
@@ -285,77 +285,77 @@ public class YNetwork : YFunction
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("readiness")) {
-            _readiness = json_val.GetInt("readiness");
+        if (json_val.has("readiness")) {
+            _readiness = json_val.getInt("readiness");
         }
-        if (json_val.Has("macAddress")) {
-            _macAddress = json_val.GetString("macAddress");
+        if (json_val.has("macAddress")) {
+            _macAddress = json_val.getString("macAddress");
         }
-        if (json_val.Has("ipAddress")) {
-            _ipAddress = json_val.GetString("ipAddress");
+        if (json_val.has("ipAddress")) {
+            _ipAddress = json_val.getString("ipAddress");
         }
-        if (json_val.Has("subnetMask")) {
-            _subnetMask = json_val.GetString("subnetMask");
+        if (json_val.has("subnetMask")) {
+            _subnetMask = json_val.getString("subnetMask");
         }
-        if (json_val.Has("router")) {
-            _router = json_val.GetString("router");
+        if (json_val.has("router")) {
+            _router = json_val.getString("router");
         }
-        if (json_val.Has("ipConfig")) {
-            _ipConfig = json_val.GetString("ipConfig");
+        if (json_val.has("ipConfig")) {
+            _ipConfig = json_val.getString("ipConfig");
         }
-        if (json_val.Has("primaryDNS")) {
-            _primaryDNS = json_val.GetString("primaryDNS");
+        if (json_val.has("primaryDNS")) {
+            _primaryDNS = json_val.getString("primaryDNS");
         }
-        if (json_val.Has("secondaryDNS")) {
-            _secondaryDNS = json_val.GetString("secondaryDNS");
+        if (json_val.has("secondaryDNS")) {
+            _secondaryDNS = json_val.getString("secondaryDNS");
         }
-        if (json_val.Has("ntpServer")) {
-            _ntpServer = json_val.GetString("ntpServer");
+        if (json_val.has("ntpServer")) {
+            _ntpServer = json_val.getString("ntpServer");
         }
-        if (json_val.Has("userPassword")) {
-            _userPassword = json_val.GetString("userPassword");
+        if (json_val.has("userPassword")) {
+            _userPassword = json_val.getString("userPassword");
         }
-        if (json_val.Has("adminPassword")) {
-            _adminPassword = json_val.GetString("adminPassword");
+        if (json_val.has("adminPassword")) {
+            _adminPassword = json_val.getString("adminPassword");
         }
-        if (json_val.Has("httpPort")) {
-            _httpPort = json_val.GetInt("httpPort");
+        if (json_val.has("httpPort")) {
+            _httpPort = json_val.getInt("httpPort");
         }
-        if (json_val.Has("defaultPage")) {
-            _defaultPage = json_val.GetString("defaultPage");
+        if (json_val.has("defaultPage")) {
+            _defaultPage = json_val.getString("defaultPage");
         }
-        if (json_val.Has("discoverable")) {
-            _discoverable = json_val.GetInt("discoverable") > 0 ? 1 : 0;
+        if (json_val.has("discoverable")) {
+            _discoverable = json_val.getInt("discoverable") > 0 ? 1 : 0;
         }
-        if (json_val.Has("wwwWatchdogDelay")) {
-            _wwwWatchdogDelay = json_val.GetInt("wwwWatchdogDelay");
+        if (json_val.has("wwwWatchdogDelay")) {
+            _wwwWatchdogDelay = json_val.getInt("wwwWatchdogDelay");
         }
-        if (json_val.Has("callbackUrl")) {
-            _callbackUrl = json_val.GetString("callbackUrl");
+        if (json_val.has("callbackUrl")) {
+            _callbackUrl = json_val.getString("callbackUrl");
         }
-        if (json_val.Has("callbackMethod")) {
-            _callbackMethod = json_val.GetInt("callbackMethod");
+        if (json_val.has("callbackMethod")) {
+            _callbackMethod = json_val.getInt("callbackMethod");
         }
-        if (json_val.Has("callbackEncoding")) {
-            _callbackEncoding = json_val.GetInt("callbackEncoding");
+        if (json_val.has("callbackEncoding")) {
+            _callbackEncoding = json_val.getInt("callbackEncoding");
         }
-        if (json_val.Has("callbackCredentials")) {
-            _callbackCredentials = json_val.GetString("callbackCredentials");
+        if (json_val.has("callbackCredentials")) {
+            _callbackCredentials = json_val.getString("callbackCredentials");
         }
-        if (json_val.Has("callbackInitialDelay")) {
-            _callbackInitialDelay = json_val.GetInt("callbackInitialDelay");
+        if (json_val.has("callbackInitialDelay")) {
+            _callbackInitialDelay = json_val.getInt("callbackInitialDelay");
         }
-        if (json_val.Has("callbackSchedule")) {
-            _callbackSchedule = json_val.GetString("callbackSchedule");
+        if (json_val.has("callbackSchedule")) {
+            _callbackSchedule = json_val.getString("callbackSchedule");
         }
-        if (json_val.Has("callbackMinDelay")) {
-            _callbackMinDelay = json_val.GetInt("callbackMinDelay");
+        if (json_val.has("callbackMinDelay")) {
+            _callbackMinDelay = json_val.getInt("callbackMinDelay");
         }
-        if (json_val.Has("callbackMaxDelay")) {
-            _callbackMaxDelay = json_val.GetInt("callbackMaxDelay");
+        if (json_val.has("callbackMaxDelay")) {
+            _callbackMaxDelay = json_val.getInt("callbackMaxDelay");
         }
-        if (json_val.Has("poeCurrent")) {
-            _poeCurrent = json_val.GetInt("poeCurrent");
+        if (json_val.has("poeCurrent")) {
+            _poeCurrent = json_val.getInt("poeCurrent");
         }
         base.imm_parseAttr(json_val);
     }
@@ -800,6 +800,8 @@ public class YNetwork : YFunction
     public async Task<int> set_userPassword(string  newval)
     {
         string rest_val;
+        if (newval.Length > YAPI.HASH_BUF_SIZE)
+            _throw(YAPI.INVALID_ARGUMENT,"Password too long :" + newval);
         rest_val = newval;
         await _setAttr("userPassword",rest_val);
         return YAPI.SUCCESS;
@@ -863,6 +865,8 @@ public class YNetwork : YFunction
     public async Task<int> set_adminPassword(string  newval)
     {
         string rest_val;
+        if (newval.Length > YAPI.HASH_BUF_SIZE)
+            _throw(YAPI.INVALID_ARGUMENT,"Password too long :" + newval);
         rest_val = newval;
         await _setAttr("adminPassword",rest_val);
         return YAPI.SUCCESS;

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YGenericSensor.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YGenericSensor.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindGenericSensor(), the high-level API for GenericSensor functions
  *
@@ -146,23 +146,23 @@ public class YGenericSensor : YSensor
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("signalValue")) {
-            _signalValue = Math.Round(json_val.GetDouble("signalValue") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("signalValue")) {
+            _signalValue = Math.Round(json_val.getDouble("signalValue") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("signalUnit")) {
-            _signalUnit = json_val.GetString("signalUnit");
+        if (json_val.has("signalUnit")) {
+            _signalUnit = json_val.getString("signalUnit");
         }
-        if (json_val.Has("signalRange")) {
-            _signalRange = json_val.GetString("signalRange");
+        if (json_val.has("signalRange")) {
+            _signalRange = json_val.getString("signalRange");
         }
-        if (json_val.Has("valueRange")) {
-            _valueRange = json_val.GetString("valueRange");
+        if (json_val.has("valueRange")) {
+            _valueRange = json_val.getString("valueRange");
         }
-        if (json_val.Has("signalBias")) {
-            _signalBias = Math.Round(json_val.GetDouble("signalBias") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("signalBias")) {
+            _signalBias = Math.Round(json_val.getDouble("signalBias") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("signalSampling")) {
-            _signalSampling = json_val.GetInt("signalSampling");
+        if (json_val.has("signalSampling")) {
+            _signalSampling = json_val.getInt("signalSampling");
         }
         base.imm_parseAttr(json_val);
     }

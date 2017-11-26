@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YPEntry.cs 25191 2016-08-15 12:43:02Z seb $
+ * $Id: YPEntry.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Yellow page implementation
  *
@@ -117,17 +117,17 @@ namespace com.yoctopuce.YoctoAPI {
         private readonly BaseClass _baseclass;
 
         public YPEntry(YJSONObject json) {
-            string hardwareId = json.GetString("hardwareId");
+            string hardwareId = json.getString("hardwareId");
             int pos = hardwareId.IndexOf('.');
             _serial = hardwareId.Substring(0, pos);
             _funcId = hardwareId.Substring(pos + 1);
             _classname = YAPIContext.imm_functionClass(_funcId);
-            _logicalName = json.GetString("logicalName");
-            _advertisedValue = json.GetString("advertisedValue");
-            _index = json.GetInt("index");
+            _logicalName = json.getString("logicalName");
+            _advertisedValue = json.getString("advertisedValue");
+            _index = json.getInt("index");
 
-            if (json.Has("baseType")) {
-                _baseclass = BaseClass.values()[json.GetInt("baseType")];
+            if (json.has("baseType")) {
+                _baseclass = BaseClass.values()[json.getInt("baseType")];
             }
             else {
                 _baseclass = BaseClass.Function;

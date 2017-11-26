@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSegmentedDisplay.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YSegmentedDisplay.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindSegmentedDisplay(), the high-level API for SegmentedDisplay functions
  *
@@ -113,11 +113,11 @@ public class YSegmentedDisplay : YFunction
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("displayedText")) {
-            _displayedText = json_val.GetString("displayedText");
+        if (json_val.has("displayedText")) {
+            _displayedText = json_val.getString("displayedText");
         }
-        if (json_val.Has("displayMode")) {
-            _displayMode = json_val.GetInt("displayMode");
+        if (json_val.has("displayMode")) {
+            _displayMode = json_val.getInt("displayMode");
         }
         base.imm_parseAttr(json_val);
     }

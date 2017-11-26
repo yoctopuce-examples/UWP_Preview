@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWakeUpSchedule.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YWakeUpSchedule.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindWakeUpSchedule(), the high-level API for WakeUpSchedule functions
  *
@@ -146,26 +146,26 @@ public class YWakeUpSchedule : YFunction
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("minutesA")) {
-            _minutesA = json_val.GetInt("minutesA");
+        if (json_val.has("minutesA")) {
+            _minutesA = json_val.getInt("minutesA");
         }
-        if (json_val.Has("minutesB")) {
-            _minutesB = json_val.GetInt("minutesB");
+        if (json_val.has("minutesB")) {
+            _minutesB = json_val.getInt("minutesB");
         }
-        if (json_val.Has("hours")) {
-            _hours = json_val.GetInt("hours");
+        if (json_val.has("hours")) {
+            _hours = json_val.getInt("hours");
         }
-        if (json_val.Has("weekDays")) {
-            _weekDays = json_val.GetInt("weekDays");
+        if (json_val.has("weekDays")) {
+            _weekDays = json_val.getInt("weekDays");
         }
-        if (json_val.Has("monthDays")) {
-            _monthDays = json_val.GetInt("monthDays");
+        if (json_val.has("monthDays")) {
+            _monthDays = json_val.getInt("monthDays");
         }
-        if (json_val.Has("months")) {
-            _months = json_val.GetInt("months");
+        if (json_val.has("months")) {
+            _months = json_val.getInt("months");
         }
-        if (json_val.Has("nextOccurence")) {
-            _nextOccurence = json_val.GetLong("nextOccurence");
+        if (json_val.has("nextOccurence")) {
+            _nextOccurence = json_val.getLong("nextOccurence");
         }
         base.imm_parseAttr(json_val);
     }

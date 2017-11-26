@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YDataLogger.cs 27700 2017-06-01 12:27:09Z seb $
+ * $Id: YDataLogger.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements yFindDataLogger(), the high-level API for DataLogger functions
  *
@@ -179,11 +179,11 @@ public class YDataLogger : YFunction
 
             byte[] loadval = await getData(null, null);
             YJSONArray jsonAllStreams = new YJSONArray(YAPI.DefaultEncoding.GetString(loadval));
-            jsonAllStreams.Parse();
+            jsonAllStreams.parse();
             if (jsonAllStreams.Length == 0) {
                 return YAPI.SUCCESS;
             }
-            if (jsonAllStreams.Get(0) is YJSONArray) {
+            if (jsonAllStreams.get(0) is YJSONArray) {
                 // old datalogger format: [runIdx, timerel, utc, interval]
                 _throw(YAPI.NOT_SUPPORTED, "Old datalogger is no more supported. Please upgrade your device.");
                 return YAPI.NOT_SUPPORTED;                
@@ -205,23 +205,23 @@ public class YDataLogger : YFunction
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("currentRunIndex")) {
-            _currentRunIndex = json_val.GetInt("currentRunIndex");
+        if (json_val.has("currentRunIndex")) {
+            _currentRunIndex = json_val.getInt("currentRunIndex");
         }
-        if (json_val.Has("timeUTC")) {
-            _timeUTC = json_val.GetLong("timeUTC");
+        if (json_val.has("timeUTC")) {
+            _timeUTC = json_val.getLong("timeUTC");
         }
-        if (json_val.Has("recording")) {
-            _recording = json_val.GetInt("recording");
+        if (json_val.has("recording")) {
+            _recording = json_val.getInt("recording");
         }
-        if (json_val.Has("autoStart")) {
-            _autoStart = json_val.GetInt("autoStart") > 0 ? 1 : 0;
+        if (json_val.has("autoStart")) {
+            _autoStart = json_val.getInt("autoStart") > 0 ? 1 : 0;
         }
-        if (json_val.Has("beaconDriven")) {
-            _beaconDriven = json_val.GetInt("beaconDriven") > 0 ? 1 : 0;
+        if (json_val.has("beaconDriven")) {
+            _beaconDriven = json_val.getInt("beaconDriven") > 0 ? 1 : 0;
         }
-        if (json_val.Has("clearHistory")) {
-            _clearHistory = json_val.GetInt("clearHistory") > 0 ? 1 : 0;
+        if (json_val.has("clearHistory")) {
+            _clearHistory = json_val.getInt("clearHistory") > 0 ? 1 : 0;
         }
         base.imm_parseAttr(json_val);
     }

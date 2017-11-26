@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YColorLed.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YColorLed.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindColorLed(), the high-level API for ColorLed functions
  *
@@ -161,26 +161,26 @@ public class YColorLed : YFunction
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("rgbColor")) {
-            _rgbColor = json_val.GetInt("rgbColor");
+        if (json_val.has("rgbColor")) {
+            _rgbColor = json_val.getInt("rgbColor");
         }
-        if (json_val.Has("hslColor")) {
-            _hslColor = json_val.GetInt("hslColor");
+        if (json_val.has("hslColor")) {
+            _hslColor = json_val.getInt("hslColor");
         }
-        if (json_val.Has("rgbColorAtPowerOn")) {
-            _rgbColorAtPowerOn = json_val.GetInt("rgbColorAtPowerOn");
+        if (json_val.has("rgbColorAtPowerOn")) {
+            _rgbColorAtPowerOn = json_val.getInt("rgbColorAtPowerOn");
         }
-        if (json_val.Has("blinkSeqSize")) {
-            _blinkSeqSize = json_val.GetInt("blinkSeqSize");
+        if (json_val.has("blinkSeqSize")) {
+            _blinkSeqSize = json_val.getInt("blinkSeqSize");
         }
-        if (json_val.Has("blinkSeqMaxSize")) {
-            _blinkSeqMaxSize = json_val.GetInt("blinkSeqMaxSize");
+        if (json_val.has("blinkSeqMaxSize")) {
+            _blinkSeqMaxSize = json_val.getInt("blinkSeqMaxSize");
         }
-        if (json_val.Has("blinkSeqSignature")) {
-            _blinkSeqSignature = json_val.GetInt("blinkSeqSignature");
+        if (json_val.has("blinkSeqSignature")) {
+            _blinkSeqSignature = json_val.getInt("blinkSeqSignature");
         }
-        if (json_val.Has("command")) {
-            _command = json_val.GetString("command");
+        if (json_val.has("command")) {
+            _command = json_val.getString("command");
         }
         base.imm_parseAttr(json_val);
     }

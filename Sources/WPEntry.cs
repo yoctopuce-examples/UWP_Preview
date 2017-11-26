@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: WPEntry.cs 24941 2016-07-01 08:53:57Z seb $
+ * $Id: WPEntry.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Yellow page implementation
  *
@@ -49,14 +49,14 @@ namespace com.yoctopuce.YoctoAPI {
         private readonly string _serialNumber;
 
         public WPEntry(YJSONObject json) : base() {
-            _serialNumber = json.GetString("serialNumber");
-            _logicalName = json.GetString("logicalName");
-            _productName = json.GetString("productName");
-            _productId = json.GetInt("productId");
-            string networkUrl = json.GetString("networkUrl");
+            _serialNumber = json.getString("serialNumber");
+            _logicalName = json.getString("logicalName");
+            _productName = json.getString("productName");
+            _productId = json.getInt("productId");
+            string networkUrl = json.getString("networkUrl");
             //Remove the /api of the network URL
             _networkUrl = networkUrl.Substring(0, networkUrl.Length - 4);
-            _beacon = json.GetInt("beacon");
+            _beacon = json.getInt("beacon");
         }
 
         public override string ToString() {

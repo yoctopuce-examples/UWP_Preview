@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPower.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YPower.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindPower(), the high-level API for Power functions
  *
@@ -120,14 +120,14 @@ public class YPower : YSensor
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("cosPhi")) {
-            _cosPhi = Math.Round(json_val.GetDouble("cosPhi") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("cosPhi")) {
+            _cosPhi = Math.Round(json_val.getDouble("cosPhi") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("meter")) {
-            _meter = Math.Round(json_val.GetDouble("meter") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("meter")) {
+            _meter = Math.Round(json_val.getDouble("meter") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("meterTimer")) {
-            _meterTimer = json_val.GetInt("meterTimer");
+        if (json_val.has("meterTimer")) {
+            _meterTimer = json_val.getInt("meterTimer");
         }
         base.imm_parseAttr(json_val);
     }

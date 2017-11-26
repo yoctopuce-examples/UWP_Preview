@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YModule.cs 27700 2017-06-01 12:27:09Z seb $
+ * $Id: YModule.cs 29240 2017-11-23 13:29:57Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -290,32 +290,32 @@ public class YModule : YFunction
             YJSONArray jsonout = new YJSONArray();
             string accutalSettingsStr = YAPI.DefaultEncoding.GetString(actualSettings);            
             YJSONObject json = new YJSONObject(accutalSettingsStr);
-            json.Parse();
-            List<string> functionList = json.Keys();
+            json.parse();
+            List<string> functionList = json.keys();
             foreach (string fun_key in functionList)
             {
                 if (!fun_key.Equals("services")) {
-                    YJSONObject functionJson = json.GetYJSONObject(fun_key);
+                    YJSONObject functionJson = json.getYJSONObject(fun_key);
                     if (functionJson == null) {
                         continue;
                     }
-                    List<string> attr_keys = functionJson.Keys();
+                    List<string> attr_keys = functionJson.keys();
                     foreach (string attr_key in attr_keys)
                     {
-                        if (!functionJson.Has(attr_key)) {
+                        if (!functionJson.has(attr_key)) {
                             continue;
                         }
-                        YJSONContent value = functionJson.Get(attr_key);
+                        YJSONContent value = functionJson.get(attr_key);
                         if (value == null) {
                             continue;
                         }
                         string flat_attr = fun_key + "/" + attr_key + "=" + value.ToString();
-                        jsonout.Put(flat_attr);
+                        jsonout.put(flat_attr);
                     }
                 }
 
             }
-            return YAPI.DefaultEncoding.GetBytes(jsonout.ToJSON());
+            return YAPI.DefaultEncoding.GetBytes(jsonout.toJSON());
         }
 
 
@@ -366,41 +366,41 @@ public class YModule : YFunction
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("productName")) {
-            _productName = json_val.GetString("productName");
+        if (json_val.has("productName")) {
+            _productName = json_val.getString("productName");
         }
-        if (json_val.Has("serialNumber")) {
-            _serialNumber = json_val.GetString("serialNumber");
+        if (json_val.has("serialNumber")) {
+            _serialNumber = json_val.getString("serialNumber");
         }
-        if (json_val.Has("productId")) {
-            _productId = json_val.GetInt("productId");
+        if (json_val.has("productId")) {
+            _productId = json_val.getInt("productId");
         }
-        if (json_val.Has("productRelease")) {
-            _productRelease = json_val.GetInt("productRelease");
+        if (json_val.has("productRelease")) {
+            _productRelease = json_val.getInt("productRelease");
         }
-        if (json_val.Has("firmwareRelease")) {
-            _firmwareRelease = json_val.GetString("firmwareRelease");
+        if (json_val.has("firmwareRelease")) {
+            _firmwareRelease = json_val.getString("firmwareRelease");
         }
-        if (json_val.Has("persistentSettings")) {
-            _persistentSettings = json_val.GetInt("persistentSettings");
+        if (json_val.has("persistentSettings")) {
+            _persistentSettings = json_val.getInt("persistentSettings");
         }
-        if (json_val.Has("luminosity")) {
-            _luminosity = json_val.GetInt("luminosity");
+        if (json_val.has("luminosity")) {
+            _luminosity = json_val.getInt("luminosity");
         }
-        if (json_val.Has("beacon")) {
-            _beacon = json_val.GetInt("beacon") > 0 ? 1 : 0;
+        if (json_val.has("beacon")) {
+            _beacon = json_val.getInt("beacon") > 0 ? 1 : 0;
         }
-        if (json_val.Has("upTime")) {
-            _upTime = json_val.GetLong("upTime");
+        if (json_val.has("upTime")) {
+            _upTime = json_val.getLong("upTime");
         }
-        if (json_val.Has("usbCurrent")) {
-            _usbCurrent = json_val.GetInt("usbCurrent");
+        if (json_val.has("usbCurrent")) {
+            _usbCurrent = json_val.getInt("usbCurrent");
         }
-        if (json_val.Has("rebootCountdown")) {
-            _rebootCountdown = json_val.GetInt("rebootCountdown");
+        if (json_val.has("rebootCountdown")) {
+            _rebootCountdown = json_val.getInt("rebootCountdown");
         }
-        if (json_val.Has("userVar")) {
-            _userVar = json_val.GetInt("userVar");
+        if (json_val.has("userVar")) {
+            _userVar = json_val.getInt("userVar");
         }
         base.imm_parseAttr(json_val);
     }
@@ -1955,6 +1955,7 @@ public class YModule : YFunction
         for (int ii = 0; ii < restoreLast.Count; ii++) {
             await this._download(restoreLast[ii]);
         }
+        await this.clearCache();
         return YAPI.SUCCESS;
     }
 

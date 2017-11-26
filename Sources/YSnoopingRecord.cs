@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSnoopingRecord.cs 28670 2017-09-27 08:28:39Z seb $
+ * $Id: YSnoopingRecord.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindSnoopingRecord(), the high-level API for SnoopingRecord functions
  *
@@ -68,9 +68,9 @@ public class YSnoopingRecord
     internal YSnoopingRecord(string json_str)
     {
         YJSONObject json = new YJSONObject(json_str);
-        json.Parse();
-        _tim = json.GetInt("t");
-        string m = json.GetString("m");
+        json.parse();
+        _tim = json.getInt("t");
+        string m = json.getString("m");
         _dir = (m[0] == '<' ? 1 : 0);
         _msg = m.Substring(1);
     }

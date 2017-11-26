@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCurrentLoopOutput.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YCurrentLoopOutput.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindCurrentLoopOutput(), the high-level API for CurrentLoopOutput functions
  *
@@ -127,17 +127,17 @@ public class YCurrentLoopOutput : YFunction
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("current")) {
-            _current = Math.Round(json_val.GetDouble("current") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("current")) {
+            _current = Math.Round(json_val.getDouble("current") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("currentTransition")) {
-            _currentTransition = json_val.GetString("currentTransition");
+        if (json_val.has("currentTransition")) {
+            _currentTransition = json_val.getString("currentTransition");
         }
-        if (json_val.Has("currentAtStartUp")) {
-            _currentAtStartUp = Math.Round(json_val.GetDouble("currentAtStartUp") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("currentAtStartUp")) {
+            _currentAtStartUp = Math.Round(json_val.getDouble("currentAtStartUp") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("loopPower")) {
-            _loopPower = json_val.GetInt("loopPower");
+        if (json_val.has("loopPower")) {
+            _loopPower = json_val.getInt("loopPower");
         }
         base.imm_parseAttr(json_val);
     }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YHumidity.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YHumidity.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindHumidity(), the high-level API for Humidity functions
  *
@@ -112,11 +112,11 @@ public class YHumidity : YSensor
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("relHum")) {
-            _relHum = Math.Round(json_val.GetDouble("relHum") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("relHum")) {
+            _relHum = Math.Round(json_val.getDouble("relHum") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("absHum")) {
-            _absHum = Math.Round(json_val.GetDouble("absHum") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("absHum")) {
+            _absHum = Math.Round(json_val.getDouble("absHum") * 1000.0 / 65536.0) / 1000.0;
         }
         base.imm_parseAttr(json_val);
     }

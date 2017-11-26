@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDualPower.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YDualPower.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindDualPower(), the high-level API for DualPower functions
  *
@@ -127,14 +127,14 @@ public class YDualPower : YFunction
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("powerState")) {
-            _powerState = json_val.GetInt("powerState");
+        if (json_val.has("powerState")) {
+            _powerState = json_val.getInt("powerState");
         }
-        if (json_val.Has("powerControl")) {
-            _powerControl = json_val.GetInt("powerControl");
+        if (json_val.has("powerControl")) {
+            _powerControl = json_val.getInt("powerControl");
         }
-        if (json_val.Has("extVoltage")) {
-            _extVoltage = json_val.GetInt("extVoltage");
+        if (json_val.has("extVoltage")) {
+            _extVoltage = json_val.getInt("extVoltage");
         }
         base.imm_parseAttr(json_val);
     }

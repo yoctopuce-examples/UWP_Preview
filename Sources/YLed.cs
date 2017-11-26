@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YLed.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YLed.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindLed(), the high-level API for Led functions
  *
@@ -126,14 +126,14 @@ public class YLed : YFunction
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("power")) {
-            _power = json_val.GetInt("power") > 0 ? 1 : 0;
+        if (json_val.has("power")) {
+            _power = json_val.getInt("power") > 0 ? 1 : 0;
         }
-        if (json_val.Has("luminosity")) {
-            _luminosity = json_val.GetInt("luminosity");
+        if (json_val.has("luminosity")) {
+            _luminosity = json_val.getInt("luminosity");
         }
-        if (json_val.Has("blinking")) {
-            _blinking = json_val.GetInt("blinking");
+        if (json_val.has("blinking")) {
+            _blinking = json_val.getInt("blinking");
         }
         base.imm_parseAttr(json_val);
     }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YProximity.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YProximity.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindProximity(), the high-level API for Proximity functions
  *
@@ -161,29 +161,29 @@ public class YProximity : YSensor
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("signalValue")) {
-            _signalValue = Math.Round(json_val.GetDouble("signalValue") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("signalValue")) {
+            _signalValue = Math.Round(json_val.getDouble("signalValue") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("detectionThreshold")) {
-            _detectionThreshold = json_val.GetInt("detectionThreshold");
+        if (json_val.has("detectionThreshold")) {
+            _detectionThreshold = json_val.getInt("detectionThreshold");
         }
-        if (json_val.Has("isPresent")) {
-            _isPresent = json_val.GetInt("isPresent") > 0 ? 1 : 0;
+        if (json_val.has("isPresent")) {
+            _isPresent = json_val.getInt("isPresent") > 0 ? 1 : 0;
         }
-        if (json_val.Has("lastTimeApproached")) {
-            _lastTimeApproached = json_val.GetLong("lastTimeApproached");
+        if (json_val.has("lastTimeApproached")) {
+            _lastTimeApproached = json_val.getLong("lastTimeApproached");
         }
-        if (json_val.Has("lastTimeRemoved")) {
-            _lastTimeRemoved = json_val.GetLong("lastTimeRemoved");
+        if (json_val.has("lastTimeRemoved")) {
+            _lastTimeRemoved = json_val.getLong("lastTimeRemoved");
         }
-        if (json_val.Has("pulseCounter")) {
-            _pulseCounter = json_val.GetLong("pulseCounter");
+        if (json_val.has("pulseCounter")) {
+            _pulseCounter = json_val.getLong("pulseCounter");
         }
-        if (json_val.Has("pulseTimer")) {
-            _pulseTimer = json_val.GetLong("pulseTimer");
+        if (json_val.has("pulseTimer")) {
+            _pulseTimer = json_val.getLong("pulseTimer");
         }
-        if (json_val.Has("proximityReportMode")) {
-            _proximityReportMode = json_val.GetInt("proximityReportMode");
+        if (json_val.has("proximityReportMode")) {
+            _proximityReportMode = json_val.getInt("proximityReportMode");
         }
         base.imm_parseAttr(json_val);
     }

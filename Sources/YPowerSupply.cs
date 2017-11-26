@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPowerSupply.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YPowerSupply.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindPowerSupply(), the high-level API for PowerSupply functions
  *
@@ -191,44 +191,44 @@ public class YPowerSupply : YFunction
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("voltageSetPoint")) {
-            _voltageSetPoint = Math.Round(json_val.GetDouble("voltageSetPoint") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("voltageSetPoint")) {
+            _voltageSetPoint = Math.Round(json_val.getDouble("voltageSetPoint") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("currentLimit")) {
-            _currentLimit = Math.Round(json_val.GetDouble("currentLimit") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("currentLimit")) {
+            _currentLimit = Math.Round(json_val.getDouble("currentLimit") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("powerOutput")) {
-            _powerOutput = json_val.GetInt("powerOutput") > 0 ? 1 : 0;
+        if (json_val.has("powerOutput")) {
+            _powerOutput = json_val.getInt("powerOutput") > 0 ? 1 : 0;
         }
-        if (json_val.Has("voltageSense")) {
-            _voltageSense = json_val.GetInt("voltageSense");
+        if (json_val.has("voltageSense")) {
+            _voltageSense = json_val.getInt("voltageSense");
         }
-        if (json_val.Has("measuredVoltage")) {
-            _measuredVoltage = Math.Round(json_val.GetDouble("measuredVoltage") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("measuredVoltage")) {
+            _measuredVoltage = Math.Round(json_val.getDouble("measuredVoltage") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("measuredCurrent")) {
-            _measuredCurrent = Math.Round(json_val.GetDouble("measuredCurrent") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("measuredCurrent")) {
+            _measuredCurrent = Math.Round(json_val.getDouble("measuredCurrent") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("inputVoltage")) {
-            _inputVoltage = Math.Round(json_val.GetDouble("inputVoltage") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("inputVoltage")) {
+            _inputVoltage = Math.Round(json_val.getDouble("inputVoltage") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("vInt")) {
-            _vInt = Math.Round(json_val.GetDouble("vInt") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("vInt")) {
+            _vInt = Math.Round(json_val.getDouble("vInt") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("ldoTemperature")) {
-            _ldoTemperature = Math.Round(json_val.GetDouble("ldoTemperature") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("ldoTemperature")) {
+            _ldoTemperature = Math.Round(json_val.getDouble("ldoTemperature") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("voltageTransition")) {
-            _voltageTransition = json_val.GetString("voltageTransition");
+        if (json_val.has("voltageTransition")) {
+            _voltageTransition = json_val.getString("voltageTransition");
         }
-        if (json_val.Has("voltageAtStartUp")) {
-            _voltageAtStartUp = Math.Round(json_val.GetDouble("voltageAtStartUp") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("voltageAtStartUp")) {
+            _voltageAtStartUp = Math.Round(json_val.getDouble("voltageAtStartUp") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("currentAtStartUp")) {
-            _currentAtStartUp = Math.Round(json_val.GetDouble("currentAtStartUp") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("currentAtStartUp")) {
+            _currentAtStartUp = Math.Round(json_val.getDouble("currentAtStartUp") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("command")) {
-            _command = json_val.GetString("command");
+        if (json_val.has("command")) {
+            _command = json_val.getString("command");
         }
         base.imm_parseAttr(json_val);
     }

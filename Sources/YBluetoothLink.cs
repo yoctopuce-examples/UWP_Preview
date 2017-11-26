@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YBluetoothLink.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YBluetoothLink.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindBluetoothLink(), the high-level API for BluetoothLink functions
  *
@@ -174,35 +174,35 @@ public class YBluetoothLink : YFunction
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("ownAddress")) {
-            _ownAddress = json_val.GetString("ownAddress");
+        if (json_val.has("ownAddress")) {
+            _ownAddress = json_val.getString("ownAddress");
         }
-        if (json_val.Has("pairingPin")) {
-            _pairingPin = json_val.GetString("pairingPin");
+        if (json_val.has("pairingPin")) {
+            _pairingPin = json_val.getString("pairingPin");
         }
-        if (json_val.Has("remoteAddress")) {
-            _remoteAddress = json_val.GetString("remoteAddress");
+        if (json_val.has("remoteAddress")) {
+            _remoteAddress = json_val.getString("remoteAddress");
         }
-        if (json_val.Has("remoteName")) {
-            _remoteName = json_val.GetString("remoteName");
+        if (json_val.has("remoteName")) {
+            _remoteName = json_val.getString("remoteName");
         }
-        if (json_val.Has("mute")) {
-            _mute = json_val.GetInt("mute") > 0 ? 1 : 0;
+        if (json_val.has("mute")) {
+            _mute = json_val.getInt("mute") > 0 ? 1 : 0;
         }
-        if (json_val.Has("preAmplifier")) {
-            _preAmplifier = json_val.GetInt("preAmplifier");
+        if (json_val.has("preAmplifier")) {
+            _preAmplifier = json_val.getInt("preAmplifier");
         }
-        if (json_val.Has("volume")) {
-            _volume = json_val.GetInt("volume");
+        if (json_val.has("volume")) {
+            _volume = json_val.getInt("volume");
         }
-        if (json_val.Has("linkState")) {
-            _linkState = json_val.GetInt("linkState");
+        if (json_val.has("linkState")) {
+            _linkState = json_val.getInt("linkState");
         }
-        if (json_val.Has("linkQuality")) {
-            _linkQuality = json_val.GetInt("linkQuality");
+        if (json_val.has("linkQuality")) {
+            _linkQuality = json_val.getInt("linkQuality");
         }
-        if (json_val.Has("command")) {
-            _command = json_val.GetString("command");
+        if (json_val.has("command")) {
+            _command = json_val.getString("command");
         }
         base.imm_parseAttr(json_val);
     }

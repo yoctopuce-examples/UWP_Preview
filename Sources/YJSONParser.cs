@@ -8,8 +8,6 @@ using System.Text;
 namespace com.yoctopuce.YoctoAPI
 
 {
-
-
     internal enum Tjstate
     {
         JSTART,
@@ -24,80 +22,128 @@ namespace com.yoctopuce.YoctoAPI
         JWAITFORINTVALUE,
         JWAITFORBOOLVALUE
     }
-
-
-
     internal abstract class YJSONContent
     {
-        protected string _data;
-        protected int _data_start;
-        protected int _data_len;
-        protected int _data_boundary;
-        protected string debug;
+        internal string _data;
+        internal int _data_start;
+        internal int _data_len;
+        internal int _data_boundary;
 
-        public YJSONContent(string data, int start, int stop)
+        internal YJSONType _type;
+        //protected string debug;
+
+        internal enum YJSONType
+        {
+            STRING,
+            NUMBER,
+            ARRAY,
+            OBJECT
+        }
+
+        protected enum Tjstate
+        {
+            JSTART,
+            JWAITFORNAME,
+            JWAITFORENDOFNAME,
+            JWAITFORCOLON,
+            JWAITFORDATA,
+            JWAITFORNEXTSTRUCTMEMBER,
+            JWAITFORNEXTARRAYITEM,
+            JWAITFORSTRINGVALUE,
+            JWAITFORSTRINGVALUE_ESC,
+            JWAITFORINTVALUE,
+            JWAITFORBOOLVALUE
+        }
+
+        internal static YJSONContent ParseJson(string data, int start, int stop)
+        {
+            int cur_pos = SkipGarbage(data, start, stop);
+            YJSONContent res;
+            if (data[cur_pos] == '[') {
+                res = new YJSONArray(data, start, stop);
+            } else if (data[cur_pos] == '{') {
+                res = new YJSONObject(data, start, stop);
+            } else if (data[cur_pos] == '"') {
+                res = new YJSONString(data, start, stop);
+            } else {
+                res = new YJSONNumber(data, start, stop);
+            }
+            res.parse();
+            return res;
+        }
+
+        protected YJSONContent(string data, int start, int stop, YJSONType type)
         {
             _data = data;
             _data_start = start;
             _data_boundary = stop;
-            debug = data.Substring(start, stop - start);
-
+            _type = type;
         }
 
-        public YJSONContent()
+        protected YJSONContent(YJSONType type)
         {
             _data = null;
         }
 
-        public abstract int Parse();
-
-        protected int SkipGarbage(int i)
+        public YJSONType getJSONType()
         {
-            if (_data.Length <= i) {
-                return i;
-            }
-            char sti = _data[i];
-            while (i < _data_boundary && (sti == '\n' | sti == '\r' | sti == ' ')) {
-                i++;
-            }
-            return i;
+            return _type;
         }
+
+        public abstract int parse();
+
+        protected static int SkipGarbage(string data, int start, int stop)
+        {
+            if (data.Length <= start) {
+                return start;
+            }
+            char sti = data[start];
+            while (start < stop && (sti == '\n' || sti == '\r' || sti == ' ')) {
+                start++;
+            }
+            return start;
+        }
+
         protected string FormatError(string errmsg, int cur_pos)
         {
             int ststart = cur_pos - 10;
             int stend = cur_pos + 10;
-            if (ststart < 0) ststart = 0;
-            if (stend > _data_boundary) stend = _data_boundary;
+            if (ststart < 0)
+                ststart = 0;
+            if (stend > _data_boundary)
+                stend = _data_boundary;
+            if (_data == null) {
+                return errmsg;
+            }
             return errmsg + " near " + _data.Substring(ststart, cur_pos - ststart) + _data.Substring(cur_pos, stend - cur_pos);
         }
 
-        public abstract string ToJSON();
+        public abstract string toJSON();
     }
+
 
     internal class YJSONArray : YJSONContent
     {
         private List<YJSONContent> _arrayValue = new List<YJSONContent>();
 
-        public YJSONArray(string data, int start, int stop) : base(data, start, stop)
-        {}
+        public YJSONArray(string data, int start, int stop) : base(data, start, stop, YJSONType.ARRAY)
+        { }
 
-        public YJSONArray(string data) : this(data,0, data.Length)
-        {}
+        public YJSONArray(string data) : this(data, 0, data.Length)
+        { }
 
-        public YJSONArray() : base()
-        {
-            
+        public YJSONArray() : base(YJSONType.ARRAY)
+        { }
+
+        public int Length {
+            get {
+                return _arrayValue.Count;
+            }
         }
 
-        public int Length
+        public override int parse()
         {
-            get { return _arrayValue.Count; }
-        }
-
-        public override int Parse()
-        {
-            int cur_pos = _data_start;
-            cur_pos = SkipGarbage(cur_pos);
+            int cur_pos = SkipGarbage(_data, _data_start, _data_boundary);
 
             if (_data[cur_pos] != '[') {
                 throw new System.Exception(FormatError("Opening braces was expected", cur_pos));
@@ -111,40 +157,40 @@ namespace com.yoctopuce.YoctoAPI
                     case Tjstate.JWAITFORDATA:
                         if (sti == '{') {
                             YJSONObject jobj = new YJSONObject(_data, cur_pos, _data_boundary);
-                            int len = jobj.Parse();
+                            int len = jobj.parse();
                             cur_pos += len;
                             _arrayValue.Add(jobj);
                             state = Tjstate.JWAITFORNEXTARRAYITEM;
-                            //cur_pos is allready incremented
+                            //cur_pos is already incremented
                             continue;
                         } else if (sti == '[') {
                             YJSONArray jobj = new YJSONArray(_data, cur_pos, _data_boundary);
-                            int len = jobj.Parse();
+                            int len = jobj.parse();
                             cur_pos += len;
                             _arrayValue.Add(jobj);
                             state = Tjstate.JWAITFORNEXTARRAYITEM;
-                            //cur_pos is allready incremented
+                            //cur_pos is already incremented
                             continue;
                         } else if (sti == '"') {
                             YJSONString jobj = new YJSONString(_data, cur_pos, _data_boundary);
-                            int len = jobj.Parse();
+                            int len = jobj.parse();
                             cur_pos += len;
                             _arrayValue.Add(jobj);
                             state = Tjstate.JWAITFORNEXTARRAYITEM;
-                            //cur_pos is allready incremented
+                            //cur_pos is already incremented
                             continue;
                         } else if (sti == '-' || (sti >= '0' && sti <= '9')) {
-                            GetYJSONNumber jobj = new GetYJSONNumber(_data, cur_pos, _data_boundary);
-                            int len = jobj.Parse();
+                            YJSONNumber jobj = new YJSONNumber(_data, cur_pos, _data_boundary);
+                            int len = jobj.parse();
                             cur_pos += len;
                             _arrayValue.Add(jobj);
                             state = Tjstate.JWAITFORNEXTARRAYITEM;
-                            //cur_pos is allready incremented
+                            //cur_pos is already incremented
                             continue;
-                        } else if (sti == ']') { 
+                        } else if (sti == ']') {
                             _data_len = cur_pos + 1 - _data_start;
                             return _data_len;
-                        } else if (sti != ' ' & sti != '\n' & sti != ' ') {
+                        } else if (sti != ' ' && sti != '\n' && sti != '\r') {
                             throw new System.Exception(FormatError("invalid char: was expecting  \",0..9,t or f", cur_pos));
                         }
                         break;
@@ -155,7 +201,7 @@ namespace com.yoctopuce.YoctoAPI
                             _data_len = cur_pos + 1 - _data_start;
                             return _data_len;
                         } else {
-                            if (sti != ' ' && sti != '\n' && sti != ' ') {
+                            if (sti != ' ' && sti != '\n' && sti != '\r') {
                                 throw new System.Exception(FormatError("invalid char: was expecting ,", cur_pos));
                             }
                         }
@@ -168,55 +214,53 @@ namespace com.yoctopuce.YoctoAPI
             throw new System.Exception(FormatError("unexpected end of data", cur_pos));
         }
 
-       
-
-        public YJSONObject GetYJSONObject(int i)
+        public YJSONObject getYJSONObject(int i)
         {
-            return (YJSONObject)_arrayValue[i];
+            return (YJSONObject) _arrayValue[i];
         }
 
-        public string GetString(int i)
+        public string getString(int i)
         {
-            YJSONString ystr = (YJSONString)_arrayValue[i];
-            return ystr.GetString();
+            YJSONString ystr = (YJSONString) _arrayValue[i];
+            return ystr.getString();
         }
 
-        public YJSONContent Get(int i)
+        public YJSONContent get(int i)
         {
             return _arrayValue[i];
         }
 
-        public YJSONArray GetYJSONArray(int i)
+        public YJSONArray getYJSONArray(int i)
         {
-            return (YJSONArray)_arrayValue[i];
+            return (YJSONArray) _arrayValue[i];
         }
 
-        public int GetInt(int i)
+        public int getInt(int i)
         {
-            GetYJSONNumber ystr = (GetYJSONNumber)_arrayValue[i];
-            return ystr.GetInt();
+            YJSONNumber ystr = (YJSONNumber) _arrayValue[i];
+            return ystr.getInt();
         }
 
-        public long GetLong(int i)
+        public long getLong(int i)
         {
-            GetYJSONNumber ystr = (GetYJSONNumber)_arrayValue[i];
-            return ystr.GetLong();
+            YJSONNumber ystr = (YJSONNumber) _arrayValue[i];
+            return ystr.getLong();
         }
 
-        public void Put(string flatAttr)
+        public void put(string flatAttr)
         {
             YJSONString strobj = new YJSONString();
             strobj.setContent(flatAttr);
             _arrayValue.Add(strobj);
         }
 
-        public override string ToJSON()
+        public override string toJSON()
         {
             StringBuilder res = new StringBuilder();
             res.Append('[');
             string sep = "";
             foreach (YJSONContent yjsonContent in _arrayValue) {
-                string subres = yjsonContent.ToJSON();
+                string subres = yjsonContent.toJSON();
                 res.Append(sep);
                 res.Append(subres);
                 sep = ",";
@@ -229,9 +273,8 @@ namespace com.yoctopuce.YoctoAPI
         {
             StringBuilder res = new StringBuilder();
             res.Append('[');
-            string sep ="";
-            foreach (YJSONContent yjsonContent in _arrayValue)
-            {
+            string sep = "";
+            foreach (YJSONContent yjsonContent in _arrayValue) {
                 string subres = yjsonContent.ToString();
                 res.Append(sep);
                 res.Append(subres);
@@ -240,38 +283,31 @@ namespace com.yoctopuce.YoctoAPI
             res.Append(']');
             return res.ToString();
         }
-
-
     }
 
     internal class YJSONString : YJSONContent
     {
         private string _stringValue;
 
-        public YJSONString(string data, int start, int stop) : base(data, start, stop)
-        {
-        }
+        public YJSONString(string data, int start, int stop) : base(data, start, stop, YJSONType.STRING)
+        { }
 
-        public YJSONString(string data): this(data,0, data.Length)
-        {
-        }
+        public YJSONString(string data) : this(data, 0, data.Length)
+        { }
 
-        public YJSONString()
-        {
-        }
+        public YJSONString() : base(YJSONType.STRING)
+        { }
 
-        public override int Parse()
+        public override int parse()
         {
-            int str_start;
             string value = "";
-            int cur_pos = _data_start;
-            cur_pos = SkipGarbage(cur_pos);
+            int cur_pos = SkipGarbage(_data, _data_start, _data_boundary);
 
             if (_data[cur_pos] != '"') {
                 throw new System.Exception(FormatError("double quote was expected", cur_pos));
             }
             cur_pos++;
-            str_start = cur_pos;
+            int str_start = cur_pos;
             Tjstate state = Tjstate.JWAITFORSTRINGVALUE;
 
             while (cur_pos < _data_boundary) {
@@ -304,14 +340,12 @@ namespace com.yoctopuce.YoctoAPI
             throw new System.Exception(FormatError("unexpected end of data", cur_pos));
         }
 
-        public override string ToJSON()
+        public override string toJSON()
         {
-            StringBuilder res = new StringBuilder(_stringValue.Length*2);
+            StringBuilder res = new StringBuilder(_stringValue.Length * 2);
             res.Append('"');
-            foreach (char c in _stringValue)
-            {
-                switch (c)
-                {
+            foreach (char c in _stringValue) {
+                switch (c) {
                     case '"':
                         res.Append("\\\"");
                         break;
@@ -340,13 +374,12 @@ namespace com.yoctopuce.YoctoAPI
                         res.Append(c);
                         break;
                 }
-               
             }
             res.Append('"');
             return res.ToString();
         }
 
-        public string GetString()
+        public string getString()
         {
             return _stringValue;
         }
@@ -363,24 +396,22 @@ namespace com.yoctopuce.YoctoAPI
     }
 
 
-    internal class GetYJSONNumber : YJSONContent
+    internal class YJSONNumber : YJSONContent
     {
         private long _intValue = 0;
         private double _doubleValue = 0;
         private bool _isFloat = false;
 
-        public GetYJSONNumber(string data, int start, int stop) : base(data, start, stop)
-        {
-        }
+        public YJSONNumber(string data, int start, int stop) : base(data, start, stop, YJSONType.NUMBER)
+        { }
 
-        public override int Parse()
+        public override int parse()
         {
 
             bool neg = false;
             int start, dotPos;
             char sti;
-            int cur_pos = _data_start;
-            cur_pos = SkipGarbage(cur_pos);
+            int cur_pos = SkipGarbage(_data, _data_start, _data_boundary);
             sti = _data[cur_pos];
             if (sti == '-') {
                 neg = true;
@@ -409,10 +440,10 @@ namespace com.yoctopuce.YoctoAPI
                 }
                 cur_pos++;
             }
-            throw new System.Exception(FormatError("unexpected end of data", cur_pos)); throw new NotImplementedException();
+            throw new System.Exception(FormatError("unexpected end of data", cur_pos));
         }
 
-        public override string ToJSON()
+        public override string toJSON()
         {
             if (_isFloat)
                 return _doubleValue.ToString();
@@ -420,18 +451,28 @@ namespace com.yoctopuce.YoctoAPI
                 return _intValue.ToString();
         }
 
-        public long GetLong()
+        public long getLong()
         {
-            return _intValue;
-        }
-        public int GetInt()
-        {
-            return (int) _intValue;
+            if (_isFloat)
+                return (long)_doubleValue;
+            else
+                return _intValue;
         }
 
-        public double GetDouble()
+        public int getInt()
         {
-            return _doubleValue;
+            if (_isFloat)
+                return (int)_doubleValue;
+            else
+                return (int)_intValue;
+        }
+
+        public double getDouble()
+        {
+            if (_isFloat)
+                return _doubleValue;
+            else
+                return _intValue;
         }
 
         public override string ToString()
@@ -442,29 +483,26 @@ namespace com.yoctopuce.YoctoAPI
                 return _intValue.ToString();
         }
     }
-    
+
 
     internal class YJSONObject : YJSONContent
     {
-        Dictionary<string, YJSONContent> parsed = new Dictionary<string, YJSONContent>();
+        readonly Dictionary<string, YJSONContent> parsed = new Dictionary<string, YJSONContent>();
+        readonly List<string> _keys = new List<string>(16);
 
+        public YJSONObject(string data) : base(data, 0, data.Length, YJSONType.OBJECT)
+        { }
 
-        public YJSONObject(string data) : base(data, 0, data.Length)
-        {
-        }
+        public YJSONObject(string data, int start, int len) : base(data, start, len, YJSONType.OBJECT)
+        { }
 
-        public YJSONObject(string data, int start, int len) : base(data, start, len)
-        {
-        }
-
-        public override int Parse()
+        public override int parse()
         {
             string current_name = "";
             int name_start = _data_start;
-            int cur_pos = _data_start;
-            cur_pos = SkipGarbage(cur_pos);
+            int cur_pos = SkipGarbage(_data, _data_start, _data_boundary);
 
-            if (_data.Length <=cur_pos ||  _data[cur_pos] != '{') {
+            if (_data.Length <= cur_pos || _data[cur_pos] != '{') {
                 throw new System.Exception(FormatError("Opening braces was expected", cur_pos));
             }
             cur_pos++;
@@ -482,7 +520,7 @@ namespace com.yoctopuce.YoctoAPI
                             _data_len = cur_pos + 1 - _data_start;
                             return _data_len;
                         } else {
-                            if (sti != ' ' && sti != '\n' && sti != ' ') {
+                            if (sti != ' ' && sti != '\n' && sti != '\r') {
                                 throw new System.Exception(FormatError("invalid char: was expecting \"", cur_pos));
                             }
                         }
@@ -494,8 +532,7 @@ namespace com.yoctopuce.YoctoAPI
 
                         } else {
                             if (sti < 32) {
-                                throw new System.Exception(
-                                    FormatError("invalid char: was expecting an identifier compliant char", cur_pos));
+                                throw new System.Exception(FormatError("invalid char: was expecting an identifier compliant char", cur_pos));
                             }
                         }
                         break;
@@ -503,7 +540,7 @@ namespace com.yoctopuce.YoctoAPI
                         if (sti == ':') {
                             state = Tjstate.JWAITFORDATA;
                         } else {
-                            if (sti != ' ' & sti != '\n' & sti != ' ') {
+                            if (sti != ' ' && sti != '\n' && sti != '\r') {
                                 throw new System.Exception(
                                     FormatError("invalid char: was expecting \"", cur_pos));
                             }
@@ -512,37 +549,41 @@ namespace com.yoctopuce.YoctoAPI
                     case Tjstate.JWAITFORDATA:
                         if (sti == '{') {
                             YJSONObject jobj = new YJSONObject(_data, cur_pos, _data_boundary);
-                            int len = jobj.Parse();
+                            int len = jobj.parse();
                             cur_pos += len;
                             parsed.Add(current_name, jobj);
+                            _keys.Add(current_name);
                             state = Tjstate.JWAITFORNEXTSTRUCTMEMBER;
-                            //cur_pos is allready incremented
+                            //cur_pos is already incremented
                             continue;
                         } else if (sti == '[') {
                             YJSONArray jobj = new YJSONArray(_data, cur_pos, _data_boundary);
-                            int len = jobj.Parse();
+                            int len = jobj.parse();
                             cur_pos += len;
                             parsed.Add(current_name, jobj);
+                            _keys.Add(current_name);
                             state = Tjstate.JWAITFORNEXTSTRUCTMEMBER;
-                            //cur_pos is allready incremented
+                            //cur_pos is already incremented
                             continue;
                         } else if (sti == '"') {
                             YJSONString jobj = new YJSONString(_data, cur_pos, _data_boundary);
-                            int len = jobj.Parse();
+                            int len = jobj.parse();
                             cur_pos += len;
                             parsed.Add(current_name, jobj);
+                            _keys.Add(current_name);
                             state = Tjstate.JWAITFORNEXTSTRUCTMEMBER;
-                            //cur_pos is allready incremented
+                            //cur_pos is already incremented
                             continue;
-                        } else if (sti=='-' || (sti >= '0' && sti <= '9')) {
-                            GetYJSONNumber jobj = new GetYJSONNumber(_data, cur_pos, _data_boundary);
-                            int len = jobj.Parse();
+                        } else if (sti == '-' || (sti >= '0' && sti <= '9')) {
+                            YJSONNumber jobj = new YJSONNumber(_data, cur_pos, _data_boundary);
+                            int len = jobj.parse();
                             cur_pos += len;
                             parsed.Add(current_name, jobj);
+                            _keys.Add(current_name);
                             state = Tjstate.JWAITFORNEXTSTRUCTMEMBER;
-                            //cur_pos is allready incremented
+                            //cur_pos is already incremented
                             continue;
-                        } else if (sti != ' ' & sti != '\n' & sti != ' ') {
+                        } else if (sti != ' ' && sti != '\n' && sti != '\r') {
                             throw new System.Exception(FormatError("invalid char: was expecting  \",0..9,t or f", cur_pos));
                         }
                         break;
@@ -554,12 +595,11 @@ namespace com.yoctopuce.YoctoAPI
                             _data_len = cur_pos + 1 - _data_start;
                             return _data_len;
                         } else {
-                            if (sti != ' ' && sti != '\n' && sti != ' ') {
+                            if (sti != ' ' && sti != '\n' && sti != '\r') {
                                 throw new System.Exception(FormatError("invalid char: was expecting ,", cur_pos));
                             }
                         }
                         break;
-
                     case Tjstate.JWAITFORNEXTARRAYITEM:
                     case Tjstate.JWAITFORSTRINGVALUE:
                     case Tjstate.JWAITFORINTVALUE:
@@ -571,79 +611,78 @@ namespace com.yoctopuce.YoctoAPI
             throw new System.Exception(FormatError("unexpected end of data", cur_pos));
         }
 
-
-        public bool Has(string key)
+        public bool has(string key)
         {
             return parsed.ContainsKey(key);
         }
 
-        public YJSONObject GetYJSONObject(string key)
+        public YJSONObject getYJSONObject(string key)
         {
             return (YJSONObject)parsed[key];
         }
 
-        public YJSONString GetYJSONString(string key)
+        internal YJSONString getYJSONString(string key)
         {
             return (YJSONString)parsed[key];
         }
 
-        public YJSONArray GetYJSONArray(string key)
+        internal YJSONArray getYJSONArray(string key)
         {
             return (YJSONArray)parsed[key];
         }
 
-        public List<string> Keys()
+        public List<string> keys()
         {
             return parsed.Keys.ToList();
         }
 
-        public GetYJSONNumber GetYJSONNumber(string key)
+        internal YJSONNumber getYJSONNumber(string key)
         {
-            return (GetYJSONNumber)parsed[key];
+            return (YJSONNumber)parsed[key];
         }
 
-        public void Remove(string key)
+        public void remove(string key)
         {
             parsed.Remove(key);
         }
 
-        public string GetString(string key)
+        public string getString(string key)
         {
-            YJSONString ystr =(YJSONString)parsed[key];
-            return ystr.GetString();
+            YJSONString ystr = (YJSONString)parsed[key];
+            return ystr.getString();
         }
 
-        public int GetInt(string key)
+        public int getInt(string key)
         {
-            GetYJSONNumber yint = (GetYJSONNumber) parsed[key];
-            return yint.GetInt();
+            YJSONNumber yint = (YJSONNumber)parsed[key];
+            return yint.getInt();
         }
 
-        public YJSONContent Get(string key)
+        public YJSONContent get(string key)
         {
             return parsed[key];
         }
 
-        public long GetLong(string key)
+        public long getLong(string key)
         {
-            GetYJSONNumber yint = (GetYJSONNumber)parsed[key];
-            return yint.GetLong();
+            YJSONNumber yint = (YJSONNumber)parsed[key];
+            return yint.getLong();
         }
 
-        public double GetDouble(string key)
+        public double getDouble(string key)
         {
-            GetYJSONNumber yint = (GetYJSONNumber)parsed[key];
-            return yint.GetDouble();
+            YJSONNumber yint = (YJSONNumber)parsed[key];
+            return yint.getDouble();
         }
 
-        public override string ToJSON()
+        public override string toJSON()
         {
             StringBuilder res = new StringBuilder();
             res.Append('{');
             string sep = "";
             foreach (string key in parsed.Keys.ToArray()) {
                 YJSONContent subContent = parsed[key];
-                string subres = subContent.ToJSON();
+                string subres = subContent.toJSON();
                 res.Append(sep);
                 res.Append('"');
                 res.Append(key);
@@ -655,14 +694,12 @@ namespace com.yoctopuce.YoctoAPI
             return res.ToString();
         }
 
-
         public override string ToString()
         {
             StringBuilder res = new StringBuilder();
             res.Append('{');
             string sep = "";
-            foreach (string key in parsed.Keys.ToArray())
-            {
+            foreach (string key in parsed.Keys.ToArray()) {
                 YJSONContent subContent = parsed[key];
                 string subres = subContent.ToString();
                 res.Append(sep);
@@ -675,6 +712,50 @@ namespace com.yoctopuce.YoctoAPI
             return res.ToString();
         }
 
-    }
 
+
+        public void parseWithRef(YJSONObject reference)
+        {
+            if (reference != null) {
+                try {
+                    YJSONArray yzon = new YJSONArray(_data, _data_start, _data_boundary);
+                    yzon.parse();
+                    convert(reference, yzon);
+                    return;
+                } catch (Exception) {
+
+                }
+            }
+            this.parse();
+        }
+
+        private void convert(YJSONObject reference, YJSONArray newArray)
+        {
+            int length = newArray.Length;
+            for (int i = 0; i < length; i++) {
+                string key = reference.getKeyFromIdx(i);
+                YJSONContent new_item = newArray.get(i);
+                YJSONContent reference_item = reference.get(key);
+
+                if (new_item.getJSONType() == reference_item.getJSONType()) {
+                    parsed.Add(key, new_item);
+                    _keys.Add(key);
+                } else if (new_item.getJSONType() == YJSONType.ARRAY && reference_item.getJSONType() == YJSONType.OBJECT) {
+                    YJSONObject jobj = new YJSONObject(new_item._data, new_item._data_start, reference_item._data_boundary);
+                    jobj.convert((YJSONObject) reference_item, (YJSONArray) new_item);
+                    parsed.Add(key, jobj);
+                    _keys.Add(key);
+                } else {
+                    throw new System.Exception("Unable to convert "+ new_item.getJSONType().ToString() + " to "+ reference.getJSONType().ToString());
+
+                }
+            }
+        }
+
+        private string getKeyFromIdx(int i)
+        {
+            return _keys[i];
+        }
+
+    }
 }

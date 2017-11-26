@@ -38,7 +38,7 @@ namespace UniversalApp
         {
             int thid = Environment.CurrentManagedThreadId;
             Debug.Write("[" + thid + "]:" + line);
-            //Output.Text += "YAPI:"+line;
+            Output.Text += "YAPI:"+line;
         }
 #pragma warning restore 1998
 
@@ -61,22 +61,23 @@ namespace UniversalApp
                 Output.Text += "Error:" + ex.Message;
                 throw;
             }
+            Output.Text += "Enum done";
         }
 
         private async void Button_Click_init(object sender, RoutedEventArgs e)
         {
             string url = this.url.Text;
 
-            await yoctoLog("Main thread");
+            await yoctoLog("Main thread\n");
             YAPI.RegisterLogFunction(yoctoLog);
             try {
                 int res = await YAPI.RegisterHub(url);
-                Output.Text = "Init done:\n";
+                Output.Text += "Init done:\n";
                 initButton.IsEnabled = false;
                 enumButton.IsEnabled = true;
                 freebutton.IsEnabled = true;
             } catch (YAPI_Exception ex) {
-                Output.Text = "Error:" + ex.Message + "\n";
+                Output.Text += "Error:" + ex.Message + "\n";
             }
         }
 
@@ -117,7 +118,7 @@ namespace UniversalApp
                 ulong reftime;
                 long pulse_counter;
 
-                Output.Text = "  Using lib " + YAPIContext.GetAPIVersion() + "\n";
+                Output.Text += "  Using lib " + YAPIContext.GetAPIVersion() + "\n";
                 input1 = YAnButton.FindAnButton("input1");
                 if (!(await input1.isOnline())) {
                     Output.Text = "No AnButton named 'input1' found, check cable!";

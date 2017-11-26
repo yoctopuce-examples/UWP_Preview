@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YDevice.cs 28886 2017-10-16 10:12:32Z seb $
+ * $Id: YDevice.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Internal YDevice class
  *
@@ -36,6 +36,7 @@
  *  WARRANTY, OR OTHERWISE.
  *
  *********************************************************************/
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,7 +44,6 @@ using System.Threading.Tasks;
 
 namespace com.yoctopuce.YoctoAPI
 {
-
     //
     // YDevice Class (used internally)
     //
@@ -63,7 +63,7 @@ namespace com.yoctopuce.YoctoAPI
         private YGenericHub _hub;
         internal WPEntry _wpRec;
         private ulong _cache_expiration;
-        private string _cache_json;
+        private YJSONObject _cache_json;
         private readonly Dictionary<int?, YPEntry> _ypRecs;
         private double _deviceTime;
         private YPEntry _moduleYPEntry;
@@ -72,12 +72,13 @@ namespace com.yoctopuce.YoctoAPI
         private bool _logIsPulling = false;
 
         // Device constructor. Automatically call the YAPI functin to reindex device
-        internal YDevice(YGenericHub hub, WPEntry wpRec, Dictionary<string, List<YPEntry>> ypRecs) {
+        internal YDevice(YGenericHub hub, WPEntry wpRec, Dictionary<string, List<YPEntry>> ypRecs)
+        {
             // private attributes
             _hub = hub;
             _wpRec = wpRec;
             _cache_expiration = 0;
-            _cache_json = "";
+            _cache_json = null;
             _moduleYPEntry = new YPEntry(wpRec.SerialNumber, "module", YPEntry.BaseClass.Function);
             _moduleYPEntry.LogicalName = wpRec.LogicalName;
             _ypRecs = new Dictionary<int?, YPEntry>();
@@ -93,148 +94,155 @@ namespace com.yoctopuce.YoctoAPI
         }
 
         internal virtual YGenericHub Hub {
-            get {
-                return _hub;
-            }
+            get { return _hub; }
         }
 
         // Return the serial number of the device, as found during discovery
         public virtual string SerialNumber {
-            get {
-                return _wpRec.SerialNumber;
-            }
+            get { return _wpRec.SerialNumber; }
         }
 
         // Return the logical name of the device, as found during discovery
         public virtual string LogicalName {
-            get {
-                return _wpRec.LogicalName;
-            }
+            get { return _wpRec.LogicalName; }
         }
 
         // Return the product name of the device, as found during discovery
         public virtual string ProductName {
-            get {
-                return _wpRec.ProductName;
-            }
+            get { return _wpRec.ProductName; }
         }
 
         // Return the product Id of the device, as found during discovery
         public virtual int ProductId {
-            get {
-                return _wpRec.ProductId;
-            }
+            get { return _wpRec.ProductId; }
         }
 
         internal virtual string RelativePath {
-            get {
-                return _wpRec.NetworkUrl;
-            }
+            get { return _wpRec.NetworkUrl; }
         }
 
         // Return the beacon state of the device, as found during discovery
         public virtual int Beacon {
-            get {
-                return _wpRec.Beacon;
-            }
+            get { return _wpRec.Beacon; }
         }
 
         // Get the whole REST API string for a device, from cache if possible
-        public virtual async Task<string> requestAPI() {
+        internal virtual async Task<YJSONObject> requestAPI()
+        {
             if (_cache_expiration > YAPI.GetTickCount()) {
                 return _cache_json;
             }
-            string yreq = await requestHTTPSyncAsString("GET /api.json", null);
+            string request;
+            if (_cache_json == null) {
+                request = "GET /api.json \r\n\r\n";
+            } else {
+                request = "GET /api.json?fw=" + _cache_json.getYJSONObject("module").getString("firmwareRelease") + " \r\n\r\n";
+            }
+            string yreq = await requestHTTPSyncAsString(request, null);
+
+            YJSONObject cache_json;
+            try {
+                cache_json = new YJSONObject(yreq);
+                cache_json.parseWithRef(_cache_json);
+            } catch (Exception ex) {
+                _cache_json = null;
+                throw new YAPI_Exception(YAPI.IO_ERROR, "Request failed, could not parse API (" + ex.Message + ")");
+            }
             this._cache_expiration = YAPI.GetTickCount() + YAPI.DefaultCacheValidity;
-            this._cache_json = yreq;
-            return yreq;
+            this._cache_json = cache_json;
+            return cache_json;
         }
 
         // Reload a device API (store in cache), and update YAPI function lists accordingly
         // Intended to be called within UpdateDeviceList only
-        public virtual async Task<int> refresh() {
-            string result = await this.requestAPI();
-            YJSONObject loadval;
-            bool? reindex = false;
-            loadval = new YJSONObject(result);
-            loadval.Parse();
-
-            _cache_expiration = YAPI.GetTickCount() + YAPI.DefaultCacheValidity;
-            _cache_json = result;
-            // parse module and refresh names if needed
-            List<string> keys = loadval.Keys();
-            foreach (string key in keys) {
-                if (key.Equals("module")) {
-                    YJSONObject module = loadval.GetYJSONObject("module");
-                    if (!_wpRec.LogicalName.Equals(module.GetString("logicalName"))) {
-                        _wpRec.LogicalName = module.GetString("logicalName");
-                        _moduleYPEntry.LogicalName = _wpRec.LogicalName;
-                        reindex = true;
-                    }
-                    _wpRec.Beacon = module.GetInt("beacon");
-                } else if (!key.Equals("services")) {
-                    YJSONObject func = loadval.GetYJSONObject(key);
-                    string name;
-                    if (func.Has("logicalName")) {
-                        name = func.GetString("logicalName");
-                    } else {
-                        name = _wpRec.LogicalName;
-                    }
-                    if (func.Has("advertisedValue")) {
-                        string pubval = func.GetString("advertisedValue");
-                        _hub._yctx._yHash.imm_setFunctionValue(_wpRec.SerialNumber+"."+key, pubval);
-                    }
-                    for (int f = 0; f < _ypRecs.Count; f++) {
-                        if (_ypRecs[f].FuncId.Equals(key)) {
-                            if (!_ypRecs[f].LogicalName.Equals(name)) {
-                                _ypRecs[f].LogicalName = name;
-                                reindex = true;
+        public virtual async Task<int> refresh()
+        {
+            YJSONObject loadval = await requestAPI();
+            bool reindex = false;
+            try {
+                // parse module and refresh names if needed
+                List<string> keys = loadval.keys();
+                foreach (string key in keys) {
+                    if (key.Equals("module")) {
+                        YJSONObject module = loadval.getYJSONObject("module");
+                        if (!_wpRec.LogicalName.Equals(module.getString("logicalName"))) {
+                            _wpRec.LogicalName = module.getString("logicalName");
+                            _moduleYPEntry.LogicalName = _wpRec.LogicalName;
+                            reindex = true;
+                        }
+                        _wpRec.Beacon = module.getInt("beacon");
+                    } else if (!key.Equals("services")) {
+                        YJSONObject func = loadval.getYJSONObject(key);
+                        string name;
+                        if (func.has("logicalName")) {
+                            name = func.getString("logicalName");
+                        } else {
+                            name = _wpRec.LogicalName;
+                        }
+                        if (func.has("advertisedValue")) {
+                            string pubval = func.getString("advertisedValue");
+                            _hub._yctx._yHash.imm_setFunctionValue(_wpRec.SerialNumber + "." + key, pubval);
+                        }
+                        for (int f = 0; f < _ypRecs.Count; f++) {
+                            if (_ypRecs[f].FuncId.Equals(key)) {
+                                if (!_ypRecs[f].LogicalName.Equals(name)) {
+                                    _ypRecs[f].LogicalName = name;
+                                    reindex = true;
+                                }
+                                break;
                             }
-                            break;
                         }
                     }
                 }
+            } catch (Exception e) {
+                throw new YAPI_Exception(YAPI.IO_ERROR, "Request failed, could not parse API result (" + e.Message + ")");
             }
-
-            if (reindex.Value) {
+            if (reindex) {
                 _hub._yctx._yHash.imm_reindexDevice(this);
             }
             return YAPI.SUCCESS;
         }
 
         // Force the REST API string in cache to expire immediately
-        public virtual void imm_clearCache() {
+        public virtual void imm_clearCache()
+        {
             _cache_expiration = 0;
         }
 
         // Retrieve the number of functions (beside "module") in the device
-        protected internal virtual int imm_functionCount() {
+        protected internal virtual int imm_functionCount()
+        {
             return _ypRecs.Count;
         }
 
-        internal virtual YPEntry imm_getYPEntry(int idx) {
+        internal virtual YPEntry imm_getYPEntry(int idx)
+        {
             if (idx < _ypRecs.Count) {
                 return _ypRecs[idx];
             }
             return null;
         }
 
-        internal virtual async Task<byte[]> requestHTTPSync(string request, byte[] rest_of_request) {
+        internal virtual async Task<byte[]> requestHTTPSync(string request, byte[] rest_of_request)
+        {
             string shortRequest = imm_formatRequest(request);
             return await _hub.devRequestSync(this, shortRequest, rest_of_request, null, null);
         }
 
-        internal virtual async Task<string> requestHTTPSyncAsString(string request, byte[] rest_of_request) {
+        internal virtual async Task<string> requestHTTPSyncAsString(string request, byte[] rest_of_request)
+        {
             byte[] bytes = await requestHTTPSync(request, rest_of_request);
-            return YAPI.DefaultEncoding.GetString(bytes,0, bytes.Length);
+            return YAPI.DefaultEncoding.GetString(bytes, 0, bytes.Length);
         }
 
-        internal virtual async Task requestHTTPAsync(string request, byte[] rest_of_request, YGenericHub.RequestAsyncResult asyncResult, object context) {
+        internal virtual async Task requestHTTPAsync(string request, byte[] rest_of_request, YGenericHub.RequestAsyncResult asyncResult, object context)
+        {
             string shortRequest = imm_formatRequest(request);
             await _hub.devRequestAsync(this, shortRequest, rest_of_request, asyncResult, context);
         }
 
-        private string imm_formatRequest(string request) {
+        private string imm_formatRequest(string request)
+        {
             string[] words = request.Split(' ');
             if (words.Length < 2) {
                 throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Invalid request, not enough words; expected a method name and a URL");
@@ -247,22 +255,23 @@ namespace com.yoctopuce.YoctoAPI
         }
 
 
-        public virtual double imm_getDeviceTime() {
+        public virtual double imm_getDeviceTime()
+        {
             return _deviceTime;
         }
 
-        public virtual void imm_setDeviceTime(byte[] data) {
+        public virtual void imm_setDeviceTime(byte[] data)
+        {
             double time = data[0] + 0x100 * data[1] + 0x10000 * data[2] + 0x1000000 * data[3];
             _deviceTime = time + data[4] / 250.0;
         }
 
         internal virtual YPEntry ModuleYPEntry {
-            get {
-                return _moduleYPEntry;
-            }
+            get { return _moduleYPEntry; }
         }
 
-        private void imm_logCallbackHandle(object context, byte[] result, int error, string errmsg) {
+        private void imm_logCallbackHandle(object context, byte[] result, int error, string errmsg)
+        {
             if (result == null) {
                 _logIsPulling = false;
                 return;
@@ -271,7 +280,7 @@ namespace com.yoctopuce.YoctoAPI
                 _logIsPulling = false;
                 return;
             }
-            string resultStr = YAPI.DefaultEncoding.GetString(result,0, result.Length);
+            string resultStr = YAPI.DefaultEncoding.GetString(result, 0, result.Length);
             int pos = resultStr.LastIndexOf("@", StringComparison.Ordinal);
             if (pos < 0) {
                 _logIsPulling = false;
@@ -288,7 +297,8 @@ namespace com.yoctopuce.YoctoAPI
             _logIsPulling = false;
         }
 
-        internal virtual async Task triggerLogPull() {
+        internal virtual async Task triggerLogPull()
+        {
             if (_logCallback == null || _logIsPulling) {
                 return;
             }
@@ -301,13 +311,15 @@ namespace com.yoctopuce.YoctoAPI
             }
         }
 
-        internal virtual async Task registerLogCallback(YModule.LogCallback callback) {
+        internal virtual async Task registerLogCallback(YModule.LogCallback callback)
+        {
             _logCallback = callback;
             await triggerLogPull();
         }
 
         //todo: look if we can rewrite this function in c# to be more efficent
-        internal static byte[] imm_formatHTTPUpload(string path, byte[] content) {
+        internal static byte[] imm_formatHTTPUpload(string path, byte[] content)
+        {
             Random randomGenerator = new Random();
             string boundary;
             string mp_header = "Content-Disposition: form-data; name=\"" + path + "\"; filename=\"api\"\r\n" + "Content-Type: application/octet-stream\r\n" + "Content-Transfer-Encoding: binary\r\n\r\n";
@@ -334,7 +346,8 @@ namespace com.yoctopuce.YoctoAPI
             return head_body;
         }
 
-        internal virtual async Task<int> requestHTTPUpload(string path, byte[] content) {
+        internal virtual async Task<int> requestHTTPUpload(string path, byte[] content)
+        {
             string request = "POST /upload.html";
             byte[] head_body = YDevice.imm_formatHTTPUpload(path, content);
             await requestHTTPSync(request, head_body);
@@ -347,5 +360,4 @@ namespace com.yoctopuce.YoctoAPI
             return _hub.get_debugMsg(SerialNumber);
         }
     }
-
 }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPwmInput.cs 28807 2017-10-12 09:46:33Z seb $
+ * $Id: YPwmInput.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindPwmInput(), the high-level API for PwmInput functions
  *
@@ -164,29 +164,29 @@ public class YPwmInput : YSensor
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("dutyCycle")) {
-            _dutyCycle = Math.Round(json_val.GetDouble("dutyCycle") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("dutyCycle")) {
+            _dutyCycle = Math.Round(json_val.getDouble("dutyCycle") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("pulseDuration")) {
-            _pulseDuration = Math.Round(json_val.GetDouble("pulseDuration") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("pulseDuration")) {
+            _pulseDuration = Math.Round(json_val.getDouble("pulseDuration") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("frequency")) {
-            _frequency = Math.Round(json_val.GetDouble("frequency") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("frequency")) {
+            _frequency = Math.Round(json_val.getDouble("frequency") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("period")) {
-            _period = Math.Round(json_val.GetDouble("period") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("period")) {
+            _period = Math.Round(json_val.getDouble("period") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("pulseCounter")) {
-            _pulseCounter = json_val.GetLong("pulseCounter");
+        if (json_val.has("pulseCounter")) {
+            _pulseCounter = json_val.getLong("pulseCounter");
         }
-        if (json_val.Has("pulseTimer")) {
-            _pulseTimer = json_val.GetLong("pulseTimer");
+        if (json_val.has("pulseTimer")) {
+            _pulseTimer = json_val.getLong("pulseTimer");
         }
-        if (json_val.Has("pwmReportMode")) {
-            _pwmReportMode = json_val.GetInt("pwmReportMode");
+        if (json_val.has("pwmReportMode")) {
+            _pwmReportMode = json_val.getInt("pwmReportMode");
         }
-        if (json_val.Has("debouncePeriod")) {
-            _debouncePeriod = json_val.GetInt("debouncePeriod");
+        if (json_val.has("debouncePeriod")) {
+            _debouncePeriod = json_val.getInt("debouncePeriod");
         }
         base.imm_parseAttr(json_val);
     }

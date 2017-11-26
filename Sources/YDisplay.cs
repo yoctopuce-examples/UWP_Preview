@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplay.cs 27700 2017-06-01 12:27:09Z seb $
+ * $Id: YDisplay.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindDisplay(), the high-level API for Display functions
  *
@@ -186,38 +186,38 @@ public class YDisplay : YFunction
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("enabled")) {
-            _enabled = json_val.GetInt("enabled") > 0 ? 1 : 0;
+        if (json_val.has("enabled")) {
+            _enabled = json_val.getInt("enabled") > 0 ? 1 : 0;
         }
-        if (json_val.Has("startupSeq")) {
-            _startupSeq = json_val.GetString("startupSeq");
+        if (json_val.has("startupSeq")) {
+            _startupSeq = json_val.getString("startupSeq");
         }
-        if (json_val.Has("brightness")) {
-            _brightness = json_val.GetInt("brightness");
+        if (json_val.has("brightness")) {
+            _brightness = json_val.getInt("brightness");
         }
-        if (json_val.Has("orientation")) {
-            _orientation = json_val.GetInt("orientation");
+        if (json_val.has("orientation")) {
+            _orientation = json_val.getInt("orientation");
         }
-        if (json_val.Has("displayWidth")) {
-            _displayWidth = json_val.GetInt("displayWidth");
+        if (json_val.has("displayWidth")) {
+            _displayWidth = json_val.getInt("displayWidth");
         }
-        if (json_val.Has("displayHeight")) {
-            _displayHeight = json_val.GetInt("displayHeight");
+        if (json_val.has("displayHeight")) {
+            _displayHeight = json_val.getInt("displayHeight");
         }
-        if (json_val.Has("displayType")) {
-            _displayType = json_val.GetInt("displayType");
+        if (json_val.has("displayType")) {
+            _displayType = json_val.getInt("displayType");
         }
-        if (json_val.Has("layerWidth")) {
-            _layerWidth = json_val.GetInt("layerWidth");
+        if (json_val.has("layerWidth")) {
+            _layerWidth = json_val.getInt("layerWidth");
         }
-        if (json_val.Has("layerHeight")) {
-            _layerHeight = json_val.GetInt("layerHeight");
+        if (json_val.has("layerHeight")) {
+            _layerHeight = json_val.getInt("layerHeight");
         }
-        if (json_val.Has("layerCount")) {
-            _layerCount = json_val.GetInt("layerCount");
+        if (json_val.has("layerCount")) {
+            _layerCount = json_val.getInt("layerCount");
         }
-        if (json_val.Has("command")) {
-            _command = json_val.GetString("command");
+        if (json_val.has("command")) {
+            _command = json_val.getString("command");
         }
         base.imm_parseAttr(json_val);
     }

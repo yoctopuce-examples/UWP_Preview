@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPwmOutput.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YPwmOutput.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindPwmOutput(), the high-level API for PwmOutput functions
  *
@@ -155,29 +155,29 @@ public class YPwmOutput : YFunction
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("enabled")) {
-            _enabled = json_val.GetInt("enabled") > 0 ? 1 : 0;
+        if (json_val.has("enabled")) {
+            _enabled = json_val.getInt("enabled") > 0 ? 1 : 0;
         }
-        if (json_val.Has("frequency")) {
-            _frequency = Math.Round(json_val.GetDouble("frequency") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("frequency")) {
+            _frequency = Math.Round(json_val.getDouble("frequency") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("period")) {
-            _period = Math.Round(json_val.GetDouble("period") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("period")) {
+            _period = Math.Round(json_val.getDouble("period") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("dutyCycle")) {
-            _dutyCycle = Math.Round(json_val.GetDouble("dutyCycle") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("dutyCycle")) {
+            _dutyCycle = Math.Round(json_val.getDouble("dutyCycle") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("pulseDuration")) {
-            _pulseDuration = Math.Round(json_val.GetDouble("pulseDuration") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("pulseDuration")) {
+            _pulseDuration = Math.Round(json_val.getDouble("pulseDuration") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("pwmTransition")) {
-            _pwmTransition = json_val.GetString("pwmTransition");
+        if (json_val.has("pwmTransition")) {
+            _pwmTransition = json_val.getString("pwmTransition");
         }
-        if (json_val.Has("enabledAtPowerOn")) {
-            _enabledAtPowerOn = json_val.GetInt("enabledAtPowerOn") > 0 ? 1 : 0;
+        if (json_val.has("enabledAtPowerOn")) {
+            _enabledAtPowerOn = json_val.getInt("enabledAtPowerOn") > 0 ? 1 : 0;
         }
-        if (json_val.Has("dutyCycleAtPowerOn")) {
-            _dutyCycleAtPowerOn = Math.Round(json_val.GetDouble("dutyCycleAtPowerOn") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("dutyCycleAtPowerOn")) {
+            _dutyCycleAtPowerOn = Math.Round(json_val.getDouble("dutyCycleAtPowerOn") * 1000.0 / 65536.0) / 1000.0;
         }
         base.imm_parseAttr(json_val);
     }

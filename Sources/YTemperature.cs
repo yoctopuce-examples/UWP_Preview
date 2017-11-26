@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YTemperature.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YTemperature.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindTemperature(), the high-level API for Temperature functions
  *
@@ -143,17 +143,17 @@ public class YTemperature : YSensor
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("sensorType")) {
-            _sensorType = json_val.GetInt("sensorType");
+        if (json_val.has("sensorType")) {
+            _sensorType = json_val.getInt("sensorType");
         }
-        if (json_val.Has("signalValue")) {
-            _signalValue = Math.Round(json_val.GetDouble("signalValue") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("signalValue")) {
+            _signalValue = Math.Round(json_val.getDouble("signalValue") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("signalUnit")) {
-            _signalUnit = json_val.GetString("signalUnit");
+        if (json_val.has("signalUnit")) {
+            _signalUnit = json_val.getString("signalUnit");
         }
-        if (json_val.Has("command")) {
-            _command = json_val.GetString("command");
+        if (json_val.has("command")) {
+            _command = json_val.getString("command");
         }
         base.imm_parseAttr(json_val);
     }

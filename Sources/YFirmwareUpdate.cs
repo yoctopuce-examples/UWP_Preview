@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YFirmwareUpdate.cs 25204 2016-08-17 13:52:16Z seb $
+ * $Id: YFirmwareUpdate.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -259,9 +259,9 @@ public class YFirmwareUpdate
                 byte[] json = await YFirmwareUpdate._downloadfile("http://www.yoctopuce.com//FR/common/getLastFirmwareLink.php?serial=" + serial);
                 YJSONObject obj;
                 obj = new YJSONObject(YAPI.DefaultEncoding.GetString(json));
-                obj.Parse();
-                link = obj.GetString("link");
-                best_rev = obj.GetInt("version");
+                obj.parse();
+                link = obj.getString("link");
+                best_rev = obj.getInt("version");
 
             } else {
                 YFirmwareFile firmware = await YFirmwareUpdate.checkFirmware_r(path, serial.Substring(0, YAPI.YOCTO_BASE_SERIAL_LEN));

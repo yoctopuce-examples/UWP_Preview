@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAltitude.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YAltitude.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindAltitude(), the high-level API for Altitude functions
  *
@@ -114,11 +114,11 @@ public class YAltitude : YSensor
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("qnh")) {
-            _qnh = Math.Round(json_val.GetDouble("qnh") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("qnh")) {
+            _qnh = Math.Round(json_val.getDouble("qnh") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("technology")) {
-            _technology = json_val.GetString("technology");
+        if (json_val.has("technology")) {
+            _technology = json_val.getString("technology");
         }
         base.imm_parseAttr(json_val);
     }

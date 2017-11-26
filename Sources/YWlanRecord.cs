@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWlanRecord.cs 25163 2016-08-11 09:42:13Z seb $
+ * $Id: YWlanRecord.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindWlanRecord(), the high-level API for WlanRecord functions
  *
@@ -69,11 +69,11 @@ public class YWlanRecord
     internal YWlanRecord(string json_str)
     {
         YJSONObject json = new YJSONObject(json_str);
-        json.Parse();
-        _ssid = json.GetString("ssid");
-        _channel = json.GetInt("channel");
-        _sec = json.GetString("sec");
-        _rssi = json.GetInt("rssi");
+        json.parse();
+        _ssid = json.getString("ssid");
+        _channel = json.getInt("channel");
+        _sec = json.getString("sec");
+        _rssi = json.getInt("rssi");
     }
 
     //--- (generated code: YWlanRecord implementation)

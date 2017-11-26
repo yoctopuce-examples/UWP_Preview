@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMultiAxisController.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YMultiAxisController.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindMultiAxisController(), the high-level API for MultiAxisController functions
  *
@@ -122,14 +122,14 @@ public class YMultiAxisController : YFunction
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("nAxis")) {
-            _nAxis = json_val.GetInt("nAxis");
+        if (json_val.has("nAxis")) {
+            _nAxis = json_val.getInt("nAxis");
         }
-        if (json_val.Has("globalState")) {
-            _globalState = json_val.GetInt("globalState");
+        if (json_val.has("globalState")) {
+            _globalState = json_val.getInt("globalState");
         }
-        if (json_val.Has("command")) {
-            _command = json_val.GetString("command");
+        if (json_val.has("command")) {
+            _command = json_val.getString("command");
         }
         base.imm_parseAttr(json_val);
     }

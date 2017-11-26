@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRealTimeClock.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YRealTimeClock.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindRealTimeClock(), the high-level API for RealTimeClock functions
  *
@@ -128,17 +128,17 @@ public class YRealTimeClock : YFunction
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("unixTime")) {
-            _unixTime = json_val.GetLong("unixTime");
+        if (json_val.has("unixTime")) {
+            _unixTime = json_val.getLong("unixTime");
         }
-        if (json_val.Has("dateTime")) {
-            _dateTime = json_val.GetString("dateTime");
+        if (json_val.has("dateTime")) {
+            _dateTime = json_val.getString("dateTime");
         }
-        if (json_val.Has("utcOffset")) {
-            _utcOffset = json_val.GetInt("utcOffset");
+        if (json_val.has("utcOffset")) {
+            _utcOffset = json_val.getInt("utcOffset");
         }
-        if (json_val.Has("timeSet")) {
-            _timeSet = json_val.GetInt("timeSet") > 0 ? 1 : 0;
+        if (json_val.has("timeSet")) {
+            _timeSet = json_val.getInt("timeSet") > 0 ? 1 : 0;
         }
         base.imm_parseAttr(json_val);
     }

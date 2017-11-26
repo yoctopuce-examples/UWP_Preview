@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YQuadratureDecoder.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YQuadratureDecoder.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindQuadratureDecoder(), the high-level API for QuadratureDecoder functions
  *
@@ -114,11 +114,11 @@ public class YQuadratureDecoder : YSensor
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("speed")) {
-            _speed = Math.Round(json_val.GetDouble("speed") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("speed")) {
+            _speed = Math.Round(json_val.getDouble("speed") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("decoding")) {
-            _decoding = json_val.GetInt("decoding") > 0 ? 1 : 0;
+        if (json_val.has("decoding")) {
+            _decoding = json_val.getInt("decoding") > 0 ? 1 : 0;
         }
         base.imm_parseAttr(json_val);
     }

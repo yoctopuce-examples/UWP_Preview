@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YTilt.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YTilt.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindTilt(), the high-level API for Tilt functions
  *
@@ -121,11 +121,11 @@ public class YTilt : YSensor
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("bandwidth")) {
-            _bandwidth = json_val.GetInt("bandwidth");
+        if (json_val.has("bandwidth")) {
+            _bandwidth = json_val.getInt("bandwidth");
         }
-        if (json_val.Has("axis")) {
-            _axis = json_val.GetInt("axis");
+        if (json_val.has("axis")) {
+            _axis = json_val.getInt("axis");
         }
         base.imm_parseAttr(json_val);
     }

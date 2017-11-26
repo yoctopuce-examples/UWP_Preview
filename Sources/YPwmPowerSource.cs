@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPwmPowerSource.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YPwmPowerSource.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindPwmPowerSource(), the high-level API for PwmPowerSource functions
  *
@@ -107,8 +107,8 @@ public class YPwmPowerSource : YFunction
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("powerMode")) {
-            _powerMode = json_val.GetInt("powerMode");
+        if (json_val.has("powerMode")) {
+            _powerMode = json_val.getInt("powerMode");
         }
         base.imm_parseAttr(json_val);
     }

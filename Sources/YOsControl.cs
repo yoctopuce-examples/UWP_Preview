@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YOsControl.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YOsControl.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindOsControl(), the high-level API for OsControl functions
  *
@@ -104,8 +104,8 @@ public class YOsControl : YFunction
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("shutdownCountdown")) {
-            _shutdownCountdown = json_val.GetInt("shutdownCountdown");
+        if (json_val.has("shutdownCountdown")) {
+            _shutdownCountdown = json_val.getInt("shutdownCountdown");
         }
         base.imm_parseAttr(json_val);
     }

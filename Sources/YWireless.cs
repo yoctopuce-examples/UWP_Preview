@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWireless.cs 27700 2017-06-01 12:27:09Z seb $
+ * $Id: YWireless.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindWireless(), the high-level API for Wireless functions
  *
@@ -157,26 +157,26 @@ public class YWireless : YFunction
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("linkQuality")) {
-            _linkQuality = json_val.GetInt("linkQuality");
+        if (json_val.has("linkQuality")) {
+            _linkQuality = json_val.getInt("linkQuality");
         }
-        if (json_val.Has("ssid")) {
-            _ssid = json_val.GetString("ssid");
+        if (json_val.has("ssid")) {
+            _ssid = json_val.getString("ssid");
         }
-        if (json_val.Has("channel")) {
-            _channel = json_val.GetInt("channel");
+        if (json_val.has("channel")) {
+            _channel = json_val.getInt("channel");
         }
-        if (json_val.Has("security")) {
-            _security = json_val.GetInt("security");
+        if (json_val.has("security")) {
+            _security = json_val.getInt("security");
         }
-        if (json_val.Has("message")) {
-            _message = json_val.GetString("message");
+        if (json_val.has("message")) {
+            _message = json_val.getString("message");
         }
-        if (json_val.Has("wlanConfig")) {
-            _wlanConfig = json_val.GetString("wlanConfig");
+        if (json_val.has("wlanConfig")) {
+            _wlanConfig = json_val.getString("wlanConfig");
         }
-        if (json_val.Has("wlanState")) {
-            _wlanState = json_val.GetInt("wlanState");
+        if (json_val.has("wlanState")) {
+            _wlanState = json_val.getInt("wlanState");
         }
         base.imm_parseAttr(json_val);
     }

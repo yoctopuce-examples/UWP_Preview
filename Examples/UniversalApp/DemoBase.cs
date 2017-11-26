@@ -2,31 +2,47 @@
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Controls;
 using com.yoctopuce.YoctoAPI;
+using System.ComponentModel;
+using System.Text;
 
 namespace Demo
 {
-    public abstract class DemoBase
+    public abstract class DemoBase : INotifyPropertyChanged
     {
-        protected string _hubULR;
-        private TextBlock _textBlock;
 
-        public DemoBase(string url, TextBlock textBlock)
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void OnPropertyChanged(PropertyChangedEventArgs e)
         {
-            this._hubULR = url;
-            _textBlock = textBlock;
-            textBlock.Text = "";
+            if (PropertyChanged != null)
+                PropertyChanged(this, e);
+        }
+
+        private StringBuilder console = new StringBuilder();
+
+
+        public string Output {
+            get {
+                return console.ToString();
+            }
+            set {
+                console.Clear();
+                console.Append(value);
+                OnPropertyChanged(new PropertyChangedEventArgs("Output"));
+            }
         }
 
         protected void WriteLine(string line)
         {
             Debug.WriteLine(line);
-            _textBlock.Text += line + "\n";
+            console.Append(line).Append("\n");
+            OnPropertyChanged(new PropertyChangedEventArgs("Output"));
         }
 
         protected void Write(string s)
         {
             Debug.Write(s);
-            _textBlock.Text += s;
+            console.Append(s);
+            OnPropertyChanged(new PropertyChangedEventArgs("Output"));
         }
 
         public abstract Task<int> Run();

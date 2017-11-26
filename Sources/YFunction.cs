@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YFunction.cs 28650 2017-09-26 14:39:44Z mvuilleu $
+ * $Id: YFunction.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * YFunction Class (virtual class, used internally)
  *
@@ -39,6 +39,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 
@@ -167,11 +168,11 @@ public class YFunction
 #pragma warning disable 1998
     internal virtual void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("logicalName")) {
-            _logicalName = json_val.GetString("logicalName");
+        if (json_val.has("logicalName")) {
+            _logicalName = json_val.getString("logicalName");
         }
-        if (json_val.Has("advertisedValue")) {
-            _advertisedValue = json_val.GetString("advertisedValue");
+        if (json_val.has("advertisedValue")) {
+            _advertisedValue = json_val.getString("advertisedValue");
         }
     }
 
@@ -733,9 +734,9 @@ public class YFunction
         protected internal virtual string imm_json_get_key(byte[] json, string key)
         {
             YJSONObject obj = new YJSONObject(YAPI.DefaultEncoding.GetString(json));
-            obj.Parse();
-            if (obj.Has(key)) {
-                string val = obj.GetString(key);
+            obj.parse();
+            if (obj.has(key)) {
+                string val = obj.getString(key);
                 if (val == null) {
                     val = obj.ToString();
                 }
@@ -748,19 +749,19 @@ public class YFunction
         {
             string s = YAPI.DefaultEncoding.GetString(json);
             YJSONString jstring = new YJSONString(s, 0, s.Length);
-            jstring.Parse();
-            return jstring.GetString();
+            jstring.parse();
+            return jstring.getString();
         }
 
         protected internal virtual List<string> imm_json_get_array(byte[] json)
         {
             YJSONArray array = new YJSONArray(YAPI.DefaultEncoding.GetString(json));
-            array.Parse();
+            array.parse();
             List<string> list = new List<string>();
             int len = array.Length;
             for (int i = 0; i < len; i++) {
-                YJSONContent o = array.Get(i);
-                list.Add(o.ToJSON());
+                YJSONContent o = array.get(i);
+                list.Add(o.toJSON());
             }
             return list;
         }
@@ -769,20 +770,20 @@ public class YFunction
         internal virtual string imm_get_json_path_struct(YJSONObject jsonObject, string[] paths, int ofs)
         {
             string key = paths[ofs];
-            if (!jsonObject.Has(key)) {
+            if (!jsonObject.has(key)) {
                 return "";
             }
 
-            YJSONContent obj = jsonObject.Get(key);
+            YJSONContent obj = jsonObject.get(key);
             if (obj != null) {
                 if (paths.Length == ofs + 1) {
-                    return obj.ToJSON();
+                    return obj.toJSON();
                 }
 
                 if (obj is YJSONArray) {
-                    return imm_get_json_path_array(jsonObject.GetYJSONArray(key), paths, ofs + 1);
+                    return imm_get_json_path_array(jsonObject.getYJSONArray(key), paths, ofs + 1);
                 } else if (obj is YJSONObject) {
-                    return imm_get_json_path_struct(jsonObject.GetYJSONObject(key), paths, ofs + 1);
+                    return imm_get_json_path_struct(jsonObject.getYJSONObject(key), paths, ofs + 1);
                 }
             }
             return "";
@@ -795,16 +796,16 @@ public class YFunction
                 return "";
             }
 
-            YJSONContent obj = jsonArray.Get(key);
+            YJSONContent obj = jsonArray.get(key);
             if (obj != null) {
                 if (paths.Length == ofs + 1) {
                     return obj.ToString();
                 }
 
                 if (obj is YJSONArray) {
-                    return imm_get_json_path_array(jsonArray.GetYJSONArray(key), paths, ofs + 1);
+                    return imm_get_json_path_array(jsonArray.getYJSONArray(key), paths, ofs + 1);
                 } else if (obj is YJSONObject) {
-                    return imm_get_json_path_struct(jsonArray.GetYJSONObject(key), paths, ofs + 1);
+                    return imm_get_json_path_struct(jsonArray.getYJSONObject(key), paths, ofs + 1);
                 }
             }
             return "";
@@ -815,7 +816,7 @@ public class YFunction
         {
             YJSONObject jsonObject = null;
             jsonObject = new YJSONObject(json);
-            jsonObject.Parse();
+            jsonObject.parse();
             string[] split = path.Split(new char[] {'\\', '|'});
             return imm_get_json_path_struct(jsonObject, split, 0);
         }
@@ -823,8 +824,8 @@ public class YFunction
         internal virtual string imm_decode_json_string(string json)
         {
             YJSONString ystr = new YJSONString(json, 0, json.Length);
-            ystr.Parse();
-            return ystr.GetString();
+            ystr.parse();
+            return ystr.getString();
         }
 
         // Load and parse the REST API for a function given by class name and
@@ -842,10 +843,8 @@ public class YFunction
             if (extra.Equals("")) {
                 // use a cached API string, without reloading unless module is
                 // requested
-                string yreq = await dev.requestAPI();
-                YJSONObject jsonval = new YJSONObject(yreq);
-                jsonval.Parse();
-                loadval = jsonval.GetYJSONObject(_funId);
+                YJSONObject jsonval = await dev.requestAPI();
+                loadval = jsonval.getYJSONObject(_funId);
             } else {
                 dev.imm_clearCache();
             }
@@ -855,7 +854,7 @@ public class YFunction
                     string httpreq = "GET /api/" + _funId + ".json";
                     string yreq = await dev.requestHTTPSyncAsString(httpreq, null);
                     loadval = new YJSONObject(yreq);
-                    loadval.Parse();
+                    loadval.parse();
                 } else {
                     string httpreq = "GET /api/" + _funId + extra;
                     await dev.requestHTTPAsync(httpreq, null, null, null);

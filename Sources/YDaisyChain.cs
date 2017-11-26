@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDaisyChain.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YDaisyChain.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindDaisyChain(), the high-level API for DaisyChain functions
  *
@@ -123,14 +123,14 @@ public class YDaisyChain : YFunction
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("daisyState")) {
-            _daisyState = json_val.GetInt("daisyState");
+        if (json_val.has("daisyState")) {
+            _daisyState = json_val.getInt("daisyState");
         }
-        if (json_val.Has("childCount")) {
-            _childCount = json_val.GetInt("childCount");
+        if (json_val.has("childCount")) {
+            _childCount = json_val.getInt("childCount");
         }
-        if (json_val.Has("requiredChildCount")) {
-            _requiredChildCount = json_val.GetInt("requiredChildCount");
+        if (json_val.has("requiredChildCount")) {
+            _requiredChildCount = json_val.getInt("requiredChildCount");
         }
         base.imm_parseAttr(json_val);
     }

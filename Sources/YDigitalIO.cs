@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDigitalIO.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YDigitalIO.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindDigitalIO(), the high-level API for DigitalIO functions
  *
@@ -157,29 +157,29 @@ public class YDigitalIO : YFunction
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("portState")) {
-            _portState = json_val.GetInt("portState");
+        if (json_val.has("portState")) {
+            _portState = json_val.getInt("portState");
         }
-        if (json_val.Has("portDirection")) {
-            _portDirection = json_val.GetInt("portDirection");
+        if (json_val.has("portDirection")) {
+            _portDirection = json_val.getInt("portDirection");
         }
-        if (json_val.Has("portOpenDrain")) {
-            _portOpenDrain = json_val.GetInt("portOpenDrain");
+        if (json_val.has("portOpenDrain")) {
+            _portOpenDrain = json_val.getInt("portOpenDrain");
         }
-        if (json_val.Has("portPolarity")) {
-            _portPolarity = json_val.GetInt("portPolarity");
+        if (json_val.has("portPolarity")) {
+            _portPolarity = json_val.getInt("portPolarity");
         }
-        if (json_val.Has("portDiags")) {
-            _portDiags = json_val.GetInt("portDiags");
+        if (json_val.has("portDiags")) {
+            _portDiags = json_val.getInt("portDiags");
         }
-        if (json_val.Has("portSize")) {
-            _portSize = json_val.GetInt("portSize");
+        if (json_val.has("portSize")) {
+            _portSize = json_val.getInt("portSize");
         }
-        if (json_val.Has("outputVoltage")) {
-            _outputVoltage = json_val.GetInt("outputVoltage");
+        if (json_val.has("outputVoltage")) {
+            _outputVoltage = json_val.getInt("outputVoltage");
         }
-        if (json_val.Has("command")) {
-            _command = json_val.GetString("command");
+        if (json_val.has("command")) {
+            _command = json_val.getString("command");
         }
         base.imm_parseAttr(json_val);
     }

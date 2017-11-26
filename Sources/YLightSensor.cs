@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YLightSensor.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YLightSensor.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindLightSensor(), the high-level API for LightSensor functions
  *
@@ -114,8 +114,8 @@ public class YLightSensor : YSensor
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("measureType")) {
-            _measureType = json_val.GetInt("measureType");
+        if (json_val.has("measureType")) {
+            _measureType = json_val.getInt("measureType");
         }
         base.imm_parseAttr(json_val);
     }

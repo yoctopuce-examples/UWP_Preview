@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YVoltage.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YVoltage.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindVoltage(), the high-level API for Voltage functions
  *
@@ -107,8 +107,8 @@ public class YVoltage : YSensor
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("enabled")) {
-            _enabled = json_val.GetInt("enabled") > 0 ? 1 : 0;
+        if (json_val.has("enabled")) {
+            _enabled = json_val.getInt("enabled") > 0 ? 1 : 0;
         }
         base.imm_parseAttr(json_val);
     }

@@ -21,7 +21,7 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <TextBlock  Grid.Column="0" Text="Hub URL:"/>
-            <TextBox Grid.Column="1" Grid.Row="1" x:Name="tb_net_url" Margin="10" TextWrapping="Wrap" Text="{Binding HubURL,Mode=OneWay}"/>
+            <TextBox Grid.Column="1" Grid.Row="1" x:Name="tb_net_url" Margin="10" TextWrapping="Wrap" Text="{Binding HubURL,Mode=TwoWay}"/>
         </Grid>
         <Button Grid.Row="1" x:Name="button" Content="Run" Margin="10" Click="button_Click" />
         <TextBlock Grid.Row="2" x:Name="textBlock" TextWrapping="Wrap" Text="{Binding Output,Mode=TwoWay}" />

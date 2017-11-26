@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRefFrame.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YRefFrame.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindRefFrame(), the high-level API for RefFrame functions
  *
@@ -169,17 +169,17 @@ public class YRefFrame : YFunction
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("mountPos")) {
-            _mountPos = json_val.GetInt("mountPos");
+        if (json_val.has("mountPos")) {
+            _mountPos = json_val.getInt("mountPos");
         }
-        if (json_val.Has("bearing")) {
-            _bearing = Math.Round(json_val.GetDouble("bearing") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("bearing")) {
+            _bearing = Math.Round(json_val.getDouble("bearing") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("calibrationParam")) {
-            _calibrationParam = json_val.GetString("calibrationParam");
+        if (json_val.has("calibrationParam")) {
+            _calibrationParam = json_val.getString("calibrationParam");
         }
-        if (json_val.Has("fusionMode")) {
-            _fusionMode = json_val.GetInt("fusionMode");
+        if (json_val.has("fusionMode")) {
+            _fusionMode = json_val.getInt("fusionMode");
         }
         base.imm_parseAttr(json_val);
     }

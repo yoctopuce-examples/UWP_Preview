@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellular.cs 27700 2017-06-01 12:27:09Z seb $
+ * $Id: YCellular.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindCellular(), the high-level API for Cellular functions
  *
@@ -220,53 +220,53 @@ public class YCellular : YFunction
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("linkQuality")) {
-            _linkQuality = json_val.GetInt("linkQuality");
+        if (json_val.has("linkQuality")) {
+            _linkQuality = json_val.getInt("linkQuality");
         }
-        if (json_val.Has("cellOperator")) {
-            _cellOperator = json_val.GetString("cellOperator");
+        if (json_val.has("cellOperator")) {
+            _cellOperator = json_val.getString("cellOperator");
         }
-        if (json_val.Has("cellIdentifier")) {
-            _cellIdentifier = json_val.GetString("cellIdentifier");
+        if (json_val.has("cellIdentifier")) {
+            _cellIdentifier = json_val.getString("cellIdentifier");
         }
-        if (json_val.Has("cellType")) {
-            _cellType = json_val.GetInt("cellType");
+        if (json_val.has("cellType")) {
+            _cellType = json_val.getInt("cellType");
         }
-        if (json_val.Has("imsi")) {
-            _imsi = json_val.GetString("imsi");
+        if (json_val.has("imsi")) {
+            _imsi = json_val.getString("imsi");
         }
-        if (json_val.Has("message")) {
-            _message = json_val.GetString("message");
+        if (json_val.has("message")) {
+            _message = json_val.getString("message");
         }
-        if (json_val.Has("pin")) {
-            _pin = json_val.GetString("pin");
+        if (json_val.has("pin")) {
+            _pin = json_val.getString("pin");
         }
-        if (json_val.Has("lockedOperator")) {
-            _lockedOperator = json_val.GetString("lockedOperator");
+        if (json_val.has("lockedOperator")) {
+            _lockedOperator = json_val.getString("lockedOperator");
         }
-        if (json_val.Has("airplaneMode")) {
-            _airplaneMode = json_val.GetInt("airplaneMode") > 0 ? 1 : 0;
+        if (json_val.has("airplaneMode")) {
+            _airplaneMode = json_val.getInt("airplaneMode") > 0 ? 1 : 0;
         }
-        if (json_val.Has("enableData")) {
-            _enableData = json_val.GetInt("enableData");
+        if (json_val.has("enableData")) {
+            _enableData = json_val.getInt("enableData");
         }
-        if (json_val.Has("apn")) {
-            _apn = json_val.GetString("apn");
+        if (json_val.has("apn")) {
+            _apn = json_val.getString("apn");
         }
-        if (json_val.Has("apnSecret")) {
-            _apnSecret = json_val.GetString("apnSecret");
+        if (json_val.has("apnSecret")) {
+            _apnSecret = json_val.getString("apnSecret");
         }
-        if (json_val.Has("pingInterval")) {
-            _pingInterval = json_val.GetInt("pingInterval");
+        if (json_val.has("pingInterval")) {
+            _pingInterval = json_val.getInt("pingInterval");
         }
-        if (json_val.Has("dataSent")) {
-            _dataSent = json_val.GetInt("dataSent");
+        if (json_val.has("dataSent")) {
+            _dataSent = json_val.getInt("dataSent");
         }
-        if (json_val.Has("dataReceived")) {
-            _dataReceived = json_val.GetInt("dataReceived");
+        if (json_val.has("dataReceived")) {
+            _dataReceived = json_val.getInt("dataReceived");
         }
-        if (json_val.Has("command")) {
-            _command = json_val.GetString("command");
+        if (json_val.has("command")) {
+            _command = json_val.getString("command");
         }
         base.imm_parseAttr(json_val);
     }

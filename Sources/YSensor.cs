@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YSensor.cs 28559 2017-09-15 15:01:38Z seb $
+ * $Id: YSensor.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements yFindSensor(), the high-level API for Sensor functions
  *
@@ -293,38 +293,38 @@ public class YSensor : YFunction
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("unit")) {
-            _unit = json_val.GetString("unit");
+        if (json_val.has("unit")) {
+            _unit = json_val.getString("unit");
         }
-        if (json_val.Has("currentValue")) {
-            _currentValue = Math.Round(json_val.GetDouble("currentValue") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("currentValue")) {
+            _currentValue = Math.Round(json_val.getDouble("currentValue") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("lowestValue")) {
-            _lowestValue = Math.Round(json_val.GetDouble("lowestValue") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("lowestValue")) {
+            _lowestValue = Math.Round(json_val.getDouble("lowestValue") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("highestValue")) {
-            _highestValue = Math.Round(json_val.GetDouble("highestValue") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("highestValue")) {
+            _highestValue = Math.Round(json_val.getDouble("highestValue") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("currentRawValue")) {
-            _currentRawValue = Math.Round(json_val.GetDouble("currentRawValue") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("currentRawValue")) {
+            _currentRawValue = Math.Round(json_val.getDouble("currentRawValue") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("logFrequency")) {
-            _logFrequency = json_val.GetString("logFrequency");
+        if (json_val.has("logFrequency")) {
+            _logFrequency = json_val.getString("logFrequency");
         }
-        if (json_val.Has("reportFrequency")) {
-            _reportFrequency = json_val.GetString("reportFrequency");
+        if (json_val.has("reportFrequency")) {
+            _reportFrequency = json_val.getString("reportFrequency");
         }
-        if (json_val.Has("advMode")) {
-            _advMode = json_val.GetInt("advMode");
+        if (json_val.has("advMode")) {
+            _advMode = json_val.getInt("advMode");
         }
-        if (json_val.Has("calibrationParam")) {
-            _calibrationParam = json_val.GetString("calibrationParam");
+        if (json_val.has("calibrationParam")) {
+            _calibrationParam = json_val.getString("calibrationParam");
         }
-        if (json_val.Has("resolution")) {
-            _resolution = Math.Round(json_val.GetDouble("resolution") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("resolution")) {
+            _resolution = Math.Round(json_val.getDouble("resolution") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.Has("sensorState")) {
-            _sensorState = json_val.GetInt("sensorState");
+        if (json_val.has("sensorState")) {
+            _sensorState = json_val.getInt("sensorState");
         }
         base.imm_parseAttr(json_val);
     }

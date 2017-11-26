@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFiles.cs 27700 2017-06-01 12:27:09Z seb $
+ * $Id: YFiles.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindFiles(), the high-level API for Files functions
  *
@@ -110,11 +110,11 @@ public class YFiles : YFunction
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("filesCount")) {
-            _filesCount = json_val.GetInt("filesCount");
+        if (json_val.has("filesCount")) {
+            _filesCount = json_val.getInt("filesCount");
         }
-        if (json_val.Has("freeSpace")) {
-            _freeSpace = json_val.GetInt("freeSpace");
+        if (json_val.has("freeSpace")) {
+            _freeSpace = json_val.getInt("freeSpace");
         }
         base.imm_parseAttr(json_val);
     }

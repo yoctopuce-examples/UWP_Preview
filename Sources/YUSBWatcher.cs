@@ -117,6 +117,7 @@ namespace com.yoctopuce.YoctoAPI
                         //Debug.WriteLine("setup yusbDevice=s " + yusbDevice.GetHashCode() + " device=" + device.GetHashCode());
                         await yusbDevice.Setup(YUSBPkt.YPKT_USB_VERSION_BCD);
                         _allDevice.Add(yusbDevice);
+                        _usableDevices.Add(yusbDevice);
                     }
                     else {
                         Debug.WriteLine("drop" + device.VendorId + ":" + device.ProductId);
@@ -134,13 +135,7 @@ namespace com.yoctopuce.YoctoAPI
             return _usableDevices;
         }
 
-        internal void imm_newUsableDevice(YUSBDevice yusbDevice)
-        {
-            if (!_usableDevices.Contains(yusbDevice)) {
-                _usableDevices.Add(yusbDevice);
-            }
-        }
-
+       
         internal void imm_removeUsableDevice(YUSBDevice yusbDevice)
         {
             if (_usableDevices.Contains(yusbDevice)) {

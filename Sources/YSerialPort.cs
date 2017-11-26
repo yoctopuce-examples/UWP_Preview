@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSerialPort.cs 28670 2017-09-27 08:28:39Z seb $
+ * $Id: YSerialPort.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindSerialPort(), the high-level API for SerialPort functions
  *
@@ -193,41 +193,41 @@ public class YSerialPort : YFunction
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("rxCount")) {
-            _rxCount = json_val.GetInt("rxCount");
+        if (json_val.has("rxCount")) {
+            _rxCount = json_val.getInt("rxCount");
         }
-        if (json_val.Has("txCount")) {
-            _txCount = json_val.GetInt("txCount");
+        if (json_val.has("txCount")) {
+            _txCount = json_val.getInt("txCount");
         }
-        if (json_val.Has("errCount")) {
-            _errCount = json_val.GetInt("errCount");
+        if (json_val.has("errCount")) {
+            _errCount = json_val.getInt("errCount");
         }
-        if (json_val.Has("rxMsgCount")) {
-            _rxMsgCount = json_val.GetInt("rxMsgCount");
+        if (json_val.has("rxMsgCount")) {
+            _rxMsgCount = json_val.getInt("rxMsgCount");
         }
-        if (json_val.Has("txMsgCount")) {
-            _txMsgCount = json_val.GetInt("txMsgCount");
+        if (json_val.has("txMsgCount")) {
+            _txMsgCount = json_val.getInt("txMsgCount");
         }
-        if (json_val.Has("lastMsg")) {
-            _lastMsg = json_val.GetString("lastMsg");
+        if (json_val.has("lastMsg")) {
+            _lastMsg = json_val.getString("lastMsg");
         }
-        if (json_val.Has("currentJob")) {
-            _currentJob = json_val.GetString("currentJob");
+        if (json_val.has("currentJob")) {
+            _currentJob = json_val.getString("currentJob");
         }
-        if (json_val.Has("startupJob")) {
-            _startupJob = json_val.GetString("startupJob");
+        if (json_val.has("startupJob")) {
+            _startupJob = json_val.getString("startupJob");
         }
-        if (json_val.Has("command")) {
-            _command = json_val.GetString("command");
+        if (json_val.has("command")) {
+            _command = json_val.getString("command");
         }
-        if (json_val.Has("voltageLevel")) {
-            _voltageLevel = json_val.GetInt("voltageLevel");
+        if (json_val.has("voltageLevel")) {
+            _voltageLevel = json_val.getInt("voltageLevel");
         }
-        if (json_val.Has("protocol")) {
-            _protocol = json_val.GetString("protocol");
+        if (json_val.has("protocol")) {
+            _protocol = json_val.getString("protocol");
         }
-        if (json_val.Has("serialMode")) {
-            _serialMode = json_val.GetString("serialMode");
+        if (json_val.has("serialMode")) {
+            _serialMode = json_val.getString("serialMode");
         }
         base.imm_parseAttr(json_val);
     }

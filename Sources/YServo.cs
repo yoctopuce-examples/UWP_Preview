@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YServo.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YServo.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindServo(), the high-level API for Servo functions
  *
@@ -154,23 +154,23 @@ public class YServo : YFunction
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("position")) {
-            _position = json_val.GetInt("position");
+        if (json_val.has("position")) {
+            _position = json_val.getInt("position");
         }
-        if (json_val.Has("enabled")) {
-            _enabled = json_val.GetInt("enabled") > 0 ? 1 : 0;
+        if (json_val.has("enabled")) {
+            _enabled = json_val.getInt("enabled") > 0 ? 1 : 0;
         }
-        if (json_val.Has("range")) {
-            _range = json_val.GetInt("range");
+        if (json_val.has("range")) {
+            _range = json_val.getInt("range");
         }
-        if (json_val.Has("neutral")) {
-            _neutral = json_val.GetInt("neutral");
+        if (json_val.has("neutral")) {
+            _neutral = json_val.getInt("neutral");
         }
-        if (json_val.Has("positionAtPowerOn")) {
-            _positionAtPowerOn = json_val.GetInt("positionAtPowerOn");
+        if (json_val.has("positionAtPowerOn")) {
+            _positionAtPowerOn = json_val.getInt("positionAtPowerOn");
         }
-        if (json_val.Has("enabledAtPowerOn")) {
-            _enabledAtPowerOn = json_val.GetInt("enabledAtPowerOn") > 0 ? 1 : 0;
+        if (json_val.has("enabledAtPowerOn")) {
+            _enabledAtPowerOn = json_val.getInt("enabledAtPowerOn") > 0 ? 1 : 0;
         }
         base.imm_parseAttr(json_val);
     }

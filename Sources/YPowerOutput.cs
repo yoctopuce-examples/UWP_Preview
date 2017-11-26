@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPowerOutput.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YPowerOutput.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindPowerOutput(), the high-level API for PowerOutput functions
  *
@@ -106,8 +106,8 @@ public class YPowerOutput : YFunction
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("voltage")) {
-            _voltage = json_val.GetInt("voltage");
+        if (json_val.has("voltage")) {
+            _voltage = json_val.getInt("voltage");
         }
         base.imm_parseAttr(json_val);
     }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWatchdog.cs 28741 2017-10-03 08:10:04Z seb $
+ * $Id: YWatchdog.cs 29015 2017-10-24 16:29:41Z seb $
  *
  * Implements FindWatchdog(), the high-level API for Watchdog functions
  *
@@ -198,38 +198,38 @@ public class YWatchdog : YFunction
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
-        if (json_val.Has("state")) {
-            _state = json_val.GetInt("state") > 0 ? 1 : 0;
+        if (json_val.has("state")) {
+            _state = json_val.getInt("state") > 0 ? 1 : 0;
         }
-        if (json_val.Has("stateAtPowerOn")) {
-            _stateAtPowerOn = json_val.GetInt("stateAtPowerOn");
+        if (json_val.has("stateAtPowerOn")) {
+            _stateAtPowerOn = json_val.getInt("stateAtPowerOn");
         }
-        if (json_val.Has("maxTimeOnStateA")) {
-            _maxTimeOnStateA = json_val.GetLong("maxTimeOnStateA");
+        if (json_val.has("maxTimeOnStateA")) {
+            _maxTimeOnStateA = json_val.getLong("maxTimeOnStateA");
         }
-        if (json_val.Has("maxTimeOnStateB")) {
-            _maxTimeOnStateB = json_val.GetLong("maxTimeOnStateB");
+        if (json_val.has("maxTimeOnStateB")) {
+            _maxTimeOnStateB = json_val.getLong("maxTimeOnStateB");
         }
-        if (json_val.Has("output")) {
-            _output = json_val.GetInt("output") > 0 ? 1 : 0;
+        if (json_val.has("output")) {
+            _output = json_val.getInt("output") > 0 ? 1 : 0;
         }
-        if (json_val.Has("pulseTimer")) {
-            _pulseTimer = json_val.GetLong("pulseTimer");
+        if (json_val.has("pulseTimer")) {
+            _pulseTimer = json_val.getLong("pulseTimer");
         }
-        if (json_val.Has("countdown")) {
-            _countdown = json_val.GetLong("countdown");
+        if (json_val.has("countdown")) {
+            _countdown = json_val.getLong("countdown");
         }
-        if (json_val.Has("autoStart")) {
-            _autoStart = json_val.GetInt("autoStart") > 0 ? 1 : 0;
+        if (json_val.has("autoStart")) {
+            _autoStart = json_val.getInt("autoStart") > 0 ? 1 : 0;
         }
-        if (json_val.Has("running")) {
-            _running = json_val.GetInt("running") > 0 ? 1 : 0;
+        if (json_val.has("running")) {
+            _running = json_val.getInt("running") > 0 ? 1 : 0;
         }
-        if (json_val.Has("triggerDelay")) {
-            _triggerDelay = json_val.GetLong("triggerDelay");
+        if (json_val.has("triggerDelay")) {
+            _triggerDelay = json_val.getLong("triggerDelay");
         }
-        if (json_val.Has("triggerDuration")) {
-            _triggerDuration = json_val.GetLong("triggerDuration");
+        if (json_val.has("triggerDuration")) {
+            _triggerDuration = json_val.getLong("triggerDuration");
         }
         base.imm_parseAttr(json_val);
     }
