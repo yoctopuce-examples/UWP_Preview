@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YColorLedCluster.cs 29015 2017-10-24 16:29:41Z seb $
+ * $Id: YColorLedCluster.cs 29390 2017-12-07 10:27:31Z seb $
  *
  * Implements FindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -1158,6 +1158,9 @@ public class YColorLedCluster : YFunction
      *   the next color code represents the target value of the next LED, etc.
      * </para>
      * </summary>
+     * <param name="ledIndex">
+     *   index of the first LED which should be updated
+     * </param>
      * <param name="rgbList">
      *   a list of target 24bit RGB codes, in the form 0xRRGGBB
      * </param>
@@ -1171,7 +1174,7 @@ public class YColorLedCluster : YFunction
      *   On failure, throws an exception or returns a negative error code.
      * </para>
      */
-    public virtual async Task<int> rgbArray_move(List<int> rgbList,int delay)
+    public virtual async Task<int> rgbArrayOfs_move(int ledIndex,List<int> rgbList,int delay)
     {
         int listlen;
         byte[] buff;
@@ -1189,7 +1192,37 @@ public class YColorLedCluster : YFunction
             idx = idx + 1;
         }
 
-        res = await this._upload("rgb:"+Convert.ToString(delay), buff);
+        res = await this._upload("rgb:"+Convert.ToString(delay)+":"+Convert.ToString(ledIndex), buff);
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Sets up a smooth RGB color transition to the specified pixel-by-pixel list of RGB
+     *   color codes.
+     * <para>
+     *   The first color code represents the target RGB value of the first LED,
+     *   the next color code represents the target value of the next LED, etc.
+     * </para>
+     * </summary>
+     * <param name="rgbList">
+     *   a list of target 24bit RGB codes, in the form 0xRRGGBB
+     * </param>
+     * <param name="delay">
+     *   transition duration in ms
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual async Task<int> rgbArray_move(List<int> rgbList,int delay)
+    {
+        int res;
+
+        res = await this.rgbArrayOfs_move(0, rgbList, delay);
         return res;
     }
 
@@ -1286,6 +1319,39 @@ public class YColorLedCluster : YFunction
      */
     public virtual async Task<int> hslArray_move(List<int> hslList,int delay)
     {
+        int res;
+
+        res = await this.hslArrayOfs_move(0, hslList, delay);
+        return res;
+    }
+
+    /**
+     * <summary>
+     *   Sets up a smooth HSL color transition to the specified pixel-by-pixel list of HSL
+     *   color codes.
+     * <para>
+     *   The first color code represents the target HSL value of the first LED,
+     *   the second color code represents the target value of the second LED, etc.
+     * </para>
+     * </summary>
+     * <param name="ledIndex">
+     *   index of the first LED which should be updated
+     * </param>
+     * <param name="hslList">
+     *   a list of target 24bit HSL codes, in the form 0xHHSSLL
+     * </param>
+     * <param name="delay">
+     *   transition duration in ms
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public virtual async Task<int> hslArrayOfs_move(int ledIndex,List<int> hslList,int delay)
+    {
         int listlen;
         byte[] buff;
         int idx;
@@ -1302,7 +1368,7 @@ public class YColorLedCluster : YFunction
             idx = idx + 1;
         }
 
-        res = await this._upload("hsl:"+Convert.ToString(delay), buff);
+        res = await this._upload("hsl:"+Convert.ToString(delay)+":"+Convert.ToString(ledIndex), buff);
         return res;
     }
 
