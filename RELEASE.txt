@@ -1,1 +1,1 @@
-- Fix IO errors due to remote socket close
+- Fix IO errors due to socket remote close

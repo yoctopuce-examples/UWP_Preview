@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YHTTPRequest.cs 29397 2017-12-08 09:17:09Z seb $
+ * $Id: YHTTPRequest.cs 29398 2017-12-08 09:20:22Z seb $
  *
  * internal yHTTPRequest object
  *
@@ -40,7 +40,6 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Networking;
@@ -56,7 +55,9 @@ namespace com.yoctopuce.YoctoAPI
         internal delegate void HandleIncommingData(byte[] result, int size);
 
         private HandleIncommingData _progressCallback;
+        // ReSharper disable once NotAccessedField.Local
         private object _context;
+        // ReSharper disable once NotAccessedField.Local
         private YGenericHub.RequestAsyncResult _resultCallback;
 
         private readonly YHTTPHub _hub;
@@ -72,10 +73,11 @@ namespace com.yoctopuce.YoctoAPI
 
 
         private static ulong global_reqNum;
+        // ReSharper disable once NotAccessedField.Local
         private ulong _reqNum;
         private Stream _out;
         private Stream _in;
-        private Task<byte[]> _currentReq = null;
+        private Task<byte[]> _currentReq;
 
         internal YHTTPRequest(YHTTPHub hub, string dbglabel)
         {
@@ -84,6 +86,7 @@ namespace com.yoctopuce.YoctoAPI
             _reqNum = global_reqNum++;
         }
 
+        // ReSharper disable once UnusedParameter.Local
         private void log(string msg)
         {
             //Debug.WriteLine(string.Format("{0}:{1}:{2}:{3}", Environment.CurrentManagedThreadId, _dbglabel, _reqNum, msg));
@@ -197,7 +200,7 @@ namespace com.yoctopuce.YoctoAPI
             _reuse_socket = false;
             bool eof = false;
             do {
-                int read = 0;
+                int read;
                 try {
                     int waitms;
                     ulong now;
