@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YAPIContext.cs 28987 2017-10-23 09:39:15Z seb $
+ * $Id: YAPIContext.cs 29423 2017-12-11 14:46:46Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -688,7 +688,6 @@ namespace com.yoctopuce.YoctoAPI
 
         internal void _Log(string message)
         {
-            Debug.Write(message);
             if (_logCallback != null) {
                 _logCallback(message);
             }

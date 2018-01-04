@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YAPI.cs 29083 2017-11-03 17:48:44Z seb $
+ * $Id: YAPI.cs 29463 2017-12-20 07:40:43Z mvuilleu $
  *
  * High-level programming interface, common to all modules
  *
@@ -71,7 +71,7 @@ namespace com.yoctopuce.YoctoAPI
         public const long INVALID_LONG = -9223372036854775807L;
         public const int INVALID_UINT = -1;
         public const string YOCTO_API_VERSION_STR = "1.10";
-        public const string YOCTO_API_BUILD_STR = "29407";
+        public const string YOCTO_API_BUILD_STR = "29543";
         public const int YOCTO_API_VERSION_BCD = 0x0110;
         public const int YOCTO_VENDORID = 0x24e0;
         public const int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -176,7 +176,7 @@ namespace com.yoctopuce.YoctoAPI
          */
         public static string GetAPIVersion()
         {
-            return YOCTO_API_VERSION_STR + ".29407" + YUSBHub.imm_getAPIVersion();
+            return YOCTO_API_VERSION_STR + ".29543" + YUSBHub.imm_getAPIVersion();
         }
 
         /**
@@ -427,7 +427,7 @@ namespace com.yoctopuce.YoctoAPI
 
         /**
          * <summary>
-         *   Fault-tolerant alternative to RegisterHub().
+         *   Fault-tolerant alternative to <c>RegisterHub()</c>.
          * <para>
          *   This function has the same
          *   purpose and same arguments as <c>RegisterHub()</c>, but does not trigger
@@ -465,7 +465,7 @@ namespace com.yoctopuce.YoctoAPI
 
         /**
          * <summary>
-         *   Fault-tolerant alternative to RegisterHub().
+         *   Fault-tolerant alternative to <c>RegisterHub()</c>.
          * <para>
          *   This function has the same
          *   purpose and same arguments as <c>RegisterHub()</c>, but does not trigger

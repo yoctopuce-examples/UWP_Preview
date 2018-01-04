@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YSensor.cs 29015 2017-10-24 16:29:41Z seb $
+ * $Id: YSensor.cs 29466 2017-12-20 08:11:49Z mvuilleu $
  *
  * Implements yFindSensor(), the high-level API for Sensor functions
  *
@@ -395,6 +395,8 @@ public class YSensor : YFunction
      * <summary>
      *   Changes the recorded minimal value observed.
      * <para>
+     *   Can be used to reset the value returned
+     *   by get_lowestValue().
      * </para>
      * <para>
      * </para>
@@ -423,6 +425,7 @@ public class YSensor : YFunction
      * <summary>
      *   Returns the minimal value observed for the measure since the device was started.
      * <para>
+     *   Can be reset to an arbitrary value thanks to set_lowestValue().
      * </para>
      * <para>
      * </para>
@@ -452,6 +455,8 @@ public class YSensor : YFunction
      * <summary>
      *   Changes the recorded maximal value observed.
      * <para>
+     *   Can be used to reset the value returned
+     *   by get_lowestValue().
      * </para>
      * <para>
      * </para>
@@ -480,6 +485,7 @@ public class YSensor : YFunction
      * <summary>
      *   Returns the maximal value observed for the measure since the device was started.
      * <para>
+     *   Can be reset to an arbitrary value thanks to set_highestValue().
      * </para>
      * <para>
      * </para>

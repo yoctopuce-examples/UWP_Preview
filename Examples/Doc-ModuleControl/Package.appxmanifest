@@ -22,6 +22,7 @@
   </Applications>
   <Capabilities>
     <Capability Name="internetClient" />
+    <Capability Name="privateNetworkClientServer" />
     <DeviceCapability Name="humaninterfacedevice">
       <!-- Yocto-Knob -->
       <Device Id="vidpid:24e0 000a">

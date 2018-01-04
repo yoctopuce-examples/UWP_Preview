@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YStepperMotor.cs 29015 2017-10-24 16:29:41Z seb $
+ * $Id: YStepperMotor.cs 29507 2017-12-28 14:14:56Z mvuilleu $
  *
  * Implements FindStepperMotor(), the high-level API for StepperMotor functions
  *
@@ -1107,7 +1107,22 @@ public class YStepperMotor : YFunction
 
     public virtual async Task<int> sendCommand(string command)
     {
-        return await this.set_command(command);
+        string id;
+        string url;
+        byte[] retBin;
+        int res;
+        id = await this.get_functionId();
+        id = (id).Substring( 12, 1);
+        url = "cmd.txt?"+ id+"="+command;
+        //may throw an exception
+        retBin = await this._download(url);
+        res = retBin[0];
+        if (res == 49) {
+            if (!(res == 48)) { this._throw( YAPI.DEVICE_BUSY, "Motor command pipeline is full, try again later"); return YAPI.DEVICE_BUSY; }
+        } else {
+            if (!(res == 48)) { this._throw( YAPI.IO_ERROR, "Motor command failed permanently"); return YAPI.IO_ERROR; }
+        }
+        return YAPI.SUCCESS;
     }
 
     /**
@@ -1213,6 +1228,31 @@ public class YStepperMotor : YFunction
 
     /**
      * <summary>
+     *   Starts the motor to reach a given relative position, keeping the speed under the
+     *   specified limit.
+     * <para>
+     *   The time needed to reach the requested position will depend on
+     *   the acceleration parameters configured for the motor.
+     * </para>
+     * </summary>
+     * <param name="relPos">
+     *   relative position, measured in steps from the current position.
+     * </param>
+     * <param name="maxSpeed">
+     *   limit speed, in steps per second.
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     *   On failure, throws an exception or returns a negative error code.
+     * </returns>
+     */
+    public virtual async Task<int> moveRelSlow(double relPos,double maxSpeed)
+    {
+        return await this.sendCommand("m"+Convert.ToString((int) Math.Round(16*relPos))+"@"+Convert.ToString((int) Math.Round(1000*maxSpeed)));
+    }
+
+    /**
+     * <summary>
      *   Keep the motor in the same state for the specified amount of time, before processing next command.
      * <para>
      * </para>
@@ -1262,6 +1302,31 @@ public class YStepperMotor : YFunction
     public virtual async Task<int> alertStepOut()
     {
         return await this.sendCommand(".");
+    }
+
+    /**
+     * <summary>
+     *   Move one single step in the selected direction without regards to end switches.
+     * <para>
+     *   The move occures even if the system is still in alert mode (end switch depressed). Caution.
+     *   use this function with great care as it may cause mechanical damages !
+     * </para>
+     * </summary>
+     * <param name="dir">
+     *   Value +1 ou -1, according to the desired direction of the move
+     * </param>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     *   On failure, throws an exception or returns a negative error code.
+     * </returns>
+     */
+    public virtual async Task<int> alertStepDir(int dir)
+    {
+        if (!(dir != 0)) { this._throw( YAPI.INVALID_ARGUMENT, "direction must be +1 or -1"); return YAPI.INVALID_ARGUMENT; }
+        if (dir > 0) {
+            return await this.sendCommand(".+");
+        }
+        return await this.sendCommand(".-");
     }
 
     /**

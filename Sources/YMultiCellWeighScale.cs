@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YWeighScale.cs 29472 2017-12-20 11:34:07Z mvuilleu $
+ * $Id: YMultiCellWeighScale.cs 29478 2017-12-21 08:10:05Z seb $
  *
- * Implements FindWeighScale(), the high-level API for WeighScale functions
+ * Implements FindMultiCellWeighScale(), the high-level API for MultiCellWeighScale functions
  *
  * - - - - - - - - - License information: - - - - - - - - -
  *
@@ -43,25 +43,31 @@ using System.Threading.Tasks;
 namespace com.yoctopuce.YoctoAPI
 {
 
-//--- (YWeighScale return codes)
-//--- (end of YWeighScale return codes)
-//--- (YWeighScale class start)
+//--- (YMultiCellWeighScale return codes)
+//--- (end of YMultiCellWeighScale return codes)
+//--- (YMultiCellWeighScale class start)
 /**
  * <summary>
- *   YWeighScale Class: WeighScale function interface
+ *   YMultiCellWeighScale Class: MultiCellWeighScale function interface
  * <para>
- *   The YWeighScale class provides a weight measurement from a ratiometric load cell
+ *   The YMultiCellWeighScale class provides a weight measurement from a set of ratiometric load cells
  *   sensor. It can be used to control the bridge excitation parameters, in order to avoid
  *   measure shifts caused by temperature variation in the electronics, and can also
  *   automatically apply an additional correction factor based on temperature to
- *   compensate for offsets in the load cell itself.
+ *   compensate for offsets in the load cells themselves.
  * </para>
  * </summary>
  */
-public class YWeighScale : YSensor
+public class YMultiCellWeighScale : YSensor
 {
-//--- (end of YWeighScale class start)
-//--- (YWeighScale definitions)
+//--- (end of YMultiCellWeighScale class start)
+//--- (YMultiCellWeighScale definitions)
+    /**
+     * <summary>
+     *   invalid cellCount value
+     * </summary>
+     */
+    public const  int CELLCOUNT_INVALID = YAPI.INVALID_UINT;
     /**
      * <summary>
      *   invalid excitation value
@@ -107,6 +113,7 @@ public class YWeighScale : YSensor
      * </summary>
      */
     public const  string COMMAND_INVALID = YAPI.INVALID_STRING;
+    protected int _cellCount = CELLCOUNT_INVALID;
     protected int _excitation = EXCITATION_INVALID;
     protected double _compTempAdaptRatio = COMPTEMPADAPTRATIO_INVALID;
     protected double _compTempAvg = COMPTEMPAVG_INVALID;
@@ -114,12 +121,12 @@ public class YWeighScale : YSensor
     protected double _compensation = COMPENSATION_INVALID;
     protected double _zeroTracking = ZEROTRACKING_INVALID;
     protected string _command = COMMAND_INVALID;
-    protected ValueCallback _valueCallbackWeighScale = null;
-    protected TimedReportCallback _timedReportCallbackWeighScale = null;
+    protected ValueCallback _valueCallbackMultiCellWeighScale = null;
+    protected TimedReportCallback _timedReportCallbackMultiCellWeighScale = null;
 
-    public new delegate Task ValueCallback(YWeighScale func, string value);
-    public new delegate Task TimedReportCallback(YWeighScale func, YMeasure measure);
-    //--- (end of YWeighScale definitions)
+    public new delegate Task ValueCallback(YMultiCellWeighScale func, string value);
+    public new delegate Task TimedReportCallback(YMultiCellWeighScale func, YMeasure measure);
+    //--- (end of YMultiCellWeighScale definitions)
 
 
     /**
@@ -129,11 +136,11 @@ public class YWeighScale : YSensor
      *   functionid
      * </param>
      */
-    protected YWeighScale(YAPIContext ctx, string func)
-        : base(ctx, func, "WeighScale")
+    protected YMultiCellWeighScale(YAPIContext ctx, string func)
+        : base(ctx, func, "MultiCellWeighScale")
     {
-        //--- (YWeighScale attributes initialization)
-        //--- (end of YWeighScale attributes initialization)
+        //--- (YMultiCellWeighScale attributes initialization)
+        //--- (end of YMultiCellWeighScale attributes initialization)
     }
 
     /**
@@ -143,15 +150,18 @@ public class YWeighScale : YSensor
      *   functionid
      * </param>
      */
-    protected YWeighScale(string func)
+    protected YMultiCellWeighScale(string func)
         : this(YAPI.imm_GetYCtx(), func)
     {
     }
 
-    //--- (YWeighScale implementation)
+    //--- (YMultiCellWeighScale implementation)
 #pragma warning disable 1998
     internal override void imm_parseAttr(YJSONObject json_val)
     {
+        if (json_val.has("cellCount")) {
+            _cellCount = json_val.getInt("cellCount");
+        }
         if (json_val.has("excitation")) {
             _excitation = json_val.getInt("excitation");
         }
@@ -178,6 +188,62 @@ public class YWeighScale : YSensor
 
     /**
      * <summary>
+     *   Returns the number of load cells in use.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <returns>
+     *   an integer corresponding to the number of load cells in use
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns <c>YMultiCellWeighScale.CELLCOUNT_INVALID</c>.
+     * </para>
+     */
+    public async Task<int> get_cellCount()
+    {
+        int res;
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+            if (await this.load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return CELLCOUNT_INVALID;
+            }
+        }
+        res = _cellCount;
+        return res;
+    }
+
+
+    /**
+     * <summary>
+     *   Changes the number of load cells in use.
+     * <para>
+     * </para>
+     * <para>
+     * </para>
+     * </summary>
+     * <param name="newval">
+     *   an integer corresponding to the number of load cells in use
+     * </param>
+     * <para>
+     * </para>
+     * <returns>
+     *   <c>YAPI.SUCCESS</c> if the call succeeds.
+     * </returns>
+     * <para>
+     *   On failure, throws an exception or returns a negative error code.
+     * </para>
+     */
+    public async Task<int> set_cellCount(int  newval)
+    {
+        string rest_val;
+        rest_val = (newval).ToString();
+        await _setAttr("cellCount",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * <summary>
      *   Returns the current load cell bridge excitation method.
      * <para>
      * </para>
@@ -185,11 +251,11 @@ public class YWeighScale : YSensor
      * </para>
      * </summary>
      * <returns>
-     *   a value among <c>YWeighScale.EXCITATION_OFF</c>, <c>YWeighScale.EXCITATION_DC</c> and
-     *   <c>YWeighScale.EXCITATION_AC</c> corresponding to the current load cell bridge excitation method
+     *   a value among <c>YMultiCellWeighScale.EXCITATION_OFF</c>, <c>YMultiCellWeighScale.EXCITATION_DC</c>
+     *   and <c>YMultiCellWeighScale.EXCITATION_AC</c> corresponding to the current load cell bridge excitation method
      * </returns>
      * <para>
-     *   On failure, throws an exception or returns <c>YWeighScale.EXCITATION_INVALID</c>.
+     *   On failure, throws an exception or returns <c>YMultiCellWeighScale.EXCITATION_INVALID</c>.
      * </para>
      */
     public async Task<int> get_excitation()
@@ -214,8 +280,8 @@ public class YWeighScale : YSensor
      * </para>
      * </summary>
      * <param name="newval">
-     *   a value among <c>YWeighScale.EXCITATION_OFF</c>, <c>YWeighScale.EXCITATION_DC</c> and
-     *   <c>YWeighScale.EXCITATION_AC</c> corresponding to the current load cell bridge excitation method
+     *   a value among <c>YMultiCellWeighScale.EXCITATION_OFF</c>, <c>YMultiCellWeighScale.EXCITATION_DC</c>
+     *   and <c>YMultiCellWeighScale.EXCITATION_AC</c> corresponding to the current load cell bridge excitation method
      * </param>
      * <para>
      * </para>
@@ -280,7 +346,7 @@ public class YWeighScale : YSensor
      *   a floating point number corresponding to the averaged temperature update rate, in percents
      * </returns>
      * <para>
-     *   On failure, throws an exception or returns <c>YWeighScale.COMPTEMPADAPTRATIO_INVALID</c>.
+     *   On failure, throws an exception or returns <c>YMultiCellWeighScale.COMPTEMPADAPTRATIO_INVALID</c>.
      * </para>
      */
     public async Task<double> get_compTempAdaptRatio()
@@ -308,7 +374,7 @@ public class YWeighScale : YSensor
      *   a floating point number corresponding to the current averaged temperature, used for thermal compensation
      * </returns>
      * <para>
-     *   On failure, throws an exception or returns <c>YWeighScale.COMPTEMPAVG_INVALID</c>.
+     *   On failure, throws an exception or returns <c>YMultiCellWeighScale.COMPTEMPAVG_INVALID</c>.
      * </para>
      */
     public async Task<double> get_compTempAvg()
@@ -336,7 +402,7 @@ public class YWeighScale : YSensor
      *   a floating point number corresponding to the current temperature variation, used for thermal compensation
      * </returns>
      * <para>
-     *   On failure, throws an exception or returns <c>YWeighScale.COMPTEMPCHG_INVALID</c>.
+     *   On failure, throws an exception or returns <c>YMultiCellWeighScale.COMPTEMPCHG_INVALID</c>.
      * </para>
      */
     public async Task<double> get_compTempChg()
@@ -364,7 +430,7 @@ public class YWeighScale : YSensor
      *   a floating point number corresponding to the current current thermal compensation value
      * </returns>
      * <para>
-     *   On failure, throws an exception or returns <c>YWeighScale.COMPENSATION_INVALID</c>.
+     *   On failure, throws an exception or returns <c>YMultiCellWeighScale.COMPENSATION_INVALID</c>.
      * </para>
      */
     public async Task<double> get_compensation()
@@ -423,7 +489,7 @@ public class YWeighScale : YSensor
      *   a floating point number corresponding to the zero tracking threshold value
      * </returns>
      * <para>
-     *   On failure, throws an exception or returns <c>YWeighScale.ZEROTRACKING_INVALID</c>.
+     *   On failure, throws an exception or returns <c>YMultiCellWeighScale.ZEROTRACKING_INVALID</c>.
      * </para>
      */
     public async Task<double> get_zeroTracking()
@@ -467,7 +533,7 @@ public class YWeighScale : YSensor
 
     /**
      * <summary>
-     *   Retrieves a weighing scale sensor for a given identifier.
+     *   Retrieves a multi-cell weighing scale sensor for a given identifier.
      * <para>
      *   The identifier can be specified using several formats:
      * </para>
@@ -491,11 +557,11 @@ public class YWeighScale : YSensor
      * <para>
      * </para>
      * <para>
-     *   This function does not require that the weighing scale sensor is online at the time
+     *   This function does not require that the multi-cell weighing scale sensor is online at the time
      *   it is invoked. The returned object is nevertheless valid.
-     *   Use the method <c>YWeighScale.isOnline()</c> to test if the weighing scale sensor is
+     *   Use the method <c>YMultiCellWeighScale.isOnline()</c> to test if the multi-cell weighing scale sensor is
      *   indeed online at a given time. In case of ambiguity when looking for
-     *   a weighing scale sensor by logical name, no error is notified: the first instance
+     *   a multi-cell weighing scale sensor by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
      * </para>
@@ -508,26 +574,26 @@ public class YWeighScale : YSensor
      * </para>
      * </summary>
      * <param name="func">
-     *   a string that uniquely characterizes the weighing scale sensor
+     *   a string that uniquely characterizes the multi-cell weighing scale sensor
      * </param>
      * <returns>
-     *   a <c>YWeighScale</c> object allowing you to drive the weighing scale sensor.
+     *   a <c>YMultiCellWeighScale</c> object allowing you to drive the multi-cell weighing scale sensor.
      * </returns>
      */
-    public static YWeighScale FindWeighScale(string func)
+    public static YMultiCellWeighScale FindMultiCellWeighScale(string func)
     {
-        YWeighScale obj;
-        obj = (YWeighScale) YFunction._FindFromCache("WeighScale", func);
+        YMultiCellWeighScale obj;
+        obj = (YMultiCellWeighScale) YFunction._FindFromCache("MultiCellWeighScale", func);
         if (obj == null) {
-            obj = new YWeighScale(func);
-            YFunction._AddToCache("WeighScale",  func, obj);
+            obj = new YMultiCellWeighScale(func);
+            YFunction._AddToCache("MultiCellWeighScale",  func, obj);
         }
         return obj;
     }
 
     /**
      * <summary>
-     *   Retrieves a weighing scale sensor for a given identifier in a YAPI context.
+     *   Retrieves a multi-cell weighing scale sensor for a given identifier in a YAPI context.
      * <para>
      *   The identifier can be specified using several formats:
      * </para>
@@ -551,11 +617,11 @@ public class YWeighScale : YSensor
      * <para>
      * </para>
      * <para>
-     *   This function does not require that the weighing scale sensor is online at the time
+     *   This function does not require that the multi-cell weighing scale sensor is online at the time
      *   it is invoked. The returned object is nevertheless valid.
-     *   Use the method <c>YWeighScale.isOnline()</c> to test if the weighing scale sensor is
+     *   Use the method <c>YMultiCellWeighScale.isOnline()</c> to test if the multi-cell weighing scale sensor is
      *   indeed online at a given time. In case of ambiguity when looking for
-     *   a weighing scale sensor by logical name, no error is notified: the first instance
+     *   a multi-cell weighing scale sensor by logical name, no error is notified: the first instance
      *   found is returned. The search is performed first by hardware name,
      *   then by logical name.
      * </para>
@@ -564,19 +630,19 @@ public class YWeighScale : YSensor
      *   a YAPI context
      * </param>
      * <param name="func">
-     *   a string that uniquely characterizes the weighing scale sensor
+     *   a string that uniquely characterizes the multi-cell weighing scale sensor
      * </param>
      * <returns>
-     *   a <c>YWeighScale</c> object allowing you to drive the weighing scale sensor.
+     *   a <c>YMultiCellWeighScale</c> object allowing you to drive the multi-cell weighing scale sensor.
      * </returns>
      */
-    public static YWeighScale FindWeighScaleInContext(YAPIContext yctx,string func)
+    public static YMultiCellWeighScale FindMultiCellWeighScaleInContext(YAPIContext yctx,string func)
     {
-        YWeighScale obj;
-        obj = (YWeighScale) YFunction._FindFromCacheInContext(yctx,  "WeighScale", func);
+        YMultiCellWeighScale obj;
+        obj = (YMultiCellWeighScale) YFunction._FindFromCacheInContext(yctx,  "MultiCellWeighScale", func);
         if (obj == null) {
-            obj = new YWeighScale(yctx, func);
-            YFunction._AddToCache("WeighScale",  func, obj);
+            obj = new YMultiCellWeighScale(yctx, func);
+            YFunction._AddToCache("MultiCellWeighScale",  func, obj);
         }
         return obj;
     }
@@ -607,7 +673,7 @@ public class YWeighScale : YSensor
         } else {
             await YFunction._UpdateValueCallbackList(this, false);
         }
-        _valueCallbackWeighScale = callback;
+        _valueCallbackMultiCellWeighScale = callback;
         // Immediately invoke value callback with current value
         if (callback != null && await this.isOnline()) {
             val = _advertisedValue;
@@ -620,8 +686,8 @@ public class YWeighScale : YSensor
 
     public override async Task<int> _invokeValueCallback(string value)
     {
-        if (_valueCallbackWeighScale != null) {
-            await _valueCallbackWeighScale(this, value);
+        if (_valueCallbackMultiCellWeighScale != null) {
+            await _valueCallbackMultiCellWeighScale(this, value);
         } else {
             await base._invokeValueCallback(value);
         }
@@ -655,14 +721,14 @@ public class YWeighScale : YSensor
         } else {
             await YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
-        _timedReportCallbackWeighScale = callback;
+        _timedReportCallbackMultiCellWeighScale = callback;
         return 0;
     }
 
     public override async Task<int> _invokeTimedReportCallback(YMeasure value)
     {
-        if (_timedReportCallbackWeighScale != null) {
-            await _timedReportCallbackWeighScale(this, value);
+        if (_timedReportCallbackMultiCellWeighScale != null) {
+            await _timedReportCallbackMultiCellWeighScale(this, value);
         } else {
             await base._invokeTimedReportCallback(value);
         }
@@ -671,7 +737,7 @@ public class YWeighScale : YSensor
 
     /**
      * <summary>
-     *   Adapts the load cell signal bias (stored in the corresponding genericSensor)
+     *   Adapts the load cells signal bias (stored in the corresponding genericSensor)
      *   so that the current signal corresponds to a zero weight.
      * <para>
      * </para>
@@ -692,7 +758,7 @@ public class YWeighScale : YSensor
 
     /**
      * <summary>
-     *   Configures the load cell span parameters (stored in the corresponding genericSensor)
+     *   Configures the load cells span parameters (stored in the corresponding genericSensors)
      *   so that the current signal corresponds to the specified reference weight.
      * <para>
      * </para>
@@ -717,338 +783,19 @@ public class YWeighScale : YSensor
         return await this.set_command("S"+Convert.ToString( (int) Math.Round(1000*currWeight))+":"+Convert.ToString((int) Math.Round(1000*maxWeight)));
     }
 
-    public virtual async Task<int> setCompensationTable(int tableIndex,List<double> tempValues,List<double> compValues)
-    {
-        int siz;
-        int res;
-        int idx;
-        int found;
-        double prev;
-        double curr;
-        double currComp;
-        double idxTemp;
-        siz = tempValues.Count;
-        if (!(siz != 1)) { this._throw( YAPI.INVALID_ARGUMENT, "thermal compensation table must have at least two points"); return YAPI.INVALID_ARGUMENT; }
-        if (!(siz == compValues.Count)) { this._throw( YAPI.INVALID_ARGUMENT, "table sizes mismatch"); return YAPI.INVALID_ARGUMENT; }
-
-        res = await this.set_command(""+Convert.ToString(tableIndex)+"Z");
-        if (!(res==YAPI.SUCCESS)) { this._throw( YAPI.IO_ERROR, "unable to reset thermal compensation table"); return YAPI.IO_ERROR; }
-        // add records in growing temperature value
-        found = 1;
-        prev = -999999.0;
-        while (found > 0) {
-            found = 0;
-            curr = 99999999.0;
-            currComp = -999999.0;
-            idx = 0;
-            while (idx < siz) {
-                idxTemp = tempValues[idx];
-                if ((idxTemp > prev) && (idxTemp < curr)) {
-                    curr = idxTemp;
-                    currComp = compValues[idx];
-                    found = 1;
-                }
-                idx = idx + 1;
-            }
-            if (found > 0) {
-                res = await this.set_command(""+Convert.ToString( tableIndex)+"m"+Convert.ToString( (int) Math.Round(1000*curr))+":"+Convert.ToString((int) Math.Round(1000*currComp)));
-                if (!(res==YAPI.SUCCESS)) { this._throw( YAPI.IO_ERROR, "unable to set thermal compensation table"); return YAPI.IO_ERROR; }
-                prev = curr;
-            }
-        }
-        return YAPI.SUCCESS;
-    }
-
-    public virtual async Task<int> loadCompensationTable(int tableIndex,List<double> tempValues,List<double> compValues)
-    {
-        string id;
-        byte[] bin_json;
-        List<string> paramlist = new List<string>();
-        int siz;
-        int idx;
-        double temp;
-        double comp;
-
-        id = await this.get_functionId();
-        id = (id).Substring( 10, (id).Length - 10);
-        bin_json = await this._download("extra.json?page="+Convert.ToString((4*YAPIContext.imm_atoi(id))+tableIndex));
-        paramlist = this.imm_json_get_array(bin_json);
-        // convert all values to float and append records
-        siz = ((paramlist.Count) >> (1));
-        tempValues.Clear();
-        compValues.Clear();
-        idx = 0;
-        while (idx < siz) {
-            temp = Double.Parse(paramlist[2*idx])/1000.0;
-            comp = Double.Parse(paramlist[2*idx+1])/1000.0;
-            tempValues.Add(temp);
-            compValues.Add(comp);
-            idx = idx + 1;
-        }
-        return YAPI.SUCCESS;
-    }
-
     /**
      * <summary>
-     *   Records a weight offset thermal compensation table, in order to automatically correct the
-     *   measured weight based on the averaged compensation temperature.
-     * <para>
-     *   The weight correction will be applied by linear interpolation between specified points.
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <param name="tempValues">
-     *   array of floating point numbers, corresponding to all averaged
-     *   temperatures for which an offset correction is specified.
-     * </param>
-     * <param name="compValues">
-     *   array of floating point numbers, corresponding to the offset correction
-     *   to apply for each of the temperature included in the first
-     *   argument, index by index.
-     * </param>
-     * <returns>
-     *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns a negative error code.
-     * </para>
-     */
-    public virtual async Task<int> set_offsetAvgCompensationTable(List<double> tempValues,List<double> compValues)
-    {
-        return await this.setCompensationTable(0,  tempValues, compValues);
-    }
-
-    /**
-     * <summary>
-     *   Retrieves the weight offset thermal compensation table previously configured using the
-     *   <c>set_offsetAvgCompensationTable</c> function.
-     * <para>
-     *   The weight correction is applied by linear interpolation between specified points.
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <param name="tempValues">
-     *   array of floating point numbers, that is filled by the function
-     *   with all averaged temperatures for which an offset correction is specified.
-     * </param>
-     * <param name="compValues">
-     *   array of floating point numbers, that is filled by the function
-     *   with the offset correction applied for each of the temperature
-     *   included in the first argument, index by index.
-     * </param>
-     * <returns>
-     *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns a negative error code.
-     * </para>
-     */
-    public virtual async Task<int> loadOffsetAvgCompensationTable(List<double> tempValues,List<double> compValues)
-    {
-        return await this.loadCompensationTable(0,  tempValues, compValues);
-    }
-
-    /**
-     * <summary>
-     *   Records a weight offset thermal compensation table, in order to automatically correct the
-     *   measured weight based on the variation of temperature.
-     * <para>
-     *   The weight correction will be applied by linear interpolation between specified points.
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <param name="tempValues">
-     *   array of floating point numbers, corresponding to temperature
-     *   variations for which an offset correction is specified.
-     * </param>
-     * <param name="compValues">
-     *   array of floating point numbers, corresponding to the offset correction
-     *   to apply for each of the temperature variation included in the first
-     *   argument, index by index.
-     * </param>
-     * <returns>
-     *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns a negative error code.
-     * </para>
-     */
-    public virtual async Task<int> set_offsetChgCompensationTable(List<double> tempValues,List<double> compValues)
-    {
-        return await this.setCompensationTable(1,  tempValues, compValues);
-    }
-
-    /**
-     * <summary>
-     *   Retrieves the weight offset thermal compensation table previously configured using the
-     *   <c>set_offsetChgCompensationTable</c> function.
-     * <para>
-     *   The weight correction is applied by linear interpolation between specified points.
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <param name="tempValues">
-     *   array of floating point numbers, that is filled by the function
-     *   with all temperature variations for which an offset correction is specified.
-     * </param>
-     * <param name="compValues">
-     *   array of floating point numbers, that is filled by the function
-     *   with the offset correction applied for each of the temperature
-     *   variation included in the first argument, index by index.
-     * </param>
-     * <returns>
-     *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns a negative error code.
-     * </para>
-     */
-    public virtual async Task<int> loadOffsetChgCompensationTable(List<double> tempValues,List<double> compValues)
-    {
-        return await this.loadCompensationTable(1,  tempValues, compValues);
-    }
-
-    /**
-     * <summary>
-     *   Records a weight span thermal compensation table, in order to automatically correct the
-     *   measured weight based on the compensation temperature.
-     * <para>
-     *   The weight correction will be applied by linear interpolation between specified points.
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <param name="tempValues">
-     *   array of floating point numbers, corresponding to all averaged
-     *   temperatures for which a span correction is specified.
-     * </param>
-     * <param name="compValues">
-     *   array of floating point numbers, corresponding to the span correction
-     *   (in percents) to apply for each of the temperature included in the first
-     *   argument, index by index.
-     * </param>
-     * <returns>
-     *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns a negative error code.
-     * </para>
-     */
-    public virtual async Task<int> set_spanAvgCompensationTable(List<double> tempValues,List<double> compValues)
-    {
-        return await this.setCompensationTable(2,  tempValues, compValues);
-    }
-
-    /**
-     * <summary>
-     *   Retrieves the weight span thermal compensation table previously configured using the
-     *   <c>set_spanAvgCompensationTable</c> function.
-     * <para>
-     *   The weight correction is applied by linear interpolation between specified points.
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <param name="tempValues">
-     *   array of floating point numbers, that is filled by the function
-     *   with all averaged temperatures for which an span correction is specified.
-     * </param>
-     * <param name="compValues">
-     *   array of floating point numbers, that is filled by the function
-     *   with the span correction applied for each of the temperature
-     *   included in the first argument, index by index.
-     * </param>
-     * <returns>
-     *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns a negative error code.
-     * </para>
-     */
-    public virtual async Task<int> loadSpanAvgCompensationTable(List<double> tempValues,List<double> compValues)
-    {
-        return await this.loadCompensationTable(2,  tempValues, compValues);
-    }
-
-    /**
-     * <summary>
-     *   Records a weight span thermal compensation table, in order to automatically correct the
-     *   measured weight based on the variation of temperature.
-     * <para>
-     *   The weight correction will be applied by linear interpolation between specified points.
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <param name="tempValues">
-     *   array of floating point numbers, corresponding to all variations of
-     *   temperatures for which a span correction is specified.
-     * </param>
-     * <param name="compValues">
-     *   array of floating point numbers, corresponding to the span correction
-     *   (in percents) to apply for each of the temperature variation included
-     *   in the first argument, index by index.
-     * </param>
-     * <returns>
-     *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns a negative error code.
-     * </para>
-     */
-    public virtual async Task<int> set_spanChgCompensationTable(List<double> tempValues,List<double> compValues)
-    {
-        return await this.setCompensationTable(3,  tempValues, compValues);
-    }
-
-    /**
-     * <summary>
-     *   Retrieves the weight span thermal compensation table previously configured using the
-     *   <c>set_spanChgCompensationTable</c> function.
-     * <para>
-     *   The weight correction is applied by linear interpolation between specified points.
-     * </para>
-     * <para>
-     * </para>
-     * </summary>
-     * <param name="tempValues">
-     *   array of floating point numbers, that is filled by the function
-     *   with all variation of temperature for which an span correction is specified.
-     * </param>
-     * <param name="compValues">
-     *   array of floating point numbers, that is filled by the function
-     *   with the span correction applied for each of variation of temperature
-     *   included in the first argument, index by index.
-     * </param>
-     * <returns>
-     *   <c>YAPI.SUCCESS</c> if the call succeeds.
-     * </returns>
-     * <para>
-     *   On failure, throws an exception or returns a negative error code.
-     * </para>
-     */
-    public virtual async Task<int> loadSpanChgCompensationTable(List<double> tempValues,List<double> compValues)
-    {
-        return await this.loadCompensationTable(3,  tempValues, compValues);
-    }
-
-    /**
-     * <summary>
-     *   Continues the enumeration of weighing scale sensors started using <c>yFirstWeighScale()</c>.
+     *   Continues the enumeration of multi-cell weighing scale sensors started using <c>yFirstMultiCellWeighScale()</c>.
      * <para>
      * </para>
      * </summary>
      * <returns>
-     *   a pointer to a <c>YWeighScale</c> object, corresponding to
-     *   a weighing scale sensor currently online, or a <c>null</c> pointer
-     *   if there are no more weighing scale sensors to enumerate.
+     *   a pointer to a <c>YMultiCellWeighScale</c> object, corresponding to
+     *   a multi-cell weighing scale sensor currently online, or a <c>null</c> pointer
+     *   if there are no more multi-cell weighing scale sensors to enumerate.
      * </returns>
      */
-    public YWeighScale nextWeighScale()
+    public YMultiCellWeighScale nextMultiCellWeighScale()
     {
         string next_hwid;
         try {
@@ -1058,57 +805,57 @@ public class YWeighScale : YSensor
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindWeighScaleInContext(_yapi, next_hwid);
+        return FindMultiCellWeighScaleInContext(_yapi, next_hwid);
     }
 
     /**
      * <summary>
-     *   Starts the enumeration of weighing scale sensors currently accessible.
+     *   Starts the enumeration of multi-cell weighing scale sensors currently accessible.
      * <para>
-     *   Use the method <c>YWeighScale.nextWeighScale()</c> to iterate on
-     *   next weighing scale sensors.
+     *   Use the method <c>YMultiCellWeighScale.nextMultiCellWeighScale()</c> to iterate on
+     *   next multi-cell weighing scale sensors.
      * </para>
      * </summary>
      * <returns>
-     *   a pointer to a <c>YWeighScale</c> object, corresponding to
-     *   the first weighing scale sensor currently online, or a <c>null</c> pointer
+     *   a pointer to a <c>YMultiCellWeighScale</c> object, corresponding to
+     *   the first multi-cell weighing scale sensor currently online, or a <c>null</c> pointer
      *   if there are none.
      * </returns>
      */
-    public static YWeighScale FirstWeighScale()
+    public static YMultiCellWeighScale FirstMultiCellWeighScale()
     {
         YAPIContext yctx = YAPI.imm_GetYCtx();
-        string next_hwid = yctx._yHash.imm_getFirstHardwareId("WeighScale");
+        string next_hwid = yctx._yHash.imm_getFirstHardwareId("MultiCellWeighScale");
         if (next_hwid == null)  return null;
-        return FindWeighScaleInContext(yctx, next_hwid);
+        return FindMultiCellWeighScaleInContext(yctx, next_hwid);
     }
 
     /**
      * <summary>
-     *   Starts the enumeration of weighing scale sensors currently accessible.
+     *   Starts the enumeration of multi-cell weighing scale sensors currently accessible.
      * <para>
-     *   Use the method <c>YWeighScale.nextWeighScale()</c> to iterate on
-     *   next weighing scale sensors.
+     *   Use the method <c>YMultiCellWeighScale.nextMultiCellWeighScale()</c> to iterate on
+     *   next multi-cell weighing scale sensors.
      * </para>
      * </summary>
      * <param name="yctx">
      *   a YAPI context.
      * </param>
      * <returns>
-     *   a pointer to a <c>YWeighScale</c> object, corresponding to
-     *   the first weighing scale sensor currently online, or a <c>null</c> pointer
+     *   a pointer to a <c>YMultiCellWeighScale</c> object, corresponding to
+     *   the first multi-cell weighing scale sensor currently online, or a <c>null</c> pointer
      *   if there are none.
      * </returns>
      */
-    public static YWeighScale FirstWeighScaleInContext(YAPIContext yctx)
+    public static YMultiCellWeighScale FirstMultiCellWeighScaleInContext(YAPIContext yctx)
     {
-        string next_hwid = yctx._yHash.imm_getFirstHardwareId("WeighScale");
+        string next_hwid = yctx._yHash.imm_getFirstHardwareId("MultiCellWeighScale");
         if (next_hwid == null)  return null;
-        return FindWeighScaleInContext(yctx, next_hwid);
+        return FindMultiCellWeighScaleInContext(yctx, next_hwid);
     }
 
 #pragma warning restore 1998
-    //--- (end of YWeighScale implementation)
+    //--- (end of YMultiCellWeighScale implementation)
 }
 }
 

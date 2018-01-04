@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YHTTPRequest.cs 29398 2017-12-08 09:20:22Z seb $
+ * $Id: YHTTPRequest.cs 29422 2017-12-11 14:21:59Z seb $
  *
  * internal yHTTPRequest object
  *
@@ -237,8 +237,8 @@ namespace com.yoctopuce.YoctoAPI
                 } else if (read > 0) {
                     _lastReceiveTime = YAPI.GetTickCount();
                     if (imm_HandleIncommingData(buffer, read)) {
-                        //todo handle request restart due to autentification
-                        throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "Authentificaitno not yet supported");
+                        closeSocket();
+                        goto retry;
                     }
                     if (_reuse_socket) {
                         byte[] tmp = _result.ToArray();
