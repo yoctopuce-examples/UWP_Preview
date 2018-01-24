@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YHTTPHub.cs 29015 2017-10-24 16:29:41Z seb $
+ * $Id: YHTTPHub.cs 29694 2018-01-23 08:52:49Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -255,12 +255,7 @@ namespace com.yoctopuce.YoctoAPI
             List<WPEntry> whitePages = new List<WPEntry>();
 
             YJSONObject loadval = new YJSONObject(json_data);
-            try {
-                loadval.parse();
-            } catch (Exception ex) {
-                Debug.WriteLine(ex.Message);
-                throw;
-            }
+            loadval.parse();
             if (!loadval.has("services") || !loadval.getYJSONObject("services").has("whitePages")) {
                 throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Device " + _http_params.Host + " is not a hub");
             }

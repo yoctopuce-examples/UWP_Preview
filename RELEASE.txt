@@ -1,3 +1,3 @@
-- Add YMultiCellWeighScale class
-- Add support for HTTP authentication
-- Fix IO error due to socket closed by remote host
+- Fix Authentication for WebSocket
+- Fix exception on YAPI.FreeAPI
+- Remove debug logs

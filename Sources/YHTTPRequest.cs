@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YHTTPRequest.cs 29422 2017-12-11 14:21:59Z seb $
+ * $Id: YHTTPRequest.cs 29700 2018-01-23 16:52:36Z seb $
  *
  * internal yHTTPRequest object
  *
@@ -166,21 +166,27 @@ namespace com.yoctopuce.YoctoAPI
                     _in = _socket.InputStream.AsStreamForRead();
                     log(String.Format(" - new socket ({0} / {1})", _socket.ToString(), _in.ToString()));
                 }
-                try {
-                    readTask = _in.ReadAsync(buffer, 0, buffer.Length);
-                    Task task = await Task.WhenAny(readTask, Task.Delay(1));
-                    if (task == readTask) {
-                        string msg = "suspect data received before request. Reset the socket";
-                        log(msg);
-                        throw new YAPI_Exception(YAPI.IO_ERROR, msg);
-                    }
-                } catch (Exception e) {
-                    if (_reuse_socket) {
+                readTask = _in.ReadAsync(buffer, 0, buffer.Length);
+                if (_reuse_socket) {
+                    try {
+                        Task task = await Task.WhenAny(readTask, Task.Delay(0));
+                        if (task == readTask) {
+                            int read = readTask.Result;
+                            if (read == 0) {
+                                //socket has been reseted
+                                closeSocket();
+                                goto retry;
+                            }
+
+                            string msg = "suspect data received before request. Reset the socket";
+                            log(msg);
+                            throw new Exception(msg);
+                        }
+                    } catch (Exception e) {
                         log("Reset socket connection:" + e.Message);
                         closeSocket();
                         goto retry;
                     }
-                    throw;
                 }
             } catch (Exception e) {
                 log("Exception on socket connection:" + e.Message);
@@ -193,7 +199,6 @@ namespace com.yoctopuce.YoctoAPI
                 await _out.FlushAsync();
                 _lastReceiveTime = 0;
             } catch (Exception e) {
-                log(e.ToString());
                 closeSocket();
                 throw new YAPI_Exception(YAPI.IO_ERROR, e.Message);
             }
@@ -208,7 +213,8 @@ namespace com.yoctopuce.YoctoAPI
                         now = YAPI.GetTickCount();
                         ulong read_timeout = _startRequestTime + _requestTimeout;
                         if (read_timeout < now) {
-                            throw new YAPI_Exception(YAPI.TIMEOUT, string.Format("Hub did not send data during {0:D}ms", YAPI.GetTickCount() - _lastReceiveTime));
+                            string msg = string.Format("Hub did not send data during {0:D}ms", YAPI.GetTickCount() - _lastReceiveTime);
+                            throw new YAPI_Exception(YAPI.TIMEOUT,msg);
                         }
                         read_timeout -= now;
                         if (read_timeout > YIO_IDLE_TCP_TIMEOUT) {

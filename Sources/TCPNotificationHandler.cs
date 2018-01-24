@@ -15,7 +15,7 @@ namespace com.yoctopuce.YoctoAPI
         private Dictionary<YDevice, YHTTPRequest> _httpReqByDev = new Dictionary<YDevice, YHTTPRequest>();
         private Task _runTask = null;
         private string _fifo;
-        private CancellationToken _token;
+        private CancellationToken _cancellationToken;
 
         internal TCPNotificationHandler(YHTTPHub hub) : base(hub)
         { }
@@ -23,8 +23,8 @@ namespace com.yoctopuce.YoctoAPI
 
         public override Task Start()
         {
-            _token = _tokenSource.Token;
-            _runTask = Task.Run(Run, _token);
+            _cancellationToken = _tokenSource.Token;
+             _runTask = Task.Run(Run, _cancellationToken);            
             return Task.FromResult(0);
         }
 
@@ -33,6 +33,7 @@ namespace com.yoctopuce.YoctoAPI
             foreach (YHTTPRequest req in _httpReqByDev.Values) {
                 await req.EnsureLastRequestDone();
             }
+
             _tokenSource.Cancel();
             if (_runTask != null) {
                 try {
@@ -46,6 +47,7 @@ namespace com.yoctopuce.YoctoAPI
                 } finally {
                     _tokenSource.Dispose();
                 }
+
                 _tokenSource = null;
                 _runTask = null;
             }
@@ -57,7 +59,7 @@ namespace com.yoctopuce.YoctoAPI
 
         private async Task Run()
         {
-            _token.ThrowIfCancellationRequested();
+            _cancellationToken.ThrowIfCancellationRequested();
             YHTTPRequest yreq = new YHTTPRequest((YHTTPHub) _hub, "Notification of " + _hub.RootUrl);
             try {
                 String notUrl;
@@ -66,6 +68,7 @@ namespace com.yoctopuce.YoctoAPI
                 } else {
                     notUrl = string.Format("GET /not.byn?abs=%d", _notifyPos);
                 }
+
                 _fifo = "";
                 _connected = true;
                 await yreq.RequestProgress(notUrl, ProgressCb);
@@ -74,21 +77,25 @@ namespace com.yoctopuce.YoctoAPI
                 _notifRetryCount++;
                 _hub._devListValidity = 500;
                 _error_delay = 100 << (_notifRetryCount > 4 ? 4 : _notifRetryCount);
+            } catch (OperationCanceledException) {
+                _connected = false;
+                throw;
             } catch (Exception ex) {
                 Debug.WriteLine(ex.Message);
             }
+
             _connected = false;
-            //yreq.imm_requestStop();
         }
 
         private void ProgressCb(byte[] partial, int size)
         {
-            _token.ThrowIfCancellationRequested();
+            _cancellationToken.ThrowIfCancellationRequested();
             if (partial != null) {
                 //todo: replace string by something more efficient
-                string s = YAPI.DefaultEncoding.GetString(partial,0,size);
+                string s = YAPI.DefaultEncoding.GetString(partial, 0, size);
                 _fifo += s;
             }
+
             int pos;
             do {
                 pos = _fifo.IndexOf("\n");
@@ -103,8 +110,10 @@ namespace com.yoctopuce.YoctoAPI
                         handleNetNotification(line);
                     }
                 }
+
                 _fifo = _fifo.Substring(pos + 1);
             } while (pos >= 0);
+
             _error_delay = 0;
         }
 
@@ -121,6 +130,7 @@ namespace com.yoctopuce.YoctoAPI
             if (!_httpReqByDev.ContainsKey(device)) {
                 _httpReqByDev[device] = new YHTTPRequest(_hub, "Device " + device.SerialNumber);
             }
+
             YHTTPRequest req = _httpReqByDev[device];
             byte[] result = await req.RequestSync(req_first_line, req_head_and_body, mstimeout);
             ulong stop = YAPI.GetTickCount();
@@ -135,6 +145,7 @@ namespace com.yoctopuce.YoctoAPI
             if (!_httpReqByDev.ContainsKey(device)) {
                 _httpReqByDev[device] = new YHTTPRequest(_hub, "Device " + device.SerialNumber);
             }
+
             YHTTPRequest req = _httpReqByDev[device];
             await req.RequestAsync(req_first_line, req_head_and_body, asyncResult, asyncContext);
             ulong stop = YAPI.GetTickCount();

@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YModule.cs 29240 2017-11-23 13:29:57Z seb $
+ * $Id: YModule.cs 29558 2018-01-04 15:44:28Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -42,9 +42,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace com.yoctopuce.YoctoAPI {
-    
-
+namespace com.yoctopuce.YoctoAPI
+{
     //--- (generated code: YModule class start)
 /**
  * <summary>
@@ -161,7 +160,8 @@ public class YModule : YFunction
 
 
         // Return the internal device object hosting the function
-        protected internal virtual YDevice imm_getDev() {
+        protected internal virtual YDevice imm_getDev()
+        {
             string devid = _func;
             int dotidx = devid.IndexOf('.');
             if (dotidx >= 0) {
@@ -175,13 +175,14 @@ public class YModule : YFunction
         }
 
         /// <param name="func"> : functionid </param>
-        protected internal YModule(YAPIContext yctx, string func) : base(yctx, func, "Module") {
+        protected internal YModule(YAPIContext yctx, string func) : base(yctx, func, "Module")
+        {
             //--- (generated code: YModule attributes initialization)
         //--- (end of generated code: YModule attributes initialization)
         }
 
-        protected internal YModule(string func) : this(YAPI.imm_GetYCtx(),func) {
-        }
+        protected internal YModule(string func) : this(YAPI.imm_GetYCtx(), func)
+        { }
 #pragma warning disable 1998
 
         /// <summary>
@@ -190,7 +191,8 @@ public class YModule : YFunction
         /// <returns> the number of functions on the module
         /// </returns>
         /// <exception cref="YAPI_Exception"> on error </exception>
-        public virtual async Task<int> functionCount() {
+        public virtual async Task<int> functionCount()
+        {
             YDevice dev = imm_getDev();
             return dev.imm_functionCount();
         }
@@ -204,7 +206,8 @@ public class YModule : YFunction
         /// <returns> a string corresponding to the unambiguous hardware identifier of the requested module function
         /// </returns>
         /// <exception cref="YAPI_Exception"> on error </exception>
-        public virtual async Task<string> functionId(int functionIndex) {
+        public virtual async Task<string> functionId(int functionIndex)
+        {
             YDevice dev = imm_getDev();
             return dev.imm_getYPEntry(functionIndex).FuncId;
         }
@@ -218,7 +221,8 @@ public class YModule : YFunction
         /// <returns> a the type of the function
         /// </returns>
         /// <exception cref="YAPI_Exception"> on error </exception>
-        public virtual async Task<string> functionType(int functionIndex) {
+        public virtual async Task<string> functionType(int functionIndex)
+        {
             YDevice dev = imm_getDev();
             return dev.imm_getYPEntry(functionIndex).Classname;
         }
@@ -231,7 +235,8 @@ public class YModule : YFunction
         /// <returns> a the type of the function
         /// </returns>
         /// <exception cref="YAPI_Exception"> on error </exception>
-        public virtual async Task<string> functionBaseType(int functionIndex) {
+        public virtual async Task<string> functionBaseType(int functionIndex)
+        {
             YDevice dev = imm_getDev();
             return dev.imm_getYPEntry(functionIndex).BaseType;
         }
@@ -245,7 +250,8 @@ public class YModule : YFunction
         /// <returns> a string corresponding to the logical name of the requested module function
         /// </returns>
         /// <exception cref="YAPI_Exception"> on error </exception>
-        public virtual async Task<string> functionName(int functionIndex) {
+        public virtual async Task<string> functionName(int functionIndex)
+        {
             YDevice dev = imm_getDev();
             return dev.imm_getYPEntry(functionIndex).LogicalName;
         }
@@ -260,7 +266,8 @@ public class YModule : YFunction
         /// module function
         /// </returns>
         /// <exception cref="YAPI_Exception"> on error </exception>
-        public virtual async Task<string> functionValue(int functionIndex) {
+        public virtual async Task<string> functionValue(int functionIndex)
+        {
             YDevice dev = imm_getDev();
             return dev.imm_getYPEntry(functionIndex).AdvertisedValue;
         }
@@ -273,7 +280,8 @@ public class YModule : YFunction
         /// <param name="callback"> : the callback function to call, or a null pointer. The callback function should take two
         ///         arguments: the module object that emitted the log message, and the character string containing the log.
         ///  </param>
-        public virtual async Task registerLogCallback(LogCallback callback) {
+        public virtual async Task registerLogCallback(LogCallback callback)
+        {
             _logCallback = callback;
             YDevice ydev = _yapi._yHash.imm_getDevice(_serialNumber);
             if (ydev != null) {
@@ -282,26 +290,26 @@ public class YModule : YFunction
         }
 
 
-        internal virtual async Task<LogCallback> get_logCallback() {
+        internal virtual async Task<LogCallback> get_logCallback()
+        {
             return _logCallback;
         }
 
-        private byte[] imm_flattenJsonStruct(byte[] actualSettings) {
+        private byte[] imm_flattenJsonStruct(byte[] actualSettings)
+        {
             YJSONArray jsonout = new YJSONArray();
-            string accutalSettingsStr = YAPI.DefaultEncoding.GetString(actualSettings);            
+            string accutalSettingsStr = YAPI.DefaultEncoding.GetString(actualSettings);
             YJSONObject json = new YJSONObject(accutalSettingsStr);
             json.parse();
             List<string> functionList = json.keys();
-            foreach (string fun_key in functionList)
-            {
+            foreach (string fun_key in functionList) {
                 if (!fun_key.Equals("services")) {
                     YJSONObject functionJson = json.getYJSONObject(fun_key);
                     if (functionJson == null) {
                         continue;
                     }
                     List<string> attr_keys = functionJson.keys();
-                    foreach (string attr_key in attr_keys)
-                    {
+                    foreach (string attr_key in attr_keys) {
                         if (!functionJson.has(attr_key)) {
                             continue;
                         }
@@ -313,7 +321,6 @@ public class YModule : YFunction
                         jsonout.put(flat_attr);
                     }
                 }
-
             }
             return YAPI.DefaultEncoding.GetBytes(jsonout.toJSON());
         }
@@ -325,7 +332,8 @@ public class YModule : YFunction
         /// Otherwise, an empty array will be returned.
         /// </summary>
         /// <returns> an array of strings containing the sub modules. </returns>
-        public virtual async Task<List<string>> get_subDevices() {
+        public virtual async Task<List<string>> get_subDevices()
+        {
             YDevice dev = imm_getDev();
             YGenericHub hub = dev.Hub;
             return hub.imm_get_subDeviceOf(_serialNumber);
@@ -338,7 +346,8 @@ public class YModule : YFunction
         /// empty string is returned.
         /// </summary>
         /// <returns> a string with the serial number of the YoctoHub or an empty string </returns>
-        public virtual async Task<string> get_parentHub() {
+        public virtual async Task<string> get_parentHub()
+        {
             YDevice dev = imm_getDev();
             YGenericHub hub = dev.Hub;
             string hubSerial = hub.SerialNumber;
@@ -354,7 +363,8 @@ public class YModule : YFunction
         /// string 'usb' is returned.
         /// </summary>
         /// <returns> a string with the URL of the module. </returns>
-        public virtual async Task<string> get_url() {
+        public virtual async Task<string> get_url()
+        {
             YDevice dev = imm_getDev();
             YGenericHub hub = dev.Hub;
             return hub.imm_get_urlOf(_serialNumber);
@@ -2120,8 +2130,5 @@ public class YModule : YFunction
 
 #pragma warning restore 1998
     //--- (end of generated code: YModule implementation)
-
-
-     }
-
+    }
 }
