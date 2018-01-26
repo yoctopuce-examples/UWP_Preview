@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YGenericHub.cs 28647 2017-09-26 12:21:17Z seb $
+ * $Id: YGenericHub.cs 29769 2018-01-26 08:54:48Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -113,8 +113,7 @@ namespace com.yoctopuce.YoctoAPI
         protected internal ulong _devListValidity = 500;
         protected internal ulong _devListExpires = 0;
 
-        protected internal readonly ConcurrentDictionary<int, string> _serialByYdx =
-            new ConcurrentDictionary<int, string>();
+        protected internal readonly ConcurrentDictionary<int, string> _serialByYdx = new ConcurrentDictionary<int, string>();
 
         protected internal Dictionary<string, YDevice> _devices = new Dictionary<string, YDevice>();
         protected internal readonly bool _reportConnnectionLost;
@@ -152,6 +151,7 @@ namespace com.yoctopuce.YoctoAPI
                 } else {
                     funcValType = funcval[ofs++] & 0xff;
                 }
+
                 switch (funcValType) {
                     case PUBVAL_LEGACY:
                         // fallback to legacy handling, just in case
@@ -170,6 +170,7 @@ namespace com.yoctopuce.YoctoAPI
                             b = c & 0xf;
                             buffer += (b > 9) ? b + 'a' - 10 : b + '0';
                         }
+
                         return buffer;
                     case PUBVAL_C_LONG:
                     case PUBVAL_YOCTO_FLOAT_E3:
@@ -186,10 +187,12 @@ namespace com.yoctopuce.YoctoAPI
                             while (endp > 0 && buffer[endp - 1] == '0') {
                                 --endp;
                             }
+
                             if (endp > 0 && buffer[endp - 1] == '.') {
                                 --endp;
                                 buffer = buffer.Substring(0, endp);
                             }
+
                             return buffer;
                         }
                     case PUBVAL_C_FLOAT:
@@ -201,10 +204,12 @@ namespace com.yoctopuce.YoctoAPI
                         while (endp > 0 && buffer[endp - 1] == '0') {
                             --endp;
                         }
+
                         if (endp > 0 && buffer[endp - 1] == '.') {
                             --endp;
                             buffer = buffer.Substring(0, endp);
                         }
+
                         return buffer;
                     default:
                         return "?";
@@ -217,14 +222,15 @@ namespace com.yoctopuce.YoctoAPI
                 if (funcval[len + ofs] == 0) {
                     break;
                 }
+
                 len++;
             }
+
             return YAPI.DefaultEncoding.GetString(funcval, ofs, len);
         }
 
 
-        protected internal virtual async Task updateFromWpAndYp(List<WPEntry> whitePages,
-            Dictionary<string, List<YPEntry>> yellowPages)
+        protected internal virtual async Task updateFromWpAndYp(List<WPEntry> whitePages, Dictionary<string, List<YPEntry>> yellowPages)
         {
             // by default consider all known device as unplugged
             List<YDevice> toRemove = new List<YDevice>(_devices.Values);
@@ -241,6 +247,7 @@ namespace com.yoctopuce.YoctoAPI
                     } else if (currdev.Beacon > 0 != wp.Beacon > 0) {
                         await currdev.refresh();
                     }
+
                     toRemove.Remove(currdev);
                 } else {
                     YDevice dev = new YDevice(this, wp, yellowPages);
@@ -265,6 +272,7 @@ namespace com.yoctopuce.YoctoAPI
                     }
                 }
             }
+
             _yctx._yHash.imm_reindexYellowPages(yellowPages);
         }
 
@@ -280,6 +288,7 @@ namespace com.yoctopuce.YoctoAPI
                     return _http_params.imm_getUrl(true, false) + dev._wpRec.NetworkUrl;
                 }
             }
+
             return _http_params.imm_getUrl(true, false);
         }
 
@@ -295,8 +304,10 @@ namespace com.yoctopuce.YoctoAPI
                         return res;
                     }
                 }
+
                 res.Add(devSerialNumber);
             }
+
             return res;
         }
 
@@ -312,20 +323,19 @@ namespace com.yoctopuce.YoctoAPI
         }
 
         //called from Jni
-        protected internal virtual void imm_handleTimedNotification(string serial, string funcid, double deviceTime,
-            sbyte[] report)
+        protected internal virtual void imm_handleTimedNotification(string serial, string funcid, double deviceTime, sbyte[] report)
         {
             List<int> arrayList = new List<int>(report.Length);
             foreach (sbyte b in report) {
                 int i = b & 0xff;
                 arrayList.Add(i);
             }
+
             imm_handleTimedNotification(serial, funcid, deviceTime, arrayList);
         }
 
 
-        protected internal virtual void imm_handleTimedNotification(string serial, string funcid, double deviceTime,
-            List<int> report)
+        protected internal virtual void imm_handleTimedNotification(string serial, string funcid, double deviceTime, List<int> report)
         {
             string hwid = serial + "." + funcid;
             YFunction func = _yctx._GetTimedReportCallback(hwid);
@@ -347,18 +357,15 @@ namespace com.yoctopuce.YoctoAPI
 
         internal delegate Task UpdateProgress(int percent, string message);
 
-        internal abstract Task<List<string>> firmwareUpdate(string serial, YFirmwareFile firmware, byte[] settings,
-            UpdateProgress progress);
+        internal abstract Task<List<string>> firmwareUpdate(string serial, YFirmwareFile firmware, byte[] settings, UpdateProgress progress);
 
         internal delegate void RequestAsyncResult(object context, byte[] result, int error, string errmsg);
 
         internal delegate void RequestProgress(object context, int acked, int total);
 
-        internal abstract Task devRequestAsync(YDevice device, string req_first_line, byte[] req_head_and_body,
-            RequestAsyncResult asyncResult, object asyncContext);
+        internal abstract Task devRequestAsync(YDevice device, string req_first_line, byte[] req_head_and_body, RequestAsyncResult asyncResult, object asyncContext);
 
-        internal abstract Task<byte[]> devRequestSync(YDevice device, string req_first_line, byte[] req_head_and_body,
-            RequestProgress progress, object context);
+        internal abstract Task<byte[]> devRequestSync(YDevice device, string req_first_line, byte[] req_head_and_body, RequestProgress progress, object context);
 
         protected internal class HTTPParams
         {
@@ -367,6 +374,7 @@ namespace com.yoctopuce.YoctoAPI
             internal readonly string _user;
             internal readonly string _pass;
             internal readonly string _proto;
+            internal readonly string _subdomain;
 
             public HTTPParams(string url)
             {
@@ -374,6 +382,9 @@ namespace com.yoctopuce.YoctoAPI
                 if (url.StartsWith("ws://", StringComparison.Ordinal)) {
                     pos = 5;
                     _proto = "ws";
+                } else if (url.StartsWith("wss://", StringComparison.Ordinal)) {
+                    pos = 6;
+                    _proto = "wss";
                 } else if (url.StartsWith("usb://", StringComparison.Ordinal)) {
                     pos = 6;
                     _proto = "usb";
@@ -383,6 +394,7 @@ namespace com.yoctopuce.YoctoAPI
                         pos = 7;
                     }
                 }
+
                 int end_auth = url.IndexOf('@', pos);
                 int end_user = url.IndexOf(':', pos);
                 if (end_auth >= 0 && end_user >= 0 && end_user < end_auth) {
@@ -393,13 +405,28 @@ namespace com.yoctopuce.YoctoAPI
                     _user = "";
                     _pass = "";
                 }
+
                 if (url.Length > pos && url[pos] == '@') {
                     pos++;
                 }
+
                 int end_url = url.IndexOf('/', pos);
                 if (end_url < 0) {
                     end_url = url.Length;
+                    _subdomain = "";
+                } else {
+                    int next_slash = url.IndexOf('/', end_url + 1);
+                    if (next_slash < 0) {
+                        next_slash = url.Length;
+                    }
+                    int length = next_slash - end_url;
+                    if (length > 0) {
+                        _subdomain = url.Substring(end_url, length);
+                    } else {
+                        _subdomain = "";
+                    }
                 }
+
                 int portpos = url.IndexOf(':', pos);
                 if (portpos > 0 && portpos < end_url) {
                     _host = url.Substring(pos, portpos - pos);
@@ -430,29 +457,32 @@ namespace com.yoctopuce.YoctoAPI
                 get { return imm_getUrl(false, true); }
             }
 
-
             internal virtual string imm_getUrl(bool withProto, bool withUserPass)
             {
                 StringBuilder url = new StringBuilder();
                 if (withProto) {
                     url.Append(_proto).Append("://");
                 }
+
                 if (withUserPass && !_user.Equals("")) {
                     url.Append(_user);
                     if (!_pass.Equals("")) {
                         url.Append(":");
                         url.Append(_pass);
                     }
+
                     url.Append("@");
                 }
+
                 url.Append(_host);
                 url.Append(":");
                 url.Append(_port);
+                url.Append(_subdomain);
                 return url.ToString();
             }
 
             public virtual bool WebSocket {
-                get { return _proto.Equals("ws"); }
+                get { return _proto.Equals("ws") || _proto.Equals("wss"); }
             }
 
             public virtual bool imm_hasAuthParam()

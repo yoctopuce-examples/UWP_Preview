@@ -220,7 +220,7 @@ namespace com.yoctopuce.YoctoAPI
             _webSock.Control.MessageType = SocketMessageType.Binary;
             _webSock.MessageReceived += WebSock_MessageReceived;
             _webSock.Closed += WebSock_Closed;
-            string url = "ws://" + _hub._http_params.imm_getUrl(false, false) + "/not.byn";
+            string url = _hub._http_params.imm_getUrl(true, false) + "/not.byn";
             Uri serverUri = new Uri(url);
 
             try {
@@ -792,8 +792,8 @@ namespace com.yoctopuce.YoctoAPI
 
         private void WSLOG(string msg)
         {
-            int thid = Environment.CurrentManagedThreadId;
-            Debug.WriteLine("[" + thid + "]:" + msg);
+            //int thid = Environment.CurrentManagedThreadId;
+            //Debug.WriteLine("[" + thid + "]:" + msg);
         }
 
 
