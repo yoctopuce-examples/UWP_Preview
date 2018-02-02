@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMultiCellWeighScale.cs 29661 2018-01-18 13:32:13Z mvuilleu $
+ * $Id: YMultiCellWeighScale.cs 29804 2018-01-30 18:05:21Z mvuilleu $
  *
  * Implements FindMultiCellWeighScale(), the high-level API for MultiCellWeighScale functions
  *
@@ -478,14 +478,17 @@ public class YMultiCellWeighScale : YSensor
 
     /**
      * <summary>
-     *   Changes the compensation temperature update rate, in percents.
+     *   Changes the zero tracking threshold value.
      * <para>
+     *   When this threshold is larger than
+     *   zero, any measure under the threshold will automatically be ignored and the
+     *   zero compensation will be updated.
      * </para>
      * <para>
      * </para>
      * </summary>
      * <param name="newval">
-     *   a floating point number corresponding to the compensation temperature update rate, in percents
+     *   a floating point number corresponding to the zero tracking threshold value
      * </param>
      * <para>
      * </para>
@@ -767,7 +770,7 @@ public class YMultiCellWeighScale : YSensor
 
     /**
      * <summary>
-     *   Adapts the load cells signal bias (stored in the corresponding genericSensor)
+     *   Adapts the load cell signal bias (stored in the corresponding genericSensor)
      *   so that the current signal corresponds to a zero weight.
      * <para>
      * </para>
