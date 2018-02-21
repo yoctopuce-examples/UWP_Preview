@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YFunction.cs 29015 2017-10-24 16:29:41Z seb $
+ * $Id: YFunction.cs 30017 2018-02-21 12:43:54Z seb $
  *
  * YFunction Class (virtual class, used internally)
  *
@@ -663,32 +663,7 @@ public class YFunction
 
         protected string imm_escapeAttr(string changeval)
         {
-            string espcaped = "";
-            int i = 0;
-            char c = '\0';
-            string h = null;
-            for (i = 0; i < changeval.Length; i++) {
-                c = changeval[i];
-                if (c <= ' ' || (c > 'z' && c != '~') || c == '"' || c == '%' || c == '&' ||
-                    c == '+' || c == '<' || c == '=' || c == '>' || c == '\\' || c == '^' || c == '`') {
-                    int hh;
-                    if ((c == 0xc2 || c == 0xc3) && (i + 1 < changeval.Length) && (changeval[i + 1] & 0xc0) == 0x80) {
-                        // UTF8-encoded ISO-8859-1 character: translate to plain ISO-8859-1
-                        hh = (c & 1) * 0x40;
-                        i++;
-                        hh += changeval[i];
-                    } else {
-                        hh = c;
-                    }
-                    h = hh.ToString("X");
-                    if ((h.Length < 2))
-                        h = "0" + h;
-                    espcaped += "%" + h;
-                } else {
-                    espcaped += c;
-                }
-            }
-            return espcaped;
+            return YAPIContext.imm_escapeAttr(changeval);
         }
 
         // Change the value of an attribute on a device, and update cache on the fly
@@ -698,8 +673,8 @@ public class YFunction
             if (newval == null) {
                 throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Undefined value to set for attribute " + attr);
             }
-            string attrname = imm_escapeAttr(attr);
-            string extra = "/" + attrname + "?" + attrname + "=" + imm_escapeAttr(newval) + "&.";
+            string attrname = YAPIContext.imm_escapeAttr(attr);
+            string extra = "/" + attrname + "?" + attrname + "=" + YAPIContext.imm_escapeAttr(newval) + "&.";
             await _devRequest(extra);
             if (_cacheExpiration != 0) {
                 _cacheExpiration = YAPI.GetTickCount();

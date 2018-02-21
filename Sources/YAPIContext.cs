@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YAPIContext.cs 29423 2017-12-11 14:46:46Z seb $
+ * $Id: YAPIContext.cs 30017 2018-02-21 12:43:54Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -383,6 +383,36 @@ namespace com.yoctopuce.YoctoAPI
             return funcid.Substring(0, 1).ToUpperInvariant() + funcid.Substring(1, classlen - 1);
         }
 
+
+        internal static string imm_escapeAttr(string changeval)
+        {
+            string espcaped = "";
+            int i = 0;
+            char c = '\0';
+            string h = null;
+            for (i = 0; i < changeval.Length; i++) {
+                c = changeval[i];
+                if (c <= ' ' || (c > 'z' && c != '~') || c == '"' || c == '%' || c == '&' ||
+                    c == '+' || c == '<' || c == '=' || c == '>' || c == '\\' || c == '^' || c == '`') {
+                    int hh;
+                    if ((c == 0xc2 || c == 0xc3) && (i + 1 < changeval.Length) && (changeval[i + 1] & 0xc0) == 0x80) {
+                        // UTF8-encoded ISO-8859-1 character: translate to plain ISO-8859-1
+                        hh = (c & 1) * 0x40;
+                        i++;
+                        hh += changeval[i];
+                    } else {
+                        hh = c;
+                    }
+                    h = hh.ToString("X");
+                    if ((h.Length < 2))
+                        h = "0" + h;
+                    espcaped += "%" + h;
+                } else {
+                    espcaped += c;
+                }
+            }
+            return espcaped;
+        }
 
         public ulong DefaultCacheValidity = 5;
 

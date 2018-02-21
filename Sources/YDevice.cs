@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YDevice.cs 29015 2017-10-24 16:29:41Z seb $
+ * $Id: YDevice.cs 30017 2018-02-21 12:43:54Z seb $
  *
  * Internal YDevice class
  *
@@ -132,12 +132,15 @@ namespace com.yoctopuce.YoctoAPI
             if (_cache_expiration > YAPI.GetTickCount()) {
                 return _cache_json;
             }
+
             string request;
             if (_cache_json == null) {
                 request = "GET /api.json \r\n\r\n";
             } else {
-                request = "GET /api.json?fw=" + _cache_json.getYJSONObject("module").getString("firmwareRelease") + " \r\n\r\n";
+                string fw = _cache_json.getYJSONObject("module").getString("firmwareRelease");
+                request = "GET /api.json?fw=" + YAPIContext.imm_escapeAttr(fw) + " \r\n\r\n";
             }
+
             string yreq = await requestHTTPSyncAsString(request, null);
 
             YJSONObject cache_json;
@@ -148,6 +151,7 @@ namespace com.yoctopuce.YoctoAPI
                 _cache_json = null;
                 throw new YAPI_Exception(YAPI.IO_ERROR, "Request failed, could not parse API (" + ex.Message + ")");
             }
+
             this._cache_expiration = YAPI.GetTickCount() + YAPI.DefaultCacheValidity;
             this._cache_json = cache_json;
             return cache_json;
@@ -170,6 +174,7 @@ namespace com.yoctopuce.YoctoAPI
                             _moduleYPEntry.LogicalName = _wpRec.LogicalName;
                             reindex = true;
                         }
+
                         _wpRec.Beacon = module.getInt("beacon");
                     } else if (!key.Equals("services")) {
                         YJSONObject func = loadval.getYJSONObject(key);
@@ -179,16 +184,19 @@ namespace com.yoctopuce.YoctoAPI
                         } else {
                             name = _wpRec.LogicalName;
                         }
+
                         if (func.has("advertisedValue")) {
                             string pubval = func.getString("advertisedValue");
                             _hub._yctx._yHash.imm_setFunctionValue(_wpRec.SerialNumber + "." + key, pubval);
                         }
+
                         for (int f = 0; f < _ypRecs.Count; f++) {
                             if (_ypRecs[f].FuncId.Equals(key)) {
                                 if (!_ypRecs[f].LogicalName.Equals(name)) {
                                     _ypRecs[f].LogicalName = name;
                                     reindex = true;
                                 }
+
                                 break;
                             }
                         }
@@ -197,9 +205,11 @@ namespace com.yoctopuce.YoctoAPI
             } catch (Exception e) {
                 throw new YAPI_Exception(YAPI.IO_ERROR, "Request failed, could not parse API result (" + e.Message + ")");
             }
+
             if (reindex) {
                 _hub._yctx._yHash.imm_reindexDevice(this);
             }
+
             return YAPI.SUCCESS;
         }
 
@@ -220,6 +230,7 @@ namespace com.yoctopuce.YoctoAPI
             if (idx < _ypRecs.Count) {
                 return _ypRecs[idx];
             }
+
             return null;
         }
 
@@ -247,10 +258,12 @@ namespace com.yoctopuce.YoctoAPI
             if (words.Length < 2) {
                 throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Invalid request, not enough words; expected a method name and a URL");
             }
+
             string relativeUrl = words[1];
             if (relativeUrl[0] != '/') {
                 relativeUrl = "/" + relativeUrl;
             }
+
             return string.Format("{0} {1}{2}", words[0], _wpRec.NetworkUrl, relativeUrl);
         }
 
@@ -276,16 +289,19 @@ namespace com.yoctopuce.YoctoAPI
                 _logIsPulling = false;
                 return;
             }
+
             if (_logCallback == null) {
                 _logIsPulling = false;
                 return;
             }
+
             string resultStr = YAPI.DefaultEncoding.GetString(result, 0, result.Length);
             int pos = resultStr.LastIndexOf("@", StringComparison.Ordinal);
             if (pos < 0) {
                 _logIsPulling = false;
                 return;
             }
+
             string logs = resultStr.Substring(0, pos);
             string posStr = resultStr.Substring(pos + 1);
             _logpos = Convert.ToInt32(posStr);
@@ -294,6 +310,7 @@ namespace com.yoctopuce.YoctoAPI
             foreach (string line in lines) {
                 _logCallback(module, line);
             }
+
             _logIsPulling = false;
         }
 
@@ -302,6 +319,7 @@ namespace com.yoctopuce.YoctoAPI
             if (_logCallback == null || _logIsPulling) {
                 return;
             }
+
             _logIsPulling = true;
             string request = "GET logs.txt?pos=" + _logpos;
             try {
@@ -327,6 +345,7 @@ namespace com.yoctopuce.YoctoAPI
             do {
                 boundary = string.Format("Zz{0:x6}zZ", randomGenerator.Next(0x1000000));
             } while (mp_header.Contains(boundary) && YAPIContext.imm_find_in_bytes(content, YAPI.DefaultEncoding.GetBytes(boundary)) >= 0);
+
             //construct header parts
             string header_start = "Content-Type: multipart/form-data; boundary=" + boundary + "\r\n\r\n--" + boundary + "\r\n" + mp_header;
             string header_stop = "\r\n--" + boundary + "--\r\n";

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPwmInput.cs 29015 2017-10-24 16:29:41Z seb $
+ * $Id: YPwmInput.cs 29968 2018-02-19 15:12:34Z seb $
  *
  * Implements FindPwmInput(), the high-level API for PwmInput functions
  *
@@ -111,6 +111,8 @@ public class YPwmInput : YSensor
     public const int PWMREPORTMODE_PWM_CPS = 5;
     public const int PWMREPORTMODE_PWM_CPM = 6;
     public const int PWMREPORTMODE_PWM_STATE = 7;
+    public const int PWMREPORTMODE_PWM_FREQ_CPS = 8;
+    public const int PWMREPORTMODE_PWM_FREQ_CPM = 9;
     public const int PWMREPORTMODE_INVALID = -1;
     /**
      * <summary>
@@ -383,9 +385,10 @@ public class YPwmInput : YSensor
      *   a value among <c>YPwmInput.PWMREPORTMODE_PWM_DUTYCYCLE</c>, <c>YPwmInput.PWMREPORTMODE_PWM_FREQUENCY</c>,
      *   <c>YPwmInput.PWMREPORTMODE_PWM_PULSEDURATION</c>, <c>YPwmInput.PWMREPORTMODE_PWM_EDGECOUNT</c>,
      *   <c>YPwmInput.PWMREPORTMODE_PWM_PULSECOUNT</c>, <c>YPwmInput.PWMREPORTMODE_PWM_CPS</c>,
-     *   <c>YPwmInput.PWMREPORTMODE_PWM_CPM</c> and <c>YPwmInput.PWMREPORTMODE_PWM_STATE</c> corresponding
-     *   to the parameter (frequency/duty cycle, pulse width, edges count) returned by the get_currentValue
-     *   function and callbacks
+     *   <c>YPwmInput.PWMREPORTMODE_PWM_CPM</c>, <c>YPwmInput.PWMREPORTMODE_PWM_STATE</c>,
+     *   <c>YPwmInput.PWMREPORTMODE_PWM_FREQ_CPS</c> and <c>YPwmInput.PWMREPORTMODE_PWM_FREQ_CPM</c>
+     *   corresponding to the parameter (frequency/duty cycle, pulse width, edges count) returned by the
+     *   get_currentValue function and callbacks
      * </returns>
      * <para>
      *   On failure, throws an exception or returns <c>YPwmInput.PWMREPORTMODE_INVALID</c>.
@@ -418,9 +421,10 @@ public class YPwmInput : YSensor
      *   a value among <c>YPwmInput.PWMREPORTMODE_PWM_DUTYCYCLE</c>, <c>YPwmInput.PWMREPORTMODE_PWM_FREQUENCY</c>,
      *   <c>YPwmInput.PWMREPORTMODE_PWM_PULSEDURATION</c>, <c>YPwmInput.PWMREPORTMODE_PWM_EDGECOUNT</c>,
      *   <c>YPwmInput.PWMREPORTMODE_PWM_PULSECOUNT</c>, <c>YPwmInput.PWMREPORTMODE_PWM_CPS</c>,
-     *   <c>YPwmInput.PWMREPORTMODE_PWM_CPM</c> and <c>YPwmInput.PWMREPORTMODE_PWM_STATE</c> corresponding
-     *   to the  parameter  type (frequency/duty cycle, pulse width, or edge count) returned by the
-     *   get_currentValue function and callbacks
+     *   <c>YPwmInput.PWMREPORTMODE_PWM_CPM</c>, <c>YPwmInput.PWMREPORTMODE_PWM_STATE</c>,
+     *   <c>YPwmInput.PWMREPORTMODE_PWM_FREQ_CPS</c> and <c>YPwmInput.PWMREPORTMODE_PWM_FREQ_CPM</c>
+     *   corresponding to the  parameter  type (frequency/duty cycle, pulse width, or edge count) returned
+     *   by the get_currentValue function and callbacks
      * </param>
      * <para>
      * </para>

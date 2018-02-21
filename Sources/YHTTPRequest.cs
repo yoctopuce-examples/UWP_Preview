@@ -1,6 +1,6 @@
 ﻿/*********************************************************************
  *
- * $Id: YHTTPRequest.cs 29700 2018-01-23 16:52:36Z seb $
+ * $Id: YHTTPRequest.cs 30019 2018-02-21 12:52:03Z seb $
  *
  * internal yHTTPRequest object
  *
@@ -68,7 +68,6 @@ namespace com.yoctopuce.YoctoAPI
         private bool _header_found;
         private readonly MemoryStream _result = new MemoryStream(1024);
         private ulong _startRequestTime;
-        private ulong _lastReceiveTime;
         private ulong _requestTimeout;
 
 
@@ -86,10 +85,12 @@ namespace com.yoctopuce.YoctoAPI
             _reqNum = global_reqNum++;
         }
 
+        //private StringBuilder debugLogs = new StringBuilder(1024);
+
         // ReSharper disable once UnusedParameter.Local
         private void log(string msg)
         {
-            //Debug.WriteLine(string.Format("{0}:{1}:{2}:{3}", Environment.CurrentManagedThreadId, _dbglabel, _reqNum, msg));
+            //debugLogs.Append(string.Format("{0}:{1}:{2}:{3}\n", Environment.CurrentManagedThreadId, _dbglabel, _reqNum, msg));
         }
 
 
@@ -113,6 +114,7 @@ namespace com.yoctopuce.YoctoAPI
         private void closeSocket()
         {
             if (_socket != null) {
+                _socket.Dispose();
                 _socket = null;
                 _in = null;
                 _out = null;
@@ -160,7 +162,6 @@ namespace com.yoctopuce.YoctoAPI
                     int port = _hub._http_params.Port;
                     _socket.Control.NoDelay = true;
                     string port_str = port.ToString();
-                    log(String.Format(" - connect to {0}:{1}", _hub._http_params.Host, port_str));
                     await _socket.ConnectAsync(serverHost, port_str);
                     _out = _socket.OutputStream.AsStreamForWrite();
                     _in = _socket.InputStream.AsStreamForRead();
@@ -174,6 +175,7 @@ namespace com.yoctopuce.YoctoAPI
                             int read = readTask.Result;
                             if (read == 0) {
                                 //socket has been reseted
+                                log(String.Format(" - reset socket {0} {1})", _socket.ToString(), read));
                                 closeSocket();
                                 goto retry;
                             }
@@ -197,7 +199,6 @@ namespace com.yoctopuce.YoctoAPI
             try {
                 await _out.WriteAsync(full_request, 0, full_request.Length);
                 await _out.FlushAsync();
-                _lastReceiveTime = 0;
             } catch (Exception e) {
                 closeSocket();
                 throw new YAPI_Exception(YAPI.IO_ERROR, e.Message);
@@ -213,8 +214,7 @@ namespace com.yoctopuce.YoctoAPI
                         now = YAPI.GetTickCount();
                         ulong read_timeout = _startRequestTime + _requestTimeout;
                         if (read_timeout < now) {
-                            string msg = string.Format("Hub did not send data during {0:D}ms", YAPI.GetTickCount() - _lastReceiveTime);
-                            throw new YAPI_Exception(YAPI.TIMEOUT,msg);
+                            throw new YAPI_Exception(YAPI.TIMEOUT, string.Format("Request took too long {0:D}ms", now - _startRequestTime));
                         }
                         read_timeout -= now;
                         if (read_timeout > YIO_IDLE_TCP_TIMEOUT) {
@@ -227,7 +227,8 @@ namespace com.yoctopuce.YoctoAPI
                     Task task = await Task.WhenAny(readTask, Task.Delay(waitms));
                     now = YAPI.GetTickCount();
                     if (task != readTask) {
-                        throw new YAPI_Exception(YAPI.TIMEOUT, string.Format("Request took too long {0:D}ms", now - _startRequestTime));
+                        string msg = string.Format("Hub did not send data during {0:D}ms", waitms);
+                        throw new YAPI_Exception(YAPI.TIMEOUT, msg);
                     }
                     read = readTask.Result;
                     log(String.Format("_requestProcesss read ={0:d} after{1}", read, now - _startRequestTime));
@@ -241,7 +242,6 @@ namespace com.yoctopuce.YoctoAPI
                     log("end of connection " + _dbglabel);
                     eof = true;
                 } else if (read > 0) {
-                    _lastReceiveTime = YAPI.GetTickCount();
                     if (imm_HandleIncommingData(buffer, read)) {
                         closeSocket();
                         goto retry;
@@ -259,7 +259,9 @@ namespace com.yoctopuce.YoctoAPI
                 }
             } while (!eof);
 
-            if (_result.Length == 0) {
+            if (_header.Length==0 && _result.Length == 0) {
+                //String full_log = debugLogs.ToString();
+                // todo: remove debug logs
                 Debug.WriteLine("Short request detected");
             }
             return _result.ToArray();
