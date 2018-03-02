@@ -1,8 +1,13 @@
-Yoctopuce library for UWP
-=========================
+Preview of Yoctopuce library for UWP (DEPRECATED)
+=================================================
+
+Important: this is an old version of Yoctopuce library for UWP. It has 
+been preserved on GitHub to avoid breaking dependencies, but is not any 
+more updated. The official Yoctopuce library for Universal Windows Platform (UWP) 
+is available here: https://github.com/yoctopuce/yoctolib_uwp
+
 
 ## License information
-
 
 Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
 
